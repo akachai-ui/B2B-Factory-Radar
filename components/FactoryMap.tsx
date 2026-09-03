@@ -313,7 +313,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         markersCluster.clearLayers();
         const bounds = [[userLocation.lat, userLocation.lng]];
 
-        leads.forEach((lead, index) => {
+        leads.forEach((lead) => {
           if (!lead.lat || !lead.lng) return;
 
           // Calculate distance from user's live position
@@ -325,9 +325,6 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
             const maxKm = parseFloat(selectedRadius);
             if (distKm > maxKm) return;
           }
-
-          const isSamplePreview = !isLoggedIn && index < 3; // 3 Free Samples on Landing Page
-          const isMaskedGuestPin = !isLoggedIn && !isSamplePreview;
 
           const statusRecord = leadStatuses[lead.place_id] || { status: 'NEW' as LeadStatus };
           const status = statusRecord.status;
@@ -351,18 +348,14 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
             </div>
           `;
 
-          // Color Pin Icon based on Pillar 1 Stages or VIP Sample
+          // Color Pin Icon based on Pillar 1 Stages
           let pinColorBg = 'bg-blue-600';
           let pinBorder = 'border-blue-400';
           let pinEmoji = '🏢';
           let statusBadgeText = t('statusNew');
           let statusBadgeClass = 'bg-slate-100 text-slate-700 border-slate-200';
 
-          if (isSamplePreview) {
-            pinColorBg = 'bg-gradient-to-tr from-amber-500 to-yellow-400';
-            pinBorder = 'border-yellow-200 ring-2 ring-amber-400 animate-pulse';
-            pinEmoji = '⭐';
-          } else if (status === 'CONTACTED') {
+          if (status === 'CONTACTED') {
             pinColorBg = 'bg-amber-500';
             pinBorder = 'border-amber-300 ring-2 ring-amber-400/50';
             pinEmoji = '📞';
@@ -406,7 +399,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
           });
 
           const cleanPhone = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : '';
-          const maskedPhone = cleanPhone ? cleanPhone.slice(0, 5) + '-XXXX' : '02-xxx-XXXX';
+          const maskedPhone = cleanPhone ? cleanPhone.slice(0, 5) + '-XXXX' : '02-740-XXXX';
           const cleanEmail = lead.email ? lead.email.split(',')[0].trim() : '';
 
           // Corporate Intelligence Search URLs for Company Quick Fact
@@ -415,79 +408,33 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
 
           let popupHtml = '';
 
-          if (isSamplePreview) {
-            // 1. FREE SAMPLE FACTORY PREVIEW (1 of 3)
+          if (!isLoggedIn) {
+            // STRATEGY 1: HIGH-VALUE MASKED TEASER FOR ALL FACTORIES
             popupHtml = `
-              <div class="p-1 space-y-2 text-slate-800 min-w-[270px] max-w-[320px]">
+              <div class="p-2 space-y-2 text-slate-800 min-w-[260px] max-w-[310px]">
                 <div class="flex items-center justify-between gap-1">
-                  <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[10px] font-black border border-amber-300 flex items-center gap-1">
-                    <span>⭐ ตัวอย่างฟรี (1 ใน 3 หมุด)</span>
+                  <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-900 text-[10px] font-black">
+                    📍 ${locationTag}
                   </span>
                   <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 text-[10px] font-black border border-emerald-300">
                     ✓ ประตูทางเข้า 100%
                   </span>
                 </div>
-                
+
                 <h3 class="font-black text-sm text-slate-900 leading-snug">${lead.name}</h3>
-                <p class="text-[11px] text-slate-600 leading-tight">${lead.address}</p>
+                <p class="text-[11px] text-slate-500 leading-tight">${lead.address ? lead.address.slice(0, 35) + '...' : 'พิกัดประตูทางเข้าโรงงาน'}</p>
                 
                 ${distanceBadge}
 
-                <!-- Direct Call & Google Gate Navigation -->
-                <div class="grid grid-cols-2 gap-1.5 pt-0.5">
-                  ${
-                    lead.phone
-                      ? `<a href="tel:${cleanPhone}" class="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow-xs transition cursor-pointer">
-                          <span>📞 ${t('callNow')}</span>
-                         </a>`
-                      : `<div class="py-2 px-3 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs text-center">${t('noPhone')}</div>`
-                  }
-                  
-                  <a href="${mapsNavUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1 shadow-xs transition">
-                    <span>📍 ${t('navigateGoogle')}</span>
-                  </a>
-                </div>
-
-                <!-- Company Quick Fact Button -->
-                <a href="${dbdSearchUrl}" target="_blank" rel="noopener noreferrer" class="block w-full p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-xs font-bold text-center transition shadow-xs">
-                  <span>🔍 ตรวจสอบทุนจดทะเบียน DBD</span>
-                </a>
-
-                <div class="p-2 rounded-xl bg-slate-900 text-white text-center space-y-1">
-                  <div class="text-[10px] text-amber-300 font-bold">ต้องการข้อมูลโรงงานอีก 1,000+ แห่ง?</div>
-                  <button onclick="window.requireAuthFromMap()" class="w-full py-1.5 px-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 text-[11px] font-black cursor-pointer hover:from-amber-400 hover:to-amber-300">
-                    👑 ปลดล็อกคลังข้อมูลทั้งหมดฟรี
-                  </button>
-                </div>
-              </div>
-            `;
-          } else if (isMaskedGuestPin) {
-            // 2. MASKED TEASER FOR REMAINING 1,000+ FACTORIES
-            popupHtml = `
-              <div class="p-2 space-y-2 text-slate-800 min-w-[260px] max-w-[300px]">
-                <div class="flex items-center justify-between gap-1">
-                  <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-black">
-                    📍 ${locationTag}
-                  </span>
-                  <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[10px] font-black border border-amber-300 flex items-center gap-1">
-                    <span>🔒 ข้อมูลพิเศษ</span>
-                  </span>
-                </div>
-
-                <h3 class="font-black text-sm text-slate-900 leading-snug">${lead.name}</h3>
-                <p class="text-[11px] text-slate-500 leading-tight">📍 พิกัดประตูทางเข้าโรงงาน (100% Gate Verified)</p>
-                
-                ${distanceBadge}
-
-                <!-- Masked Company Intel Card -->
+                <!-- Masked Company Intel Box -->
                 <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
                   <div class="flex items-center justify-between">
                     <span class="text-slate-500 font-bold text-[11px]">📞 เบอร์โทรตรงโรงงาน:</span>
-                    <span class="font-mono font-bold text-slate-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">${maskedPhone}</span>
+                    <span class="font-mono font-black text-slate-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-300 tracking-wider">${maskedPhone}</span>
                   </div>
                   <div class="flex items-center justify-between">
                     <span class="text-slate-500 font-bold text-[11px]">💰 ทุนจดทะเบียน DBD:</span>
-                    <span class="font-bold text-emerald-700">พร้อมตรวจสอบ</span>
+                    <span class="font-black text-emerald-700">พร้อมตรวจสอบ (นิติบุคคล)</span>
                   </div>
                 </div>
 
@@ -497,7 +444,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
               </div>
             `;
           } else {
-            // 3. FULL LOGGED IN DASHBOARD POPUP
+            // FULL LOGGED IN DASHBOARD POPUP
             popupHtml = `
               <div class="p-1 space-y-2 text-slate-800 min-w-[260px] max-w-[320px]">
                 <div class="flex items-center justify-between gap-1">
@@ -580,7 +527,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
 
           // Mobile bottom sheet trigger or desktop popup
           marker.on('click', () => {
-            if (isMaskedGuestPin) {
+            if (!isLoggedIn) {
               if (onRequireAuth) onRequireAuth();
               return;
             }
