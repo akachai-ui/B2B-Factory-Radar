@@ -22,18 +22,18 @@ export const translations: Record<Language, Record<string, string>> = {
     heroHeadline1: 'ประหยัดค่าจ้างพนักงานได้หลายส่วน',
     heroHeadline2: 'ฝ่ายขายไม่ต้องเสียเวลากับการวางแผน',
     heroHeadline3: 'มีหน้าที่ออกไปขายและปิดดีลอย่างเดียว',
-    heroSub: 'รวบรวม 4 ระบบอัจฉริยะไว้ในที่เดียว: สืบค้นข้อมูลบริษัท + วางแผนการเดินทางด้วย Live GPS + บริหารจัดการข้อมูลโรงงาน 1,000+ แห่ง + แดชบอร์ดติดตามงานขาย จบปัญหาเซลส์เสียเวลานั่งงมหาทาง หรือจ้างคนมาทำเอกสาร',
+    heroSub: 'รวบรวม 4 ระบบอัจฉริยะไว้ในที่เดียว: สืบค้นข้อมูลบริษัท + วางแผนการเดินทางด้วย Live GPS + บริหารจัดการข้อมูลโรงงานครอบคลุม 6 อำเภอ 990+ แห่ง + แดชบอร์ดติดตามงานขาย จบปัญหาเซลส์เสียเวลานั่งงมหาทาง หรือจ้างคนมาทำเอกสาร',
     
     pillar1Title: '1. ค้นหาข้อมูลบริษัท & DBD',
     pillar1Desc: 'เช็กทุนจดทะเบียน สถานะนิติบุคคล และเบอร์โทรศัพท์ตรงของบริษัทในคลิกเดียว ไม่ต้องจ้างคนนั่งค้นหาข้อมูล',
     pillar2Title: '2. วางแผนการเดินทางอัจฉริยะ',
     pillar2Desc: 'Live GPS คำนวณระยะทางจากรถ นำทางตรงถึงประตูทางเข้าโรงงาน 100% ประหยัดเวลาหลงทาง 3 ชม./วัน',
-    pillar3Title: '3. บริหารจัดการข้อมูลโรงงาน',
-    pillar3Desc: 'คลังเป้าหมาย 1,000+ แห่ง แบ่งตามโซนนิคมฯ บางพลี, บางปู, สุขสวัสดิ์ ฯลฯ เปิดจอแล้วเลือกเจาะได้ทันที',
+    pillar3Title: '3. บริหารจัดการข้อมูลโรงงาน (ครอบคลุม 6 อำเภอ)',
+    pillar3Desc: 'คลังเป้าหมาย 990+ แห่ง ครอบคลุม 6 อำเภออุตสาหกรรมในสมุทรปราการ (บางพลี, บางปู, พระประแดง ฯลฯ) เปิดจอแล้วเลือกเจาะได้ทันที',
     pillar4Title: '4. แดชบอร์ดติดตามงานขาย',
     pillar4Desc: 'บันทึกสถานะและโน้ตการโทรผ่านมือถือ ไม่ต้องจ้างแอดมินคอยกรอก Excel หรือตามงาน',
 
-    unlockFreeTrialBtn: 'ทดลองใช้งานฟรี (ปลดล็อก 1,000+ โรงงาน)',
+    unlockFreeTrialBtn: 'ทดลองใช้งานฟรี (ปลดล็อก 6 อำเภอ 990+ โรงงาน)',
     viewLiveRadarBtn: 'ดูเรดาร์แผนที่สด',
     enterCommandBtn: 'เข้าสู่ศูนย์บัญชาการเป้าหมาย',
 
@@ -67,12 +67,12 @@ export const translations: Record<Language, Record<string, string>> = {
     compRadar2: 'Live GPS คำนวณเส้นทางและนำทางอัตโนมัติ: บอกโรงงานที่ใกล้ตัวที่สุด ขับตรงถึงประตูผู้ติดต่อ',
     compRadar3: 'แดชบอร์ดอัปเดตสถานะทันทีบนมือถือ: ปรับสถานะ โทรแล้ว, นัดเข้าพบ, เสนอราคา ใน 1 วินาที',
 
-    radarTitle: 'ศูนย์บัญชาการพิกัดโรงงาน 1,000+ แห่ง (เปิดจอแล้ววิ่งได้ทันที)',
+    radarTitle: 'ศูนย์บัญชาการพิกัดโรงงาน 6 อำเภอ 990+ แห่ง (เปิดจอแล้ววิ่งได้ทันที)',
     screeningLabel: 'ระบบคัดกรอง:',
     gateVerifiedBadge: 'พิกัดประตูทางเข้า 100%',
 
     // Zones & Territories
-    zoneAll: '🌐 ทุกโซน / ทุกพื้นที่ (1,000+ แห่ง)',
+    zoneAll: '🌐 ทุกโซน / ครอบคลุม 6 อำเภอ (990+ แห่ง)',
     zoneBangPhli: '📍 โซนบางพลี - กิ่งแก้ว (384 แห่ง)',
     zoneBangpoo: '📍 โซนนิคมฯ บางปู - แพรกษา (328 แห่ง)',
     zoneAsiaSuvarnabhumi: '📍 โซนนิคมฯ เอเชียสุวรรณภูมิ',
@@ -81,7 +81,7 @@ export const translations: Record<Language, Record<string, string>> = {
     zonePhraSamut: '📍 โซนพระสมุทรเจดีย์ (115 แห่ง)',
     zoneBangBo: '📍 โซนบางบ่อ (87 แห่ง)',
     zoneMueang: '📍 โซนเมืองสมุทรปราการ',
-    allDistricts: '🏛️ ทุกอำเภอ (1,000+ แห่ง)',
+    allDistricts: '🏛️ ทุกอำเภอในสมุทรปราการ (990+ แห่ง)',
     allSubdistricts: '🏘️ ทุกตำบล',
 
     // Near Me & Radius Filter
@@ -147,7 +147,7 @@ export const translations: Record<Language, Record<string, string>> = {
     mapView: 'แผนที่สด',
     tableView: 'ตารางรายชื่อ',
     tableTitle: 'คลังเป้าหมายโรงงานพร้อมเจาะ (Verified Leads Directory)',
-    tableSub: 'รายชื่อโรงงาน 1,000+ แห่ง พร้อมสถานะติดตามงาน เบอร์โทรศัพท์ตรงของบริษัท และปุ่มเช็กข้อมูลนิติบุคคล',
+    tableSub: 'รายชื่อโรงงานครอบคลุม 6 อำเภอ 990+ แห่ง พร้อมสถานะติดตามงาน เบอร์โทรศัพท์ตรงของบริษัท และปุ่มเช็กข้อมูลนิติบุคคล',
     allUnlockedBadge: 'Verified 100%',
     accessDatabaseText: 'ฐานข้อมูลโรงงานฉีดพลาสติก & แม่พิมพ์ สมุทรปราการ',
 
@@ -189,18 +189,18 @@ export const translations: Record<Language, Record<string, string>> = {
     heroHeadline1: 'Save Multiple Employee Salaries',
     heroHeadline2: 'Sales Reps Waste Zero Time Planning',
     heroHeadline3: 'Focus 100% on Pitching and Closing Deals',
-    heroSub: 'All-in-one smart platform: Instant Company & DBD Research + Live GPS Route Planning + 1,000+ Factory Lead Engine + Sales Pipeline CRM. Eliminate manual route planning and admin paperwork.',
+    heroSub: 'All-in-one smart platform: Instant Company & DBD Research + Live GPS Route Planning + 990+ Factory Lead Engine Across 6 Districts + Sales Pipeline CRM. Eliminate manual route planning and admin paperwork.',
     
     pillar1Title: '1. Instant Company & DBD Research',
     pillar1Desc: 'Instant registered capital, legal status, and direct company phone lines in 1 click. Zero need for data research headcount.',
     pillar2Title: '2. Smart Travel & Route Planning',
     pillar2Desc: 'Live GPS calculates distances from your car and routes 100% to the entrance gate. Saves 3 hours of lost travel time daily.',
-    pillar3Title: '3. 1,000+ Factory Lead Management',
-    pillar3Desc: 'Comprehensive catalog of 1,000+ target factories segmented across Bang Phli, Bangpoo, Suksawat, etc. Ready to pitch instantly.',
+    pillar3Title: '3. 990+ Factory Leads (6 Districts)',
+    pillar3Desc: 'Comprehensive catalog of 990+ target factories across 6 industrial districts in Samut Prakan (Bang Phli, Bangpoo, Suksawat, etc.). Ready to pitch instantly.',
     pillar4Title: '4. Mobile Sales Pipeline Dashboard',
     pillar4Desc: 'Log call stages and notes instantly on mobile. Eliminates the need for sales admins to manage messy Excel sheets.',
 
-    unlockFreeTrialBtn: 'Start Free Trial (Unlock 1,000+ Factories)',
+    unlockFreeTrialBtn: 'Start Free Trial (Unlock 990+ Factories across 6 Districts)',
     viewLiveRadarBtn: 'Explore Live Map Radar',
     enterCommandBtn: 'Enter Radar Command Center',
 
@@ -234,12 +234,12 @@ export const translations: Record<Language, Record<string, string>> = {
     compRadar2: 'Live GPS Routing: Auto-detects closest factories and navigates directly to the contact entrance gate.',
     compRadar3: 'Real-Time Mobile Dashboard: Update stages (Contacted, Meeting, Quoted) in 1 second.',
 
-    radarTitle: '1,000+ Factory Radar Command Center (Open & Drive Instantly)',
+    radarTitle: '990+ Factory Radar Command Center across 6 Districts (Open & Drive Instantly)',
     screeningLabel: 'Lead Verification:',
     gateVerifiedBadge: '100% Gate Verified',
 
     // Zones & Territories
-    zoneAll: '🌐 All Industrial Zones (1,000+)',
+    zoneAll: '🌐 All 6 Industrial Districts (990+)',
     zoneBangPhli: '📍 Bang Phli - King Kaew Zone (384)',
     zoneBangpoo: '📍 Bangpoo Industrial Estate Zone (328)',
     zoneAsiaSuvarnabhumi: '📍 Asia Suvarnabhumi Estate Zone',
@@ -248,7 +248,7 @@ export const translations: Record<Language, Record<string, string>> = {
     zonePhraSamut: '📍 Phra Samut Chedi Zone (115)',
     zoneBangBo: '📍 Bang Bo Zone (87)',
     zoneMueang: '📍 Mueang Samut Prakan Zone',
-    allDistricts: '🏛️ All Districts (1,000+)',
+    allDistricts: '🏛️ All Districts in Samut Prakan (990+)',
     allSubdistricts: '🏘️ All Subdistricts',
 
     // Near Me & Radius Filter
@@ -314,7 +314,7 @@ export const translations: Record<Language, Record<string, string>> = {
     mapView: 'Live Radar',
     tableView: 'CRM Table',
     tableTitle: 'Verified Target Factory Directory (Pillar 1)',
-    tableSub: '1,000+ target factories with live contact stages, direct company phone lines, and DBD corporate size check buttons.',
+    tableSub: '990+ target factories across 6 districts with live contact stages, direct company phone lines, and DBD corporate size check buttons.',
     allUnlockedBadge: 'Verified 100%',
     accessDatabaseText: 'Plastic injection molding & tooling factories in Samut Prakan',
 
@@ -356,18 +356,18 @@ export const translations: Record<Language, Record<string, string>> = {
     heroHeadline1: '节省多岗位员工薪资支出',
     heroHeadline2: '销售团队无需耗时制定路线',
     heroHeadline3: '专注于客户拜访与一键关单',
-    heroSub: '四大智能系统合一：企业工商即时核验 + 随车动态GPS路线规划 + 1,000+ 精准工厂线索库 + 移动端销售漏斗看板。告别传统繁琐规划与手工报表。',
+    heroSub: '四大智能系统合一：企业工商即时核验 + 随车动态GPS路线规划 + 覆盖6大行政区990+ 精准工厂线索库 + 移动端销售漏斗看板。告别传统繁琐规划与手工报表。',
     
     pillar1Title: '1. 企业工商与注册资本即时查询',
     pillar1Desc: '一键核验注册资本、法人及企业直通电话，无需雇佣数据专员搜索。',
     pillar2Title: '2. 智能随车导航与行程规划',
     pillar2Desc: '动态GPS自动测距，100%精准定位至工厂大门，每天节省3小时迷路时间。',
-    pillar3Title: '3. 1,000+ 注塑工厂线索库',
-    pillar3Desc: '北榄府 Bang Phli、Bangpoo 等各大工业园区目标工厂一览无余，即开即拓。',
+    pillar3Title: '3. 覆盖6大行政区 990+ 注塑工厂线索库',
+    pillar3Desc: '全量覆盖北榄府6大工业行政区（Bang Phli、Bangpoo、Phra Pradaeng 等）990+ 目标企业，即开即拓。',
     pillar4Title: '4. 移动端销售跟进看板 (CRM)',
     pillar4Desc: '手机端一键切换跟进状态并记录破冰笔记，无需助理统计Excel表格。',
 
-    unlockFreeTrialBtn: '免费试用 (解锁 1,000+ 工厂)',
+    unlockFreeTrialBtn: '免费试用 (解锁6大区域 990+ 工厂)',
     viewLiveRadarBtn: '查看实时雷达地图',
     enterCommandBtn: '进入目标控制中心',
 
@@ -401,12 +401,12 @@ export const translations: Record<Language, Record<string, string>> = {
     compRadar2: '随车GPS智能测距：自动筛选附近最近工厂并直导正门。',
     compRadar3: '移动端实时更新看板：已电联、已约见、已报价1秒完成标注。',
 
-    radarTitle: '1,000+ 家工厂雷达控制中心 (即开即走)',
+    radarTitle: '覆盖6大行政区 990+ 家工厂雷达控制中心 (即开即走)',
     screeningLabel: '数据核验：',
     gateVerifiedBadge: '大门核验 100%',
 
     // Zones & Territories
-    zoneAll: '🌐 全部工业区域 (1,000+ 家)',
+    zoneAll: '🌐 覆盖全府6大工业区 (990+ 家)',
     zoneBangPhli: '📍 邦披区 Bang Phli (384)',
     zoneKingKaew: '📍 金乔路-拉差贴瓦工业带 King Kaew',
     zoneBangpoo: '📍 邦普工业区-帕萨 Bangpoo (328)',
@@ -417,7 +417,7 @@ export const translations: Record<Language, Record<string, string>> = {
     zonePhraSamut: '📍 帕沙木则滴区 Phra Samut (115)',
     zoneBangBo: '📍 邦波区 Bang Bo (87)',
     zoneMueang: '📍 府治区 Mueang',
-    allDistricts: '🏛️ 所有行政区 (1,000+ 家)',
+    allDistricts: '🏛️ 北榄府全部6大行政区 (990+ 家)',
     allSubdistricts: '🏘️ 所有乡镇/街道',
 
     // Near Me & Radius Filter
@@ -483,7 +483,7 @@ export const translations: Record<Language, Record<string, string>> = {
     mapView: '实时雷达',
     tableView: '客户线索表',
     tableTitle: '第一支柱：精准目标工厂库 (Verified Target Catalog)',
-    tableSub: '1,000+ 家注塑工厂库，集成跟进状态、企业直通电话与工商注册资本核查。',
+    tableSub: '覆盖6大行政区 990+ 家注塑工厂库，集成跟进状态、企业直通电话与工商注册资本核查。',
     allUnlockedBadge: '100% 完整权限',
     accessDatabaseText: '已授权访问北榄府注塑与机械制造工厂全量数据',
 

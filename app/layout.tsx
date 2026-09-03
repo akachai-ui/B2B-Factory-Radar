@@ -6,7 +6,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'RouteHunter | ระบบบริหารการขาย & เรดาร์โรงงานอุตสาหกรรม',
-  description: 'RouteHunter - ระบบค้นหาพิกัดโรงงาน 1,000+ แห่ง วางแผนเส้นทางออกพบลูกค้า และ Company Quick Fact (TH / EN / ZH)',
+  description: 'RouteHunter - ระบบค้นหาพิกัดโรงงานครอบคลุม 6 อำเภอ 990+ แห่ง วางแผนเส้นทางออกพบลูกค้า และ Company Quick Fact (TH / EN / ZH)',
   icons: {
     icon: '/favicon.ico',
   },
