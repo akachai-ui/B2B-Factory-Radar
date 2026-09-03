@@ -84,12 +84,10 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
   const locationTag = lead.subdistrict && lead.subdistrict !== 'ไม่ระบุตำบล' ? `${lead.subdistrict} • ${lead.district}` : lead.district;
 
   const cleanPhone = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : '';
+  const maskedPhone = cleanPhone ? cleanPhone.slice(0, 5) + '-XXXX' : '02-740-XXXX';
   const cleanEmail = lead.email ? lead.email.split(',')[0].trim() : '';
 
-  // Company Name Cleaned for Corporate Search
-  const cleanCompanyName = lead.name.replace(/บริษัท|จำกัด|\(มหาชน\)|สาขา.*/gi, '').trim() || lead.name;
   const dbdSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(lead.name + ' ทุนจดทะเบียน DBD')}`;
-  const credenSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(lead.name + ' ข้อมูลงบการเงิน creden dataforthai')}`;
   const mapsNavUrl = lead.maps_url || `https://www.google.com/maps/search/?api=1&query=${lead.lat},${lead.lng}`;
 
   return (
@@ -124,10 +122,10 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
         <div className="p-2.5 rounded-2xl bg-slate-800/60 border border-slate-700/80 space-y-1">
           <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-400">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>พิกัด GPS แม่นยำตรงประตูทางเข้าโรงงาน</span>
+            <span>พิกัด GPS แม่นยำตรงประตูทางเข้าโรงงาน (100% Gate Verified)</span>
           </div>
           <p className="text-xs text-slate-300 leading-tight">
-            {lead.address}
+            {lead.address || 'ถนนสายหลัก โซนนิคมอุตสาหกรรม'}
           </p>
         </div>
 
@@ -140,156 +138,163 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
           <span className="text-amber-300 font-extrabold">({t('drivingTime')} {estMinutes} {t('minutesUnit')})</span>
         </div>
 
-        {/* Pillar 1: Verified Lead Intelligence Details */}
-        <div className="space-y-3 pt-1">
-          
-          {/* Status & Notes Tracking Box */}
-          <div className="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 space-y-2.5">
-            <div className="flex items-center justify-between text-[11px] font-bold">
-              <span className="text-slate-300 font-black">📋 {t('statusLabel')}</span>
-              {savedSuccess && (
-                <span className="text-emerald-400 text-[10px] font-bold flex items-center gap-1 animate-pulse">
-                  <Check className="w-3 h-3" /> บันทึกแล้ว!
+        {/* 1. GUEST VIEW: MASKED TEASER (NO FORCE POPUP) */}
+        {!isLoggedIn ? (
+          <div className="space-y-3 pt-1">
+            <div className="p-3 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 font-bold text-[11px]">📞 เบอร์โทรตรงโรงงาน:</span>
+                <span className="font-mono font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 tracking-wider">
+                  {maskedPhone}
                 </span>
-              )}
-            </div>
-            
-            <select
-              value={currentStatus}
-              onChange={(e) => handleStatusChange(e.target.value as LeadStatus)}
-              className="w-full text-xs font-bold p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none cursor-pointer"
-            >
-              <option value="NEW">⚪ {t('statusNew')}</option>
-              <option value="CONTACTED">🟡 {t('statusContacted')}</option>
-              <option value="MEETING">🟣 {t('statusMeeting')}</option>
-              <option value="QUOTED">🔵 {t('statusQuoted')}</option>
-              <option value="WON">🏆 {t('statusWon')}</option>
-              <option value="LOST">🔴 {t('statusLost')}</option>
-            </select>
-
-            {/* Note input for conversation opening info */}
-            <div className="flex items-center gap-1.5 pt-1">
-              <input
-                type="text"
-                placeholder={t('notePlaceholder')}
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                onBlur={handleNoteSave}
-                className="flex-1 text-[11px] p-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 outline-none"
-              />
-              <button
-                onClick={handleNoteSave}
-                className="px-3 py-2 rounded-xl bg-blue-600 active:bg-blue-500 text-white text-[11px] font-bold shrink-0 cursor-pointer"
-              >
-                บันทึก
-              </button>
-            </div>
-          </div>
-
-          {/* Company Quick Fact Card */}
-          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-850 border border-indigo-500/30 space-y-2.5">
-            <div className="flex items-center gap-1.5 text-xs font-extrabold text-indigo-300">
-              <Building2 className="w-4 h-4 text-indigo-400" />
-              <span>{t('quickFactTitle')}</span>
-            </div>
-            
-            <a
-              href={dbdSearchUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full p-2.5 rounded-xl bg-indigo-950/70 hover:bg-indigo-900/80 border border-indigo-700/60 text-indigo-200 text-xs font-bold flex items-center justify-center gap-1.5 text-center transition active:scale-95"
-              title="เช็กทุนจดทะเบียนและสถานะนิติบุคคล"
-            >
-              <span>🔍 ตรวจสอบทุนจดทะเบียน DBD</span>
-              <ExternalLink className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            </a>
-          </div>
-
-          {/* Email Card with 1-Click Copy */}
-          {cleanEmail && (
-            <button
-              onClick={() => handleCopyEmail(cleanEmail)}
-              className="w-full text-xs text-violet-300 font-mono flex items-center justify-between bg-slate-800/80 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-700 active:scale-95 transition cursor-pointer"
-              title="แตะเพื่อคัดลอกอีเมล"
-            >
-              <div className="flex items-center gap-2 truncate">
-                <Mail className="w-4 h-4 text-violet-400 shrink-0" />
-                <span className="truncate">{cleanEmail}</span>
               </div>
-              <div className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-violet-500/20 text-violet-300 border border-violet-500/30 font-bold shrink-0">
-                {copiedEmail ? (
-                  <>
-                    <Check className="w-3 h-3 text-emerald-400" />
-                    <span className="text-emerald-400">คัดลอกแล้ว</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3 h-3" />
-                    <span>คัดลอก</span>
-                  </>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 font-bold text-[11px]">💰 ทุนจดทะเบียน DBD:</span>
+                <span className="font-black text-emerald-400">พร้อมตรวจสอบ (นิติบุคคล)</span>
+              </div>
+            </div>
+
+            <button
+              onClick={onRequireAuth}
+              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 active:scale-95 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <Sparkles className="w-4 h-4 text-slate-950" />
+              <span>👑 ปลดล็อกเบอร์เต็ม & พิกัดนำทาง</span>
+            </button>
+          </div>
+        ) : (
+          /* 2. LOGGED IN MEMBER VIEW: FULL CRM & ACTIONS */
+          <div className="space-y-3 pt-1">
+            
+            {/* Status & Notes Tracking Box */}
+            <div className="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 space-y-2.5">
+              <div className="flex items-center justify-between text-[11px] font-bold">
+                <span className="text-slate-300 font-black">📋 {t('statusLabel')}</span>
+                {savedSuccess && (
+                  <span className="text-emerald-400 text-[10px] font-bold flex items-center gap-1 animate-pulse">
+                    <Check className="w-3 h-3" /> บันทึกแล้ว!
+                  </span>
                 )}
               </div>
-            </button>
-          )}
-
-          {/* Action Buttons: Call Procurement & Door Navigation */}
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            {lead.phone ? (
-              <a
-                href={`tel:${cleanPhone}`}
-                className="py-3 px-4 rounded-2xl bg-emerald-600 active:bg-emerald-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 active:scale-95 transition"
+              
+              <select
+                value={currentStatus}
+                onChange={(e) => handleStatusChange(e.target.value as LeadStatus)}
+                className="w-full text-xs font-bold p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none cursor-pointer"
               >
-                <Phone className="w-4 h-4" />
-                <span>{t('callNow')}</span>
-              </a>
-            ) : (
-              <div className="py-3 px-4 rounded-2xl bg-slate-800 text-slate-500 font-bold text-xs text-center flex items-center justify-center">
-                {t('noPhone')}
+                <option value="NEW">⚪ {t('statusNew')}</option>
+                <option value="CONTACTED">🟡 {t('statusContacted')}</option>
+                <option value="MEETING">🟣 {t('statusMeeting')}</option>
+                <option value="QUOTED">🔵 {t('statusQuoted')}</option>
+                <option value="WON">🏆 {t('statusWon')}</option>
+                <option value="LOST">🔴 {t('statusLost')}</option>
+              </select>
+
+              {/* Note input for conversation opening info */}
+              <div className="flex items-center gap-1.5 pt-1">
+                <input
+                  type="text"
+                  placeholder={t('notePlaceholder')}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  onBlur={handleNoteSave}
+                  className="flex-1 text-[11px] p-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 outline-none"
+                />
+                <button
+                  onClick={handleNoteSave}
+                  className="px-3 py-2 rounded-xl bg-blue-600 active:bg-blue-500 text-white text-[11px] font-bold shrink-0 cursor-pointer"
+                >
+                  บันทึก
+                </button>
               </div>
+            </div>
+
+            {/* Company Quick Fact Card */}
+            <div className="p-3.5 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-850 border border-indigo-500/30 space-y-2.5">
+              <div className="flex items-center gap-1.5 text-xs font-extrabold text-indigo-300">
+                <Building2 className="w-4 h-4 text-indigo-400" />
+                <span>{t('quickFactTitle')}</span>
+              </div>
+              
+              <a
+                href={dbdSearchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full p-2.5 rounded-xl bg-indigo-950/70 hover:bg-indigo-900/80 border border-indigo-700/60 text-indigo-200 text-xs font-bold flex items-center justify-center gap-1.5 text-center transition active:scale-95"
+                title="เช็กทุนจดทะเบียนและสถานะนิติบุคคล"
+              >
+                <span>🔍 ตรวจสอบทุนจดทะเบียน DBD</span>
+                <ExternalLink className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              </a>
+            </div>
+
+            {/* Email Card with 1-Click Copy */}
+            {cleanEmail && (
+              <button
+                onClick={() => handleCopyEmail(cleanEmail)}
+                className="w-full text-xs text-violet-300 font-mono flex items-center justify-between bg-slate-800/80 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-700 active:scale-95 transition cursor-pointer"
+                title="แตะเพื่อคัดลอกอีเมล"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Mail className="w-4 h-4 text-violet-400 shrink-0" />
+                  <span className="truncate">{cleanEmail}</span>
+                </div>
+                <div className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-violet-500/20 text-violet-300 border border-violet-500/30 font-bold shrink-0">
+                  {copiedEmail ? (
+                    <>
+                      <Check className="w-3 h-3 text-emerald-400" />
+                      <span className="text-emerald-400">คัดลอกแล้ว</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3" />
+                      <span>คัดลอก</span>
+                    </>
+                  )}
+                </div>
+              </button>
             )}
 
-            <a
-              href={mapsNavUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="py-3 px-4 rounded-2xl bg-amber-500 active:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/30 active:scale-95 transition"
-            >
-              <Navigation className="w-4 h-4" />
-              <span>{t('navigateGoogle')}</span>
-            </a>
-          </div>
+            {/* Action Buttons: Call Procurement & Door Navigation */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              {lead.phone ? (
+                <a
+                  href={`tel:${cleanPhone}`}
+                  className="py-3 px-4 rounded-2xl bg-emerald-600 active:bg-emerald-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 active:scale-95 transition"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>{t('callNow')}</span>
+                </a>
+              ) : (
+                <div className="py-3 px-4 rounded-2xl bg-slate-800 text-slate-500 font-bold text-xs text-center flex items-center justify-center">
+                  {t('noPhone')}
+                </div>
+              )}
 
-          {/* Guest Unlock CTA Banner if on landing page */}
-          {!isLoggedIn && (
-            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/10 border border-amber-500/40 text-center space-y-2 mt-2">
-              <div className="text-xs text-amber-300 font-black flex items-center justify-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-                <span>ตัวอย่างโรงงานฟรี (1 ใน 3 แห่ง)</span>
-              </div>
-              <p className="text-[11px] text-slate-300">
-                เข้าสู่ระบบเพื่อปลดล็อกพิกัดประตูทางเข้าและเบอร์โทรตรงโรงงานอีก 1,000+ แห่ง
-              </p>
-              <button
-                onClick={onRequireAuth}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 active:scale-95 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/30 transition cursor-pointer"
+              <a
+                href={mapsNavUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-3 px-4 rounded-2xl bg-amber-500 active:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/30 active:scale-95 transition"
               >
-                👑 ปลดล็อกคลังข้อมูลทั้งหมดฟรี
-              </button>
+                <Navigation className="w-4 h-4" />
+                <span>{t('navigateGoogle')}</span>
+              </a>
             </div>
-          )}
 
-          {lead.website && (
-            <a
-              href={lead.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition"
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span>{t('visitWebsite')}</span>
-            </a>
-          )}
-        </div>
+            {lead.website && (
+              <a
+                href={lead.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>{t('visitWebsite')}</span>
+              </a>
+            )}
+          </div>
+        )}
 
       </div>
     </div>

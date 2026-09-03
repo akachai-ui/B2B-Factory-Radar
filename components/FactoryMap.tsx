@@ -527,10 +527,6 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
 
           // Mobile bottom sheet trigger or desktop popup
           marker.on('click', () => {
-            if (!isLoggedIn) {
-              if (onRequireAuth) onRequireAuth();
-              return;
-            }
             if (window.innerWidth < 640 && onSelectLead) {
               onSelectLead(lead);
             }
