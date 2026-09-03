@@ -32,6 +32,9 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   role TEXT DEFAULT 'owner',            -- 'owner' (เจ้าของ), 'manager' (หัวหน้าเซลส์), 'sales' (พนักงานขาย)
   company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
   company_name TEXT,                    -- Cached display name
+  pdpa_consent BOOLEAN DEFAULT TRUE,    -- สถานะการกดยินยอมรับข้อกำหนด PDPA
+  pdpa_consent_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()), -- เวลาที่กดยินยอม
+  pdpa_version TEXT DEFAULT '1.0-2026', -- เวอร์ชันของสัญญาที่ยินยอม
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
