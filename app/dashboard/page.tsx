@@ -59,7 +59,7 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
 
 // Dynamically import Map component (SSR disabled for Leaflet)
 const FactoryMap = dynamic(
-  () => import('@/components/FactoryMap').then((mod) => mod.FactoryMap),
+  () => import('@/components/FactoryMap').then((mod) => mod.FactoryMap || mod.default),
   {
     ssr: false,
     loading: () => (

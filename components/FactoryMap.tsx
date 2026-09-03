@@ -140,33 +140,46 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    if (window.L && window.L.markerClusterGroup) {
-      setIsLeafletReady(true);
-      return;
+    function checkReady() {
+      if (window.L && (window.L.markerClusterGroup || typeof window.L.markerClusterGroup === 'function')) {
+        setIsLeafletReady(true);
+        return true;
+      }
+      return false;
     }
 
+    if (checkReady()) return;
+
     const checkInterval = setInterval(() => {
-      if (window.L && window.L.markerClusterGroup) {
-        setIsLeafletReady(true);
+      if (checkReady()) {
         clearInterval(checkInterval);
       }
     }, 100);
 
-    // Fallback dynamic script loader if not already present
-    if (!window.L) {
-      const script1 = document.createElement('script');
-      script1.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script1.async = true;
-      script1.onload = () => {
-        const script2 = document.createElement('script');
-        script2.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
-        script2.async = true;
-        script2.onload = () => {
-          setIsLeafletReady(true);
-        };
-        document.body.appendChild(script2);
+    const loadMarkerCluster = () => {
+      if (window.L?.markerClusterGroup) {
+        setIsLeafletReady(true);
+        return;
+      }
+      const s2 = document.createElement('script');
+      s2.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
+      s2.async = true;
+      s2.onload = () => {
+        setIsLeafletReady(true);
       };
-      document.body.appendChild(script1);
+      document.head.appendChild(s2);
+    };
+
+    if (!window.L) {
+      const s1 = document.createElement('script');
+      s1.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      s1.async = true;
+      s1.onload = () => {
+        loadMarkerCluster();
+      };
+      document.head.appendChild(s1);
+    } else if (!window.L.markerClusterGroup) {
+      loadMarkerCluster();
     }
 
     return () => clearInterval(checkInterval);
