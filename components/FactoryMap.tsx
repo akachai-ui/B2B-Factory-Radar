@@ -313,7 +313,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         markersCluster.clearLayers();
         const bounds = [[userLocation.lat, userLocation.lng]];
 
-        leads.forEach((lead) => {
+        leads.forEach((lead, index) => {
           if (!lead.lat || !lead.lng) return;
 
           // Calculate distance from user's live position
@@ -325,6 +325,9 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
             const maxKm = parseFloat(selectedRadius);
             if (distKm > maxKm) return;
           }
+
+          const isSamplePreview = !isLoggedIn && index < 3; // 3 Free Samples on Landing Page
+          const isMaskedGuestPin = !isLoggedIn && !isSamplePreview;
 
           const statusRecord = leadStatuses[lead.place_id] || { status: 'NEW' as LeadStatus };
           const status = statusRecord.status;
@@ -348,14 +351,18 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
             </div>
           `;
 
-          // Color Pin Icon based on Pillar 1 Stages
+          // Color Pin Icon based on Pillar 1 Stages or VIP Sample
           let pinColorBg = 'bg-blue-600';
           let pinBorder = 'border-blue-400';
           let pinEmoji = '🏢';
           let statusBadgeText = t('statusNew');
           let statusBadgeClass = 'bg-slate-100 text-slate-700 border-slate-200';
 
-          if (status === 'CONTACTED') {
+          if (isSamplePreview) {
+            pinColorBg = 'bg-gradient-to-tr from-amber-500 to-yellow-400';
+            pinBorder = 'border-yellow-200 ring-2 ring-amber-400 animate-pulse';
+            pinEmoji = '⭐';
+          } else if (status === 'CONTACTED') {
             pinColorBg = 'bg-amber-500';
             pinBorder = 'border-amber-300 ring-2 ring-amber-400/50';
             pinEmoji = '📞';
@@ -399,116 +406,181 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
           });
 
           const cleanPhone = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : '';
+          const maskedPhone = cleanPhone ? cleanPhone.slice(0, 5) + '-XXXX' : '02-xxx-XXXX';
           const cleanEmail = lead.email ? lead.email.split(',')[0].trim() : '';
 
           // Corporate Intelligence Search URLs for Company Quick Fact
-          const cleanCompanyName = lead.name.replace(/บริษัท|จำกัด|\(มหาชน\)|สาขา.*/gi, '').trim() || lead.name;
           const dbdSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(lead.name + ' ทุนจดทะเบียน DBD')}`;
-          const credenSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(lead.name + ' ข้อมูลงบการเงิน creden dataforthai')}`;
           const mapsNavUrl = lead.maps_url || `https://www.google.com/maps/search/?api=1&query=${lead.lat},${lead.lng}`;
 
-          const popupHtml = !isLoggedIn
-            ? `
-              <div class="p-3 text-center space-y-2.5 text-slate-800 min-w-[240px] max-w-[280px]">
-                <div class="h-10 w-10 mx-auto rounded-2xl bg-amber-500/20 text-amber-600 flex items-center justify-center text-xl font-black shadow-inner">
-                  🔒
+          let popupHtml = '';
+
+          if (isSamplePreview) {
+            // 1. FREE SAMPLE FACTORY PREVIEW (1 of 3)
+            popupHtml = `
+              <div class="p-1 space-y-2 text-slate-800 min-w-[270px] max-w-[320px]">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[10px] font-black border border-amber-300 flex items-center gap-1">
+                    <span>⭐ ตัวอย่างฟรี (1 ใน 3 หมุด)</span>
+                  </span>
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 text-[10px] font-black border border-emerald-300">
+                    ✓ ประตูทางเข้า 100%
+                  </span>
                 </div>
-                <div class="space-y-1">
-                  <div class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-black">
-                    📍 พิกัดโรงงานอุตสาหกรรม
+                
+                <h3 class="font-black text-sm text-slate-900 leading-snug">${lead.name}</h3>
+                <p class="text-[11px] text-slate-600 leading-tight">${lead.address}</p>
+                
+                ${distanceBadge}
+
+                <!-- Direct Call & Google Gate Navigation -->
+                <div class="grid grid-cols-2 gap-1.5 pt-0.5">
+                  ${
+                    lead.phone
+                      ? `<a href="tel:${cleanPhone}" class="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow-xs transition cursor-pointer">
+                          <span>📞 ${t('callNow')}</span>
+                         </a>`
+                      : `<div class="py-2 px-3 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs text-center">${t('noPhone')}</div>`
+                  }
+                  
+                  <a href="${mapsNavUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1 shadow-xs transition">
+                    <span>📍 ${t('navigateGoogle')}</span>
+                  </a>
+                </div>
+
+                <!-- Company Quick Fact Button -->
+                <a href="${dbdSearchUrl}" target="_blank" rel="noopener noreferrer" class="block w-full p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-xs font-bold text-center transition shadow-xs">
+                  <span>🔍 ตรวจสอบทุนจดทะเบียน DBD</span>
+                </a>
+
+                <div class="p-2 rounded-xl bg-slate-900 text-white text-center space-y-1">
+                  <div class="text-[10px] text-amber-300 font-bold">ต้องการข้อมูลโรงงานอีก 1,000+ แห่ง?</div>
+                  <button onclick="window.requireAuthFromMap()" class="w-full py-1.5 px-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 text-[11px] font-black cursor-pointer hover:from-amber-400 hover:to-amber-300">
+                    👑 ปลดล็อกคลังข้อมูลทั้งหมดฟรี
+                  </button>
+                </div>
+              </div>
+            `;
+          } else if (isMaskedGuestPin) {
+            // 2. MASKED TEASER FOR REMAINING 1,000+ FACTORIES
+            popupHtml = `
+              <div class="p-2 space-y-2 text-slate-800 min-w-[260px] max-w-[300px]">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-black">
+                    📍 ${locationTag}
+                  </span>
+                  <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[10px] font-black border border-amber-300 flex items-center gap-1">
+                    <span>🔒 ข้อมูลพิเศษ</span>
+                  </span>
+                </div>
+
+                <h3 class="font-black text-sm text-slate-900 leading-snug">${lead.name}</h3>
+                <p class="text-[11px] text-slate-500 leading-tight">📍 พิกัดประตูทางเข้าโรงงาน (100% Gate Verified)</p>
+                
+                ${distanceBadge}
+
+                <!-- Masked Company Intel Card -->
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-500 font-bold text-[11px]">📞 เบอร์โทรตรงโรงงาน:</span>
+                    <span class="font-mono font-bold text-slate-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">${maskedPhone}</span>
                   </div>
-                  <h4 class="font-black text-sm text-slate-900 leading-snug">ข้อมูลถูกล็อก (สงวนสิทธิ์)</h4>
-                  <p class="text-[11px] text-slate-500 leading-tight">
-                    เข้าสู่ระบบเพื่อปลดล็อกชื่อบริษัท, เบอร์โทรตรงโรงงาน, และข้อมูลทุนจดทะเบียน DBD
-                  </p>
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-500 font-bold text-[11px]">💰 ทุนจดทะเบียน DBD:</span>
+                    <span class="font-bold text-emerald-700">พร้อมตรวจสอบ</span>
+                  </div>
                 </div>
-                <button onclick="window.requireAuthFromMap()" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 active:scale-95 text-slate-950 font-black text-xs shadow-md transition cursor-pointer">
-                  🔓 เข้าสู่ระบบเพื่อปลดล็อกข้อมูล
+
+                <button onclick="window.requireAuthFromMap()" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 active:scale-95 text-slate-950 font-black text-xs shadow-md transition cursor-pointer flex items-center justify-center gap-1.5">
+                  <span>👑 ปลดล็อกเบอร์เต็ม & พิกัดนำทาง</span>
                 </button>
               </div>
-            `
-            : `
-            <div class="p-1 space-y-2 text-slate-800 min-w-[260px] max-w-[320px]">
-              <div class="flex items-center justify-between gap-1">
-                <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-900 text-[10px] font-black">
-                  📍 ${locationTag}
-                </span>
-                <span class="px-2 py-0.5 rounded-md text-[10px] font-black border ${statusBadgeClass}">
-                  ${statusBadgeText}
-                </span>
-              </div>
-              
-              <h3 class="font-black text-sm text-slate-900 leading-snug">${lead.name}</h3>
-              <p class="text-[11px] text-slate-600 leading-tight">${lead.address}</p>
-              
-              ${distanceBadge}
-
-              <!-- Status Tag Selector (Pillar 1) -->
-              <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                <div class="text-[10px] font-bold text-slate-500 flex items-center justify-between">
-                  <span>📋 ${t('statusLabel')}</span>
-                  ${status !== 'NEW' ? '<span class="text-emerald-600 font-bold">✓ บันทึกแล้ว</span>' : ''}
+            `;
+          } else {
+            // 3. FULL LOGGED IN DASHBOARD POPUP
+            popupHtml = `
+              <div class="p-1 space-y-2 text-slate-800 min-w-[260px] max-w-[320px]">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-900 text-[10px] font-black">
+                    📍 ${locationTag}
+                  </span>
+                  <span class="px-2 py-0.5 rounded-md text-[10px] font-black border ${statusBadgeClass}">
+                    ${statusBadgeText}
+                  </span>
                 </div>
-                <select onchange="window.updateLeadStatusFromMap('${lead.place_id}', this.value)" class="w-full text-xs font-bold p-1.5 rounded-lg border border-slate-300 bg-white text-slate-800 outline-none cursor-pointer">
-                  <option value="NEW" ${status === 'NEW' ? 'selected' : ''}>⚪ ${t('statusNew')}</option>
-                  <option value="CONTACTED" ${status === 'CONTACTED' ? 'selected' : ''}>🟡 ${t('statusContacted')}</option>
-                  <option value="MEETING" ${status === 'MEETING' ? 'selected' : ''}>🟣 ${t('statusMeeting')}</option>
-                  <option value="QUOTED" ${status === 'QUOTED' ? 'selected' : ''}>🔵 ${t('statusQuoted')}</option>
-                  <option value="WON" ${status === 'WON' ? 'selected' : ''}>🏆 ${t('statusWon')}</option>
-                  <option value="LOST" ${status === 'LOST' ? 'selected' : ''}>🔴 ${t('statusLost')}</option>
-                </select>
-              </div>
-
-              <!-- Company Quick Fact Button (Pillar 1) -->
-              <a href="${dbdSearchUrl}" target="_blank" rel="noopener noreferrer" class="block w-full p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-xs font-bold text-center transition shadow-xs" title="เช็กทุนจดทะเบียนและนิติบุคคล">
-                <span>🔍 ตรวจสอบทุนจดทะเบียน DBD</span>
-              </a>
-
-              <!-- 1-Click Copy Email Button -->
-              ${
-                cleanEmail
-                  ? `<button onclick="window.copyEmailToClipboard('${cleanEmail}')" class="w-full text-xs text-violet-800 font-mono flex items-center justify-between bg-violet-50 hover:bg-violet-100 p-2 rounded-xl border border-violet-200 transition cursor-pointer active:scale-95 group" title="คลิกเพื่อคัดลอกอีเมล">
-                      <span class="truncate flex items-center gap-1.5">
-                        <span>✉️</span>
-                        <span class="font-bold">${cleanEmail}</span>
-                      </span>
-                      <span class="text-[10px] text-violet-600 font-bold px-1.5 py-0.5 rounded bg-white border border-violet-200 shrink-0 group-hover:bg-violet-600 group-hover:text-white transition">
-                        📋 คัดลอก
-                      </span>
-                     </button>`
-                  : ''
-              }
-
-              <!-- Direct Call & Google Gate Navigation -->
-              <div class="grid grid-cols-2 gap-1.5 pt-0.5">
-                ${
-                  lead.phone
-                    ? `<a href="tel:${cleanPhone}" class="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow-xs transition cursor-pointer">
-                        <span>📞 ${t('callNow')}</span>
-                       </a>`
-                    : `<div class="py-2 px-3 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs text-center">${t('noPhone')}</div>`
-                }
                 
-                <a href="${mapsNavUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1 shadow-xs transition">
-                  <span>📍 ${t('navigateGoogle')}</span>
-                </a>
-              </div>
+                <h3 class="font-black text-sm text-slate-900 leading-snug">${lead.name}</h3>
+                <p class="text-[11px] text-slate-600 leading-tight">${lead.address}</p>
+                
+                ${distanceBadge}
 
-              ${
-                lead.website
-                  ? `<a href="${lead.website}" target="_blank" rel="noopener noreferrer" class="block w-full py-1.5 px-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-blue-700 font-bold text-[11px] text-center border border-slate-200 transition">
-                      🌐 ${t('visitWebsite')}
-                     </a>`
-                  : ''
-              }
-            </div>
-          `;
+                <!-- Status Tag Selector (Pillar 1) -->
+                <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <div class="text-[10px] font-bold text-slate-500 flex items-center justify-between">
+                    <span>📋 ${t('statusLabel')}</span>
+                    ${status !== 'NEW' ? '<span class="text-emerald-600 font-bold">✓ บันทึกแล้ว</span>' : ''}
+                  </div>
+                  <select onchange="window.updateLeadStatusFromMap('${lead.place_id}', this.value)" class="w-full text-xs font-bold p-1.5 rounded-lg border border-slate-300 bg-white text-slate-800 outline-none cursor-pointer">
+                    <option value="NEW" ${status === 'NEW' ? 'selected' : ''}>⚪ ${t('statusNew')}</option>
+                    <option value="CONTACTED" ${status === 'CONTACTED' ? 'selected' : ''}>🟡 ${t('statusContacted')}</option>
+                    <option value="MEETING" ${status === 'MEETING' ? 'selected' : ''}>🟣 ${t('statusMeeting')}</option>
+                    <option value="QUOTED" ${status === 'QUOTED' ? 'selected' : ''}>🔵 ${t('statusQuoted')}</option>
+                    <option value="WON" ${status === 'WON' ? 'selected' : ''}>🏆 ${t('statusWon')}</option>
+                    <option value="LOST" ${status === 'LOST' ? 'selected' : ''}>🔴 ${t('statusLost')}</option>
+                  </select>
+                </div>
+
+                <!-- Company Quick Fact Button (Pillar 1) -->
+                <a href="${dbdSearchUrl}" target="_blank" rel="noopener noreferrer" class="block w-full p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-xs font-bold text-center transition shadow-xs" title="เช็กทุนจดทะเบียนและนิติบุคคล">
+                  <span>🔍 ตรวจสอบทุนจดทะเบียน DBD</span>
+                </a>
+
+                <!-- 1-Click Copy Email Button -->
+                ${
+                  cleanEmail
+                    ? `<button onclick="window.copyEmailToClipboard('${cleanEmail}')" class="w-full text-xs text-violet-800 font-mono flex items-center justify-between bg-violet-50 hover:bg-violet-100 p-2 rounded-xl border border-violet-200 transition cursor-pointer active:scale-95 group" title="คลิกเพื่อคัดลอกอีเมล">
+                        <span class="truncate flex items-center gap-1.5">
+                          <span>✉️</span>
+                          <span class="font-bold">${cleanEmail}</span>
+                        </span>
+                        <span class="text-[10px] text-violet-600 font-bold px-1.5 py-0.5 rounded bg-white border border-violet-200 shrink-0 group-hover:bg-violet-600 group-hover:text-white transition">
+                          📋 คัดลอก
+                        </span>
+                       </button>`
+                    : ''
+                }
+
+                <!-- Direct Call & Google Gate Navigation -->
+                <div class="grid grid-cols-2 gap-1.5 pt-0.5">
+                  ${
+                    lead.phone
+                      ? `<a href="tel:${cleanPhone}" class="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow-xs transition cursor-pointer">
+                          <span>📞 ${t('callNow')}</span>
+                         </a>`
+                      : `<div class="py-2 px-3 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs text-center">${t('noPhone')}</div>`
+                  }
+                  
+                  <a href="${mapsNavUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1 shadow-xs transition">
+                    <span>📍 ${t('navigateGoogle')}</span>
+                  </a>
+                </div>
+
+                ${
+                  lead.website
+                    ? `<a href="${lead.website}" target="_blank" rel="noopener noreferrer" class="block w-full py-1.5 px-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-blue-700 font-bold text-[11px] text-center border border-slate-200 transition">
+                        🌐 ${t('visitWebsite')}
+                       </a>`
+                    : ''
+                }
+              </div>
+            `;
+          }
 
           const marker = L.marker([lead.lat, lead.lng], { icon: customIcon });
 
           // Mobile bottom sheet trigger or desktop popup
           marker.on('click', () => {
-            if (!isLoggedIn) {
+            if (isMaskedGuestPin) {
               if (onRequireAuth) onRequireAuth();
               return;
             }

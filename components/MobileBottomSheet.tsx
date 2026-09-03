@@ -259,6 +259,25 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
             </a>
           </div>
 
+          {/* Guest Unlock CTA Banner if on landing page */}
+          {!isLoggedIn && (
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/10 border border-amber-500/40 text-center space-y-2 mt-2">
+              <div className="text-xs text-amber-300 font-black flex items-center justify-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+                <span>ตัวอย่างโรงงานฟรี (1 ใน 3 แห่ง)</span>
+              </div>
+              <p className="text-[11px] text-slate-300">
+                เข้าสู่ระบบเพื่อปลดล็อกพิกัดประตูทางเข้าและเบอร์โทรตรงโรงงานอีก 1,000+ แห่ง
+              </p>
+              <button
+                onClick={onRequireAuth}
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 active:scale-95 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/30 transition cursor-pointer"
+              >
+                👑 ปลดล็อกคลังข้อมูลทั้งหมดฟรี
+              </button>
+            </div>
+          )}
+
           {lead.website && (
             <a
               href={lead.website}
