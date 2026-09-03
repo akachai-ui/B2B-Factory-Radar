@@ -9,9 +9,14 @@ import { LogIn, LogOut, ChevronDown, ShieldCheck, LayoutDashboard, Building2, Us
 interface UserMenuProps {
   onOpenAuth: (mode: 'signin' | 'signup') => void;
   onOpenCompanyProfile?: () => void;
+  onOpenTeamManagement?: () => void;
 }
 
-export const UserMenu: React.FC<UserMenuProps> = ({ onOpenAuth, onOpenCompanyProfile }) => {
+export const UserMenu: React.FC<UserMenuProps> = ({
+  onOpenAuth,
+  onOpenCompanyProfile,
+  onOpenTeamManagement,
+}) => {
   const { user, profile, signOut } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
@@ -113,7 +118,20 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onOpenAuth, onOpenCompanyPro
                 className="w-full px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center gap-2 transition cursor-pointer text-left font-bold"
               >
                 <Building2 className="w-4 h-4 text-indigo-600" />
-                <span>แก้ไขข้อมูลบริษัท / โปรไฟล์</span>
+                <span>🏢 แก้ไขข้อมูลบริษัท / โปรไฟล์</span>
+              </button>
+            )}
+
+            {onOpenTeamManagement && (
+              <button
+                onClick={() => {
+                  setDropdownOpen(false);
+                  onOpenTeamManagement();
+                }}
+                className="w-full px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center gap-2 transition cursor-pointer text-left font-bold"
+              >
+                <span className="text-sm">👥</span>
+                <span>จัดการทีม & สิทธิ์เซลส์</span>
               </button>
             )}
 

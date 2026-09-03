@@ -14,6 +14,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { MobileBottomSheet } from '@/components/MobileBottomSheet';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { CompanyOnboardingModal } from '@/components/CompanyOnboardingModal';
+import { TeamManagementModal } from '@/components/TeamManagementModal';
 import { AuthModal } from '@/components/AuthModal';
 import {
   Layers,
@@ -94,6 +95,7 @@ export default function DashboardPage() {
 
   const [leadStatuses, setLeadStatuses] = useState<Record<string, { status: LeadStatus; note?: string }>>({});
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState<boolean>(false);
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState<boolean>(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup');
 
@@ -435,6 +437,7 @@ export default function DashboardPage() {
             <UserMenu
               onOpenAuth={handleOpenAuth}
               onOpenCompanyProfile={() => setIsCompanyModalOpen(true)}
+              onOpenTeamManagement={() => setIsTeamModalOpen(true)}
             />
 
           </div>
@@ -1139,7 +1142,13 @@ export default function DashboardPage() {
         isInitialOnboarding={!profile?.company_name || profile?.company_name === 'บริษัทของฉัน'}
       />
 
-      {/* 6. AUTH MODAL (SIGN IN / SIGN UP) */}
+      {/* 6. TEAM & ROLE MANAGEMENT MODAL */}
+      <TeamManagementModal
+        isOpen={isTeamModalOpen}
+        onClose={() => setIsTeamModalOpen(false)}
+      />
+
+      {/* 7. AUTH MODAL (SIGN IN / SIGN UP) */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
