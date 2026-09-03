@@ -89,31 +89,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // 2. Get initial Supabase session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // 2. Get initial Supabase session & verify user is still active in database
+    supabase.auth.getUser().then(({ data: { user: activeUser }, error }) => {
       if (!isMounted) return;
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      if (currentUser) {
-        fetchProfile(currentUser.id, currentUser.email || '', currentUser.user_metadata);
+      if (error || !activeUser) {
+        // User was deleted from Supabase backend
+        supabase.auth.signOut().catch(() => {});
+        setUser(null);
+        setProfile(null);
+        setLoading(false);
+      } else {
+        setUser(activeUser);
+        fetchProfile(activeUser.id, activeUser.email || '', activeUser.user_metadata);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    // 3. Listen to auth changes (e.g. SIGNED_IN from OAuth)
+    // 3. Listen to auth changes (e.g. SIGNED_IN, SIGNED_OUT from OAuth)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (!isMounted) return;
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      if (currentUser) {
+      if (event === 'SIGNED_OUT' || !session) {
+        setUser(null);
+        setProfile(null);
+      } else {
+        const currentUser = session.user;
+        setUser(currentUser);
         fetchProfile(currentUser.id, currentUser.email || '', currentUser.user_metadata);
         if (event === 'SIGNED_IN' && typeof window !== 'undefined' && window.location.pathname === '/') {
           window.location.href = '/dashboard';
         }
-      } else {
-        setProfile(null);
       }
       setLoading(false);
     });
