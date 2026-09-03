@@ -2,7 +2,9 @@ export interface FactoryLead {
   id?: string | number;
   place_id: string;
   name: string;
+  company_name?: string;
   address: string;
+  road?: string;
   district: string;
   subdistrict: string;
   province: string;
@@ -16,9 +18,12 @@ export interface FactoryLead {
   rating?: number;
   user_ratings_total?: number;
   status?: any;
+  sales_rep?: string | null;
   contact_person?: string;
   notes?: string;
   created_at?: string;
+  updated_at?: string;
+  [key: string]: any;
 }
 
 export type LeadStatus = 'NEW' | 'CONTACTED' | 'MEETING' | 'QUOTED' | 'WON' | 'LOST';

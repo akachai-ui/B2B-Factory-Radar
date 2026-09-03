@@ -77,6 +77,20 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const [leads, setLeads] = useState<FactoryLead[]>(INITIAL_LEADS);
+
+  useEffect(() => {
+    async function loadLiveLeads() {
+      try {
+        const { data, error } = await supabase.from('leads').select('*').order('id', { ascending: true });
+        if (data && data.length > 0 && !error) {
+          setLeads(data as FactoryLead[]);
+        }
+      } catch (e) {
+        console.warn('Fallback to local leads cache:', e);
+      }
+    }
+    loadLiveLeads();
+  }, []);
   const [selectedMobileLead, setSelectedMobileLead] = useState<FactoryLead | null>(null);
   const [viewMode, setViewMode] = useState<'map' | 'table'>('map');
   const [searchQuery, setSearchQuery] = useState<string>('');
