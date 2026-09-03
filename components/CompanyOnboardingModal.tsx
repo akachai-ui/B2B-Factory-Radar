@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Building2, User, Phone, MapPin, Check, Sparkles, X } from 'lucide-react';
+import { Building2, User, Phone, Check, Sparkles, X } from 'lucide-react';
 
 interface CompanyOnboardingModalProps {
   isOpen: boolean;
@@ -21,7 +21,6 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
   const [companyName, setCompanyName] = useState<string>('');
   const [fullName, setFullName] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
-  const [primaryZone, setPrimaryZone] = useState<string>('โซนบางพลี - กิ่งแก้ว');
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -32,9 +31,6 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
       }
       setFullName(profile.full_name || '');
       setPhone(profile.company_phone || '');
-      if (profile.company_address) {
-        setPrimaryZone(profile.company_address);
-      }
     }
   }, [profile]);
 
@@ -59,7 +55,7 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
         full_name: fullName.trim() || user.email?.split('@')[0] || 'สมาชิกทีมขาย',
         company_name: companyName.trim(),
         company_phone: phone.trim(),
-        company_address: primaryZone,
+        company_address: 'สมุทรปราการ',
         subscription_tier: profile?.subscription_tier || 'pro',
         updated_at: new Date().toISOString(),
       };
@@ -106,8 +102,8 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
           </h2>
           <p className="text-xs text-slate-400">
             {isInitialOnboarding
-              ? 'กรุณาระบุชื่อบริษัทและข้อมูลเซลส์ของคุณ เพื่อเริ่มต้นใช้งานฐานข้อมูลโรงงาน'
-              : 'อัปเดตข้อมูลสังกัดองค์กรและพื้นที่รับผิดชอบของท่าน'}
+              ? 'กรุณาระบุชื่อบริษัทและข้อมูลติดต่อของคุณ เพื่อเริ่มต้นเจาะฐานข้อมูลโรงงาน'
+              : 'อัปเดตข้อมูลสังกัดองค์กรของท่าน'}
           </p>
         </div>
 
@@ -165,27 +161,6 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
               placeholder="เช่น 081-234-5678"
               className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs sm:text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 transition shadow-inner"
             />
-          </div>
-
-          {/* Field 4: Primary Territory Zone */}
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-purple-400" />
-              <span>โซนพื้นที่ดูแลหลัก</span>
-            </label>
-            <select
-              value={primaryZone}
-              onChange={(e) => setPrimaryZone(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs sm:text-sm text-white outline-none focus:border-blue-500 transition cursor-pointer"
-            >
-              <option value="โซนบางพลี - กิ่งแก้ว">📍 โซนบางพลี - กิ่งแก้ว</option>
-              <option value="โซนนิคมฯ บางปู - แพรกษา">📍 โซนนิคมฯ บางปู - แพรกษา</option>
-              <option value="โซนนิคมฯ เอเชียสุวรรณภูมิ">📍 โซนนิคมฯ เอเชียสุวรรณภูมิ</option>
-              <option value="โซนบางเสาธง - บางบ่อ">📍 โซนบางเสาธง - บางบ่อ</option>
-              <option value="โซนพระประแดง - สุขสวัสดิ์">📍 โซนพระประแดง - สุขสวัสดิ์</option>
-              <option value="โซนพระสมุทรเจดีย์">📍 โซนพระสมุทรเจดีย์</option>
-              <option value="ทุกโซนในสมุทรปราการ">🌐 ทุกโซนในสมุทรปราการ</option>
-            </select>
           </div>
 
           {/* Submit CTA */}
