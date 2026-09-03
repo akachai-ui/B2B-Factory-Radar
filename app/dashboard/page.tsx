@@ -443,13 +443,13 @@ export default function DashboardPage() {
       {/* 2. MAIN APP CONTENT CONTAINER */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 py-2.5 sm:py-6 space-y-3 sm:space-y-4">
         
-        {/* Pillar 1: Verified Lead Stages Pipeline Bar */}
-        <div className="flex sm:grid sm:grid-cols-6 gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 no-scrollbar text-xs">
+        {/* Pillar 1: Verified Lead Stages Pipeline Bar (Balanced 3x2 Grid on Mobile, 6-col on Desktop - No Horizontal Sliding) */}
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2 text-xs">
           
           <button
             onClick={() => setSelectedStatus(selectedStatus === 'NEW' ? 'ALL' : 'NEW')}
-            className={`min-w-[105px] sm:min-w-0 flex-1 p-2 sm:p-2.5 rounded-2xl border text-left transition cursor-pointer shrink-0 ${
-              selectedStatus === 'NEW' ? 'bg-blue-900/50 border-blue-400 text-white shadow-sm ring-2 ring-blue-400/50' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
+            className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border text-left transition cursor-pointer active:scale-95 ${
+              selectedStatus === 'NEW' ? 'bg-blue-900/60 border-blue-400 text-white shadow-sm ring-2 ring-blue-400/50' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
             }`}
           >
             <div className="text-[10px] text-slate-400 flex items-center gap-1 font-bold">
@@ -463,13 +463,13 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setSelectedStatus(selectedStatus === 'CONTACTED' ? 'ALL' : 'CONTACTED')}
-            className={`min-w-[105px] sm:min-w-0 flex-1 p-2 sm:p-2.5 rounded-2xl border text-left transition cursor-pointer shrink-0 ${
-              selectedStatus === 'CONTACTED' ? 'bg-amber-950/50 border-amber-400 text-white shadow-sm ring-2 ring-amber-400/50' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
+            className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border text-left transition cursor-pointer active:scale-95 ${
+              selectedStatus === 'CONTACTED' ? 'bg-amber-950/60 border-amber-400 text-white shadow-sm ring-2 ring-amber-400/50' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
             }`}
           >
             <div className="text-[10px] text-amber-400 flex items-center gap-1 font-bold">
               <PhoneCall className="w-3 h-3" />
-              <span className="truncate">โทรติดต่อแล้ว</span>
+              <span className="truncate">โทรแล้ว</span>
             </div>
             <div className="text-sm sm:text-lg font-black text-amber-300 mt-0.5">
               {pipelineStats.contactedCount.toLocaleString()}
@@ -478,13 +478,13 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setSelectedStatus(selectedStatus === 'MEETING' ? 'ALL' : 'MEETING')}
-            className={`min-w-[105px] sm:min-w-0 flex-1 p-2 sm:p-2.5 rounded-2xl border text-left transition cursor-pointer shrink-0 ${
-              selectedStatus === 'MEETING' ? 'bg-purple-950/50 border-purple-400 text-white shadow-sm ring-2 ring-purple-400/50' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
+            className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border text-left transition cursor-pointer active:scale-95 ${
+              selectedStatus === 'MEETING' ? 'bg-purple-950/60 border-purple-400 text-white shadow-sm ring-2 ring-purple-400/50' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
             }`}
           >
             <div className="text-[10px] text-purple-300 flex items-center gap-1 font-bold">
               <Calendar className="w-3 h-3" />
-              <span className="truncate">นัดเข้าพบได้</span>
+              <span className="truncate">นัดเข้าพบ</span>
             </div>
             <div className="text-sm sm:text-lg font-black text-purple-200 mt-0.5">
               {pipelineStats.meetingCount.toLocaleString()}
@@ -493,13 +493,13 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setSelectedStatus(selectedStatus === 'QUOTED' ? 'ALL' : 'QUOTED')}
-            className={`min-w-[105px] sm:min-w-0 flex-1 p-2 sm:p-2.5 rounded-2xl border text-left transition cursor-pointer shrink-0 ${
-              selectedStatus === 'QUOTED' ? 'bg-cyan-950/50 border-cyan-400 text-white shadow-sm ring-2 ring-cyan-400/50' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
+            className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border text-left transition cursor-pointer active:scale-95 ${
+              selectedStatus === 'QUOTED' ? 'bg-cyan-950/60 border-cyan-400 text-white shadow-sm ring-2 ring-cyan-400/50' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
             }`}
           >
             <div className="text-[10px] text-cyan-300 flex items-center gap-1 font-bold">
               <FileText className="w-3 h-3" />
-              <span className="truncate">เสนอราคาแล้ว</span>
+              <span className="truncate">เสนอราคา</span>
             </div>
             <div className="text-sm sm:text-lg font-black text-cyan-200 mt-0.5">
               {pipelineStats.quotedCount.toLocaleString()}
@@ -508,13 +508,13 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setSelectedStatus(selectedStatus === 'WON' ? 'ALL' : 'WON')}
-            className={`min-w-[105px] sm:min-w-0 flex-1 p-2 sm:p-2.5 rounded-2xl border text-left transition cursor-pointer shrink-0 ${
-              selectedStatus === 'WON' ? 'bg-emerald-950/50 border-emerald-400 text-white shadow-sm ring-2 ring-emerald-400/50' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
+            className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border text-left transition cursor-pointer active:scale-95 ${
+              selectedStatus === 'WON' ? 'bg-emerald-950/60 border-emerald-400 text-white shadow-sm ring-2 ring-emerald-400/50' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
             }`}
           >
             <div className="text-[10px] text-emerald-400 flex items-center gap-1 font-bold">
               <Sparkles className="w-3 h-3" />
-              <span className="truncate">ลูกค้าประจำ/ปิดการขาย</span>
+              <span className="truncate">ลูกค้าประจำ</span>
             </div>
             <div className="text-sm sm:text-lg font-black text-emerald-300 mt-0.5">
               {pipelineStats.wonCount.toLocaleString()}
@@ -523,7 +523,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => setSelectedStatus('ALL')}
-            className={`min-w-[105px] sm:min-w-0 flex-1 p-2 sm:p-2.5 rounded-2xl border text-left transition cursor-pointer shrink-0 ${
+            className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border text-left transition cursor-pointer active:scale-95 ${
               selectedStatus === 'ALL' ? 'bg-blue-600 border-blue-400 text-white shadow-md shadow-blue-600/30' : 'bg-slate-800/60 border-slate-700/80 text-slate-300 hover:bg-slate-800'
             }`}
           >
