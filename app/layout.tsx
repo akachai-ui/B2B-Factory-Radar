@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'B2B Factory Radar | แพลตฟอร์มค้นหาและวิเคราะห์พิกัดโรงงานอุตสาหกรรม',
-  description: 'ระบบค้นหาพิกัดโรงงาน วางแผนเส้นทางออกพบลูกค้า และบริหารจัดการ Lead ฝ่ายขาย (TH / EN / ZH)',
+  title: 'B2B Factory Radar | เสาหลักที่ 1: Verified Lead Intelligence',
+  description: 'ระบบค้นหาพิกัดโรงงานฉีดพลาสติก 1,089 แห่ง วางแผนเส้นทางออกพบลูกค้า และ Company Quick Fact (TH / EN / ZH)',
   icons: {
     icon: '/favicon.ico',
   },
@@ -33,6 +34,16 @@ export default function RootLayout({
         <LanguageProvider>
           <AuthProvider>{children}</AuthProvider>
         </LanguageProvider>
+
+        {/* Essential Leaflet and MarkerCluster Scripts */}
+        <Script
+          src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          strategy="beforeInteractive"
+        />
+        <Script
+          src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );

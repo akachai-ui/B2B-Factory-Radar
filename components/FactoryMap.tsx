@@ -13,6 +13,8 @@ import {
   Building2,
   ExternalLink,
   ShieldCheck,
+  Phone,
+  Navigation,
 } from 'lucide-react';
 
 interface FactoryMapProps {
@@ -89,6 +91,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
   const userAccuracyCircleRef = useRef<any>(null);
   const searchRadiusCircleRef = useRef<any>(null);
 
+  const [isLeafletReady, setIsLeafletReady] = useState<boolean>(false);
   const [leadStatuses, setLeadStatuses] = useState<Record<string, { status: LeadStatus; note?: string }>>({});
   const [copyToast, setCopyToast] = useState<string | null>(null);
 
@@ -126,9 +129,45 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
     };
   }, []);
 
-  // Initialize Map
+  // Ensure Leaflet JS & MarkerCluster scripts are loaded
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.L || !mapContainerRef.current) return;
+    if (typeof window === 'undefined') return;
+
+    if (window.L && window.L.markerClusterGroup) {
+      setIsLeafletReady(true);
+      return;
+    }
+
+    const checkInterval = setInterval(() => {
+      if (window.L && window.L.markerClusterGroup) {
+        setIsLeafletReady(true);
+        clearInterval(checkInterval);
+      }
+    }, 100);
+
+    // Fallback dynamic script loader if not already present
+    if (!window.L) {
+      const script1 = document.createElement('script');
+      script1.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script1.async = true;
+      script1.onload = () => {
+        const script2 = document.createElement('script');
+        script2.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
+        script2.async = true;
+        script2.onload = () => {
+          setIsLeafletReady(true);
+        };
+        document.body.appendChild(script2);
+      };
+      document.body.appendChild(script1);
+    }
+
+    return () => clearInterval(checkInterval);
+  }, []);
+
+  // Initialize Map when Leaflet is ready
+  useEffect(() => {
+    if (!isLeafletReady || !mapContainerRef.current || typeof window === 'undefined' || !window.L) return;
 
     const L = window.L;
 
@@ -139,51 +178,59 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         zoomControl: true,
       });
 
-      // High Performance OpenStreetMap CartoDB Positron / Voyager Tiles
+      // High Performance OpenStreetMap CartoDB Voyager Tiles
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a> OpenStreetMap',
+        attribution: '&copy; CARTO &copy; OpenStreetMap',
         maxZoom: 19,
         subdomains: 'abcd',
       }).addTo(map);
 
       // Initialize Marker Cluster Group
-      const markersCluster = L.markerClusterGroup({
-        chunkedLoading: true,
-        maxClusterRadius: 45,
-        spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false,
-        zoomToBoundsOnClick: true,
-        iconCreateFunction: (cluster: any) => {
-          const count = cluster.getChildCount();
-          let c = 'marker-cluster-';
-          let size = 38;
-          if (count < 10) {
-            c += 'small';
-            size = 36;
-          } else if (count < 50) {
-            c += 'medium';
-            size = 42;
-          } else {
-            c += 'large';
-            size = 48;
-          }
-          return L.divIcon({
-            html: `<div class="flex items-center justify-center w-full h-full rounded-full bg-gradient-to-tr from-blue-700 to-indigo-600 text-white font-extrabold shadow-lg border-2 border-white text-xs"><span>${count}</span></div>`,
-            className: 'custom-cluster-icon',
-            iconSize: L.point(size, size),
-          });
-        },
-      });
+      if (L.markerClusterGroup) {
+        const markersCluster = L.markerClusterGroup({
+          chunkedLoading: true,
+          maxClusterRadius: 45,
+          spiderfyOnMaxZoom: true,
+          showCoverageOnHover: false,
+          zoomToBoundsOnClick: true,
+          iconCreateFunction: (cluster: any) => {
+            const count = cluster.getChildCount();
+            let c = 'marker-cluster-';
+            let size = 38;
+            if (count < 10) {
+              c += 'small';
+              size = 36;
+            } else if (count < 50) {
+              c += 'medium';
+              size = 42;
+            } else {
+              c += 'large';
+              size = 48;
+            }
+            return L.divIcon({
+              html: `<div class="flex items-center justify-center w-full h-full rounded-full bg-gradient-to-tr from-blue-700 to-indigo-600 text-white font-extrabold shadow-lg border-2 border-white text-xs"><span>${count}</span></div>`,
+              className: 'custom-cluster-icon',
+              iconSize: L.point(size, size),
+            });
+          },
+        });
 
-      map.addLayer(markersCluster);
-      clusterGroupRef.current = markersCluster;
+        map.addLayer(markersCluster);
+        clusterGroupRef.current = markersCluster;
+      }
+
       mapInstanceRef.current = map;
+
+      // Invalidate size to ensure zero grey/blank tiles
+      setTimeout(() => map.invalidateSize(), 150);
+      setTimeout(() => map.invalidateSize(), 400);
+      setTimeout(() => map.invalidateSize(), 800);
     }
-  }, []);
+  }, [isLeafletReady]);
 
   // Update Markers, Live GPS Location, and Radius Circle
   useEffect(() => {
-    if (!mapInstanceRef.current || !window.L) return;
+    if (!mapInstanceRef.current || !window.L || !isLeafletReady) return;
 
     const L = window.L;
     const map = mapInstanceRef.current;
@@ -457,7 +504,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
     } catch (err) {
       console.warn('Map update error:', err);
     }
-  }, [leads, userLocation, isLiveTracking, selectedDistrict, selectedSubdistrict, selectedStatus, selectedRadius, leadStatuses, t]);
+  }, [leads, userLocation, isLiveTracking, selectedDistrict, selectedSubdistrict, selectedStatus, selectedRadius, leadStatuses, isLeafletReady, t]);
 
   // Zoom to user's live position
   const zoomToUser = () => {
@@ -465,6 +512,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
       mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 14, {
         animate: true,
       });
+      mapInstanceRef.current.invalidateSize();
     }
   };
 
@@ -472,6 +520,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
   const resetMapView = () => {
     if (mapInstanceRef.current) {
       mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 11);
+      mapInstanceRef.current.invalidateSize();
       if (onRadiusChange) onRadiusChange('ALL');
     }
   };
@@ -561,8 +610,15 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
       <div
         ref={mapContainerRef}
         id="map"
-        className="shadow-inner border border-slate-200/80 h-[480px] sm:h-[620px] rounded-2xl overflow-hidden"
-      />
+        className="shadow-inner border border-slate-200/80 h-[480px] sm:h-[620px] rounded-2xl overflow-hidden relative bg-slate-100"
+      >
+        {!isLeafletReady && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 text-slate-500 space-y-2 z-10">
+            <div className="h-8 w-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-xs font-bold">กำลังเชื่อมต่อดาวเทียมแผนที่...</p>
+          </div>
+        )}
+      </div>
 
     </div>
   );
