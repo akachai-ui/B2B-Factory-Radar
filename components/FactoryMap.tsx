@@ -123,9 +123,16 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
       }
     };
 
+    window.requireAuthFromMap = () => {
+      if (onRequireAuth) {
+        onRequireAuth();
+      }
+    };
+
     return () => {
       delete (window as any).updateLeadStatusFromMap;
       delete (window as any).copyEmailToClipboard;
+      delete (window as any).requireAuthFromMap;
     };
   }, []);
 
@@ -400,7 +407,27 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
           const credenSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(lead.name + ' ข้อมูลงบการเงิน creden dataforthai')}`;
           const mapsNavUrl = lead.maps_url || `https://www.google.com/maps/search/?api=1&query=${lead.lat},${lead.lng}`;
 
-          const popupHtml = `
+          const popupHtml = !isLoggedIn
+            ? `
+              <div class="p-3 text-center space-y-2.5 text-slate-800 min-w-[240px] max-w-[280px]">
+                <div class="h-10 w-10 mx-auto rounded-2xl bg-amber-500/20 text-amber-600 flex items-center justify-center text-xl font-black shadow-inner">
+                  🔒
+                </div>
+                <div class="space-y-1">
+                  <div class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-black">
+                    📍 พิกัดโรงงานอุตสาหกรรม
+                  </div>
+                  <h4 class="font-black text-sm text-slate-900 leading-snug">ข้อมูลถูกล็อก (สงวนสิทธิ์)</h4>
+                  <p class="text-[11px] text-slate-500 leading-tight">
+                    เข้าสู่ระบบเพื่อปลดล็อกชื่อบริษัท, เบอร์โทรตรงโรงงาน, และข้อมูลทุนจดทะเบียน DBD
+                  </p>
+                </div>
+                <button onclick="window.requireAuthFromMap()" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 active:scale-95 text-slate-950 font-black text-xs shadow-md transition cursor-pointer">
+                  🔓 เข้าสู่ระบบเพื่อปลดล็อกข้อมูล
+                </button>
+              </div>
+            `
+            : `
             <div class="p-1 space-y-2 text-slate-800 min-w-[260px] max-w-[320px]">
               <div class="flex items-center justify-between gap-1">
                 <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-900 text-[10px] font-black">
@@ -481,6 +508,10 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
 
           // Mobile bottom sheet trigger or desktop popup
           marker.on('click', () => {
+            if (!isLoggedIn) {
+              if (onRequireAuth) onRequireAuth();
+              return;
+            }
             if (window.innerWidth < 640 && onSelectLead) {
               onSelectLead(lead);
             }
