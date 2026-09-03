@@ -21,7 +21,7 @@ export interface FactoryLead {
   created_at?: string;
 }
 
-export type LeadStatus = 'NEW' | 'CONTACTED' | 'MEETING' | 'WON' | 'LOST';
+export type LeadStatus = 'NEW' | 'CONTACTED' | 'MEETING' | 'QUOTED' | 'WON' | 'LOST';
 export type SalesStatus = any;
 
 export interface LeadStatusRecord {
