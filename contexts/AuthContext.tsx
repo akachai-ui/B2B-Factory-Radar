@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
-    // 1. Handle OAuth PKCE exchange code in URL (?code=...)
+    // 1. Handle OAuth PKCE exchange code in URL (?code=...) & hash fragment (#access_token=...)
     if (typeof window !== 'undefined') {
       const searchParams = new URLSearchParams(window.location.search);
       const code = searchParams.get('code');
@@ -97,6 +97,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             window.location.href = '/dashboard';
           }
         });
+      }
+
+      if (window.location.hash.includes('access_token=')) {
+        setTimeout(() => {
+          if (window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        }, 300);
       }
     }
 
