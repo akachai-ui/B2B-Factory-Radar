@@ -395,8 +395,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-1 min-w-0">
               <span className="text-xs sm:text-base font-black tracking-tight text-white truncate">
-                <span className="sm:hidden">B2B Radar</span>
-                <span className="hidden sm:inline">B2B Factory Radar</span>
+                RouteHunter
               </span>
               <span className="px-1 py-0.2 rounded-md text-[7px] sm:text-[9px] font-extrabold bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase shrink-0">
                 P1

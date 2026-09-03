@@ -98,7 +98,7 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
             <span>{isInitialOnboarding ? 'ตั้งค่าบัญชีองค์กรเริ่มต้น' : 'ข้อมูลองค์กร & ทีมขาย'}</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-            {isInitialOnboarding ? 'ยินดีต้อนรับสู่ B2B Radar' : 'แก้ไขข้อมูลบริษัท / โปรไฟล์'}
+            {isInitialOnboarding ? 'ยินดีต้อนรับสู่ RouteHunter' : 'แก้ไขข้อมูลบริษัท / โปรไฟล์'}
           </h2>
           <p className="text-xs text-slate-400">
             {isInitialOnboarding

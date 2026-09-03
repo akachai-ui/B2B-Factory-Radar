@@ -5,8 +5,8 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'B2B Factory Radar | เสาหลักที่ 1: Verified Lead Intelligence',
-  description: 'ระบบค้นหาพิกัดโรงงานฉีดพลาสติก 1,089 แห่ง วางแผนเส้นทางออกพบลูกค้า และ Company Quick Fact (TH / EN / ZH)',
+  title: 'RouteHunter | ระบบบริหารการขาย & เรดาร์โรงงานอุตสาหกรรม',
+  description: 'RouteHunter - ระบบค้นหาพิกัดโรงงาน 1,000+ แห่ง วางแผนเส้นทางออกพบลูกค้า และ Company Quick Fact (TH / EN / ZH)',
   icons: {
     icon: '/favicon.ico',
   },

@@ -3,7 +3,7 @@ export type Language = 'th' | 'en' | 'zh';
 export const translations: Record<Language, Record<string, string>> = {
   th: {
     // Brand & App
-    appName: 'B2B Factory Radar',
+    appName: 'RouteHunter',
     appSubtitle: 'ระบบจัดการข้อมูลและเรดาร์เป้าหมายโรงงาน (ประหยัดเวลา & ลดต้นทุนองค์กร)',
     proWorkspace: 'VERIFIED LEADS',
     appBadge: 'Sales Automation',
@@ -62,7 +62,7 @@ export const translations: Record<Language, Record<string, string>> = {
     compOld2: 'เซลส์เสียเวลาวางแผนครึ่งวัน: นั่งเปิด Google Maps หาซอย เสียค่าน้ำมันขับวนหาโรงงาน',
     compOld3: 'ข้อมูลกระจัดกระจาย: บันทึกงานบนกระดาษหรือไลน์ ไม่รู้ว่าโรงงานไหนโทรแล้วหรือเสนอราคาไปแล้ว',
 
-    compRadarTitle: 'ใช้ B2B Factory Radar (เซลส์มีหน้าที่ขายอย่างเดียว)',
+    compRadarTitle: 'ใช้ RouteHunter (เซลส์มีหน้าที่ขายอย่างเดียว)',
     compRadar1: 'ระบบค้นหาและเตรียมข้อมูลให้เสร็จสรรพ: เบอร์โทรศัพท์ตรงของโรงงาน/บริษัท + ทุนจดทะเบียน DBD พร้อมใช้งาน',
     compRadar2: 'Live GPS คำนวณเส้นทางและนำทางอัตโนมัติ: บอกโรงงานที่ใกล้ตัวที่สุด ขับตรงถึงประตูผู้ติดต่อ',
     compRadar3: 'แดชบอร์ดอัปเดตสถานะทันทีบนมือถือ: ปรับสถานะ โทรแล้ว, นัดเข้าพบ, เสนอราคา ใน 1 วินาที',
@@ -165,12 +165,12 @@ export const translations: Record<Language, Record<string, string>> = {
     createAccountBtn: 'สร้างบัญชีผู้ใช้ใหม่',
 
     // Footer
-    footerCopy: '© 2026 B2B Factory Radar • ระบบบริหารจัดการการขาย & เรดาร์เป้าหมายโรงงานอุตสาหกรรม',
+    footerCopy: '© 2026 RouteHunter • ระบบบริหารจัดการการขาย & เรดาร์เป้าหมายโรงงานอุตสาหกรรม',
   },
 
   en: {
     // Brand & App
-    appName: 'B2B Factory Radar',
+    appName: 'RouteHunter',
     appSubtitle: 'Sales Intelligence & Factory Radar (Save Time & Cut Overhead Costs)',
     proWorkspace: 'VERIFIED LEADS',
     appBadge: 'Sales Automation',
@@ -229,7 +229,7 @@ export const translations: Record<Language, Record<string, string>> = {
     compOld2: 'Half-Day Lost Planning: Reps spend hours on Google Maps and waste fuel driving in random circles.',
     compOld3: 'Scattered Data: Notes on paper or chat apps, with zero visibility on who was called or quoted.',
 
-    compRadarTitle: 'With B2B Factory Radar (Reps Purely Pitch & Close)',
+    compRadarTitle: 'With RouteHunter (Reps Purely Pitch & Close)',
     compRadar1: 'Pre-Engineered Intelligence: Direct company phone numbers + DBD registered capital ready to use.',
     compRadar2: 'Live GPS Routing: Auto-detects closest factories and navigates directly to the contact entrance gate.',
     compRadar3: 'Real-Time Mobile Dashboard: Update stages (Contacted, Meeting, Quoted) in 1 second.',
@@ -332,12 +332,12 @@ export const translations: Record<Language, Record<string, string>> = {
     createAccountBtn: 'Create Account',
 
     // Footer
-    footerCopy: '© 2026 B2B Factory Radar • Sales Automation & Industrial Target Radar Platform',
+    footerCopy: '© 2026 RouteHunter • Sales Automation & Industrial Target Radar Platform',
   },
 
   zh: {
     // Brand & App
-    appName: 'B2B 工厂雷达',
+    appName: 'RouteHunter 猎途',
     appSubtitle: '企业销售智能与工厂雷达控制台 (降本增效・一键出海)',
     proWorkspace: '精准目标工厂库',
     appBadge: '全自动销售引擎',
@@ -396,7 +396,7 @@ export const translations: Record<Language, Record<string, string>> = {
     compOld2: '每天耗费半天规划：在地图上来回盲测，不仅耗油更极易在园区迷路。',
     compOld3: '数据分散混乱：使用便签或微信群跟进，无法直观掌控客户所处阶段。',
 
-    compRadarTitle: '使用 B2B 工厂雷达 (销售人员专注于出单)',
+    compRadarTitle: '使用 RouteHunter 猎途 (销售人员专注于出单)',
     compRadar1: '数据就绪：企业直通电话 + DBD注册资本全量准备就绪。',
     compRadar2: '随车GPS智能测距：自动筛选附近最近工厂并直导正门。',
     compRadar3: '移动端实时更新看板：已电联、已约见、已报价1秒完成标注。',
@@ -501,6 +501,6 @@ export const translations: Record<Language, Record<string, string>> = {
     createAccountBtn: '创建新账户',
 
     // Footer
-    footerCopy: '© 2026 B2B Factory Radar • 全自动销售引擎与工业目标雷达控制中心',
+    footerCopy: '© 2026 RouteHunter 猎途 • 全自动销售引擎与工业目标雷达控制中心',
   },
 };
