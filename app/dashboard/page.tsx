@@ -766,27 +766,16 @@ export default function DashboardPage() {
                       </select>
                     </div>
 
-                    {/* Company Quick Fact Corporate Check Buttons */}
-                    <div className="grid grid-cols-2 gap-1.5">
-                      <a
-                        href={dbdSearchUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="py-1.5 px-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 text-[10px] font-bold flex items-center justify-center gap-1"
-                      >
-                        <span>🔍 ทุนจดทะเบียน DBD</span>
-                        <ExternalLink className="w-2.5 h-2.5 text-indigo-500" />
-                      </a>
-                      <a
-                        href={credenSearchUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="py-1.5 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 text-[10px] font-bold flex items-center justify-center gap-1"
-                      >
-                        <span>📊 ข้อมูลงบการเงิน</span>
-                        <ExternalLink className="w-2.5 h-2.5 text-slate-500" />
-                      </a>
-                    </div>
+                    {/* Company Quick Fact Corporate Check Button */}
+                    <a
+                      href={dbdSearchUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-2 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-950 border border-indigo-200 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95"
+                    >
+                      <span>🔍 ตรวจสอบทุนจดทะเบียน DBD</span>
+                      <ExternalLink className="w-3 h-3 text-indigo-500" />
+                    </a>
 
                     {/* Card Actions: Call Procurement & Gate Navigation */}
                     <div className="grid grid-cols-2 gap-1.5 pt-1">

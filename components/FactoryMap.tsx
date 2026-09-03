@@ -432,15 +432,10 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
                 </select>
               </div>
 
-              <!-- Company Quick Fact Buttons (Pillar 1) -->
-              <div class="grid grid-cols-2 gap-1.5 pt-0.5">
-                <a href="${dbdSearchUrl}" target="_blank" rel="noopener noreferrer" class="p-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-[10px] font-bold text-center flex items-center justify-center gap-1 transition" title="เช็กทุนจดทะเบียนและนิติบุคคล">
-                  <span>🔍 ทุนจดทะเบียน DBD</span>
-                </a>
-                <a href="${credenSearchUrl}" target="_blank" rel="noopener noreferrer" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 text-[10px] font-bold text-center flex items-center justify-center gap-1 transition" title="ประเมินไซส์โรงงาน">
-                  <span>📊 ข้อมูลงบการเงิน</span>
-                </a>
-              </div>
+              <!-- Company Quick Fact Button (Pillar 1) -->
+              <a href="${dbdSearchUrl}" target="_blank" rel="noopener noreferrer" class="block w-full p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-xs font-bold text-center transition shadow-xs" title="เช็กทุนจดทะเบียนและนิติบุคคล">
+                <span>🔍 ตรวจสอบทุนจดทะเบียน DBD</span>
+              </a>
 
               <!-- 1-Click Copy Email Button -->
               ${

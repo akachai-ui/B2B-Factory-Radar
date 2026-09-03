@@ -193,29 +193,16 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
               <span>{t('quickFactTitle')}</span>
             </div>
             
-            <div className="grid grid-cols-2 gap-2">
-              <a
-                href={dbdSearchUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-xl bg-indigo-950/60 hover:bg-indigo-900/80 border border-indigo-700/60 text-indigo-200 text-[10px] font-bold flex items-center justify-center gap-1 text-center transition"
-                title="เช็กทุนจดทะเบียนและสถานะนิติบุคคล"
-              >
-                <span>🔍 ทุนจดทะเบียน DBD</span>
-                <ExternalLink className="w-3 h-3 text-indigo-400 shrink-0" />
-              </a>
-
-              <a
-                href={credenSearchUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-750 border border-slate-700 text-slate-200 text-[10px] font-bold flex items-center justify-center gap-1 text-center transition"
-                title="ประเมินไซส์โรงงานและงบการเงิน"
-              >
-                <span>📊 ประเมินไซส์โรงงาน</span>
-                <ExternalLink className="w-3 h-3 text-slate-400 shrink-0" />
-              </a>
-            </div>
+            <a
+              href={dbdSearchUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full p-2.5 rounded-xl bg-indigo-950/70 hover:bg-indigo-900/80 border border-indigo-700/60 text-indigo-200 text-xs font-bold flex items-center justify-center gap-1.5 text-center transition active:scale-95"
+              title="เช็กทุนจดทะเบียนและสถานะนิติบุคคล"
+            >
+              <span>🔍 ตรวจสอบทุนจดทะเบียน DBD</span>
+              <ExternalLink className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+            </a>
           </div>
 
           {/* Email Card with 1-Click Copy */}
