@@ -4,13 +4,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { LogIn, LogOut, ChevronDown, ShieldCheck, LayoutDashboard } from 'lucide-react';
+import { LogIn, LogOut, ChevronDown, ShieldCheck, LayoutDashboard, Building2, User } from 'lucide-react';
 
 interface UserMenuProps {
   onOpenAuth: (mode: 'signin' | 'signup') => void;
+  onOpenCompanyProfile?: () => void;
 }
 
-export const UserMenu: React.FC<UserMenuProps> = ({ onOpenAuth }) => {
+export const UserMenu: React.FC<UserMenuProps> = ({ onOpenAuth, onOpenCompanyProfile }) => {
   const { user, profile, signOut } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
@@ -54,6 +55,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onOpenAuth }) => {
   }
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || t('proMember');
+  const companyName = profile?.company_name && profile?.company_name !== 'บริษัทของฉัน' ? profile.company_name : 'ตั้งค่าบริษัท';
   const tier = (profile?.subscription_tier || 'PRO').toUpperCase();
 
   return (
@@ -73,7 +75,10 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onOpenAuth }) => {
               {tier}
             </span>
           </div>
-          <div className="text-[10px] text-emerald-400 truncate max-w-[130px]">📍 {t('allUnlockedBadge')}</div>
+          <div className="text-[10px] text-slate-400 truncate max-w-[130px] flex items-center gap-1">
+            <span>🏢</span>
+            <span className="text-slate-300 font-medium">{companyName}</span>
+          </div>
         </div>
 
         <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
@@ -84,15 +89,34 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onOpenAuth }) => {
         <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white shadow-2xl border border-slate-200 py-2 z-50 text-slate-800 animate-in fade-in zoom-in-95 duration-150">
           
           <div className="px-4 py-3 border-b border-slate-100">
-            <p className="text-[11px] text-slate-500">Account:</p>
-            <p className="font-bold text-xs text-slate-900 truncate">{user.email}</p>
-            <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
-              <ShieldCheck className="w-3 h-3" />
-              <span>{t('allUnlockedBadge')}</span>
+            <p className="text-[10px] text-slate-500 font-semibold">บัญชีผู้ใช้:</p>
+            <p className="font-bold text-xs text-slate-900 truncate">{displayName}</p>
+            <p className="text-[11px] text-slate-500 truncate mt-0.5">{user.email}</p>
+            
+            <div className="mt-2 p-2 rounded-xl bg-blue-50/80 border border-blue-100 flex items-center justify-between gap-1">
+              <div className="text-[10px] text-blue-900 font-bold truncate">
+                🏢 {companyName}
+              </div>
+              <span className="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[9px] font-black shrink-0">
+                PRO
+              </span>
             </div>
           </div>
 
           <div className="p-1 space-y-1 text-xs font-semibold">
+            {onOpenCompanyProfile && (
+              <button
+                onClick={() => {
+                  setDropdownOpen(false);
+                  onOpenCompanyProfile();
+                }}
+                className="w-full px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center gap-2 transition cursor-pointer text-left font-bold"
+              >
+                <Building2 className="w-4 h-4 text-indigo-600" />
+                <span>แก้ไขข้อมูลบริษัท / โปรไฟล์</span>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 setDropdownOpen(false);

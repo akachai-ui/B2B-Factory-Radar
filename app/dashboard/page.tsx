@@ -13,6 +13,7 @@ import { UserMenu } from '@/components/UserMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { MobileBottomSheet } from '@/components/MobileBottomSheet';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
+import { CompanyOnboardingModal } from '@/components/CompanyOnboardingModal';
 import {
   Layers,
   Map,
@@ -91,6 +92,7 @@ export default function DashboardPage() {
   const [pageSize, setPageSize] = useState<number | 'ALL'>(25);
 
   const [leadStatuses, setLeadStatuses] = useState<Record<string, { status: LeadStatus; note?: string }>>({});
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState<boolean>(false);
 
   const [userLocation, setUserLocation] = useState<{
     lat: number;
@@ -108,6 +110,17 @@ export default function DashboardPage() {
 
   const [isLiveTracking, setIsLiveTracking] = useState<boolean>(true);
   const watchIdRef = useRef<number | null>(null);
+
+  // Auto-prompt Company Onboarding for new users or unconfigured profiles
+  useEffect(() => {
+    if (user && profile && (!profile.company_name || profile.company_name === 'บริษัทของฉัน')) {
+      const hasDismissed = sessionStorage.getItem('onboarding_prompted');
+      if (!hasDismissed) {
+        setIsCompanyModalOpen(true);
+        sessionStorage.setItem('onboarding_prompted', 'true');
+      }
+    }
+  }, [user, profile]);
 
   // Load Lead Statuses & listen to updates
   useEffect(() => {
@@ -405,7 +418,10 @@ export default function DashboardPage() {
             <LanguageSwitcher />
 
             {/* User Menu */}
-            <UserMenu onOpenAuth={() => {}} />
+            <UserMenu
+              onOpenAuth={() => {}}
+              onOpenCompanyProfile={() => setIsCompanyModalOpen(true)}
+            />
 
           </div>
 
@@ -1100,6 +1116,13 @@ export default function DashboardPage() {
         isLoggedIn={true}
         onRequireAuth={() => {}}
         userLocation={userLocation}
+      />
+
+      {/* 5. COMPANY ONBOARDING & PROFILE SETUP MODAL */}
+      <CompanyOnboardingModal
+        isOpen={isCompanyModalOpen}
+        onClose={() => setIsCompanyModalOpen(false)}
+        isInitialOnboarding={!profile?.company_name || profile?.company_name === 'บริษัทของฉัน'}
       />
 
     </div>
