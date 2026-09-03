@@ -535,27 +535,27 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         </div>
       )}
 
-      {/* SLEEK MAP TOP BAR */}
-      <div className="flex items-center justify-between gap-3 px-1">
+      {/* SLEEK MAP TOP BAR (OPTIMIZED FOR IPHONE & MOBILE) */}
+      <div className="flex items-center justify-between gap-1.5 px-0.5 sm:px-1">
         
-        {/* Left: Brand & Badge */}
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className={`h-9 w-9 rounded-2xl ${isLiveTracking ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-blue-600 to-indigo-700'} text-white flex items-center justify-center text-base shadow-sm shrink-0 transition-colors`}>
+        {/* Left: Live GPS Status & Target Count */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
+          <div className={`h-7 w-7 sm:h-9 sm:w-9 rounded-xl sm:rounded-2xl ${isLiveTracking ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-blue-600 to-indigo-700'} text-white flex items-center justify-center text-xs sm:text-base shadow-xs shrink-0 transition-colors`}>
             {isLiveTracking ? '🚗' : '🗺️'}
           </div>
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm sm:text-base font-black text-slate-900 tracking-tight truncate">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h3 className="text-xs sm:text-base font-black text-slate-900 tracking-tight truncate">
                 {t('mapCommandCenter')}
               </h3>
-              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 text-[10px] font-extrabold border border-blue-200 shrink-0">
+              <span className="px-1.5 py-0.2 sm:px-2 sm:py-0.5 rounded-full bg-blue-50 text-blue-800 text-[9px] sm:text-[10px] font-extrabold border border-blue-200 shrink-0">
                 {leads.length.toLocaleString()} เป้าหมาย
               </span>
             </div>
-            <div className="text-[11px] text-slate-500 font-medium flex items-center gap-1 truncate">
+            <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium flex items-center gap-1 truncate">
               {isLiveTracking ? (
                 <span className="text-emerald-700 font-bold flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   {t('liveGpsCar')}
                 </span>
               ) : (
@@ -566,26 +566,26 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         </div>
 
         {/* Right: Quick Controls */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           
-          {/* Live GPS Button */}
+          {/* Live GPS Toggle */}
           <button
             onClick={onToggleLiveTracking}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 ${
+            className={`p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-xs active:scale-95 shrink-0 ${
               isLiveTracking
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30 ring-2 ring-emerald-400/40'
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
             }`}
             title="เปิด/ปิด Live GPS ติดตามรถ"
           >
             <Radio className={`w-3.5 h-3.5 ${isLiveTracking ? 'animate-pulse text-emerald-200' : 'text-slate-400'}`} />
-            <span className="hidden sm:inline">{isLiveTracking ? t('liveGpsActive') : t('liveGpsInactive')}</span>
+            <span className="hidden md:inline">{isLiveTracking ? t('liveGpsActive') : t('liveGpsInactive')}</span>
           </button>
 
           {/* Zoom to GPS */}
           <button
             onClick={zoomToUser}
-            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] sm:text-xs font-bold border border-slate-200 transition-all flex items-center gap-1 cursor-pointer active:scale-95 shrink-0"
             title="ซูมไปยังพิกัดของคุณ"
           >
             <Compass className="w-3.5 h-3.5 text-blue-600" />
@@ -595,7 +595,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
           {/* Reset Map */}
           <button
             onClick={resetMapView}
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+            className="p-1.5 sm:px-2 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-all flex items-center gap-1 cursor-pointer active:scale-95 shrink-0"
             title={t('centerMap')}
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -605,11 +605,11 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
 
       </div>
 
-      {/* Map Canvas */}
+      {/* Map Canvas with Responsive Height */}
       <div
         ref={mapContainerRef}
         id="map"
-        className="shadow-inner border border-slate-200/80 h-[480px] sm:h-[620px] rounded-2xl overflow-hidden relative bg-slate-100"
+        className="shadow-inner border border-slate-200/80 h-[380px] sm:h-[620px] rounded-2xl overflow-hidden relative bg-slate-100"
       >
         {!isLeafletReady && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 text-slate-500 space-y-2 z-10">
