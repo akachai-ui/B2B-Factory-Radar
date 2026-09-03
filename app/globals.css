@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-100 text-slate-900;
+  }
+}
+
+/* Custom Leaflet Map Container */
+.leaflet-container {
+  font-family: inherit !important;
+  z-index: 10;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 1.25rem !important;
+  padding: 6px !important;
+  box-shadow: 0 20px 35px -5px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(15, 23, 42, 0.05) !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+}
+
+/* Custom HQ Marker Pulsing Radar Animation */
+.hq-pulse {
+  background: #3b82f6;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -10px 0px 0px -10px;
+  animation: pulsate 1.8s ease-out infinite;
+  opacity: 0;
+}
+
+@keyframes pulsate {
+  0% { transform: scale(0.2, 0.2); opacity: 0; }
+  50% { opacity: 0.9; }
+  100% { transform: scale(3.6, 3.6); opacity: 0; }
+}
+
+.hq-marker-icon {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.5), 0 0 0 2px rgba(37, 99, 235, 0.3);
+  width: 46px !important;
+  height: 46px !important;
+  margin-left: -23px !important;
+  margin-top: -23px !important;
+  position: relative;
+}

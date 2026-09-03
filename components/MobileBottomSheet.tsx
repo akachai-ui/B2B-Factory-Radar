@@ -1,0 +1,271 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { FactoryLead, LeadStatus } from '@/lib/types';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getLeadStatuses, saveLeadStatus } from '@/lib/leadStatusStorage';
+import { Phone, Navigation, Globe, Mail, Lock, Sparkles, Car, Check, Copy } from 'lucide-react';
+
+interface MobileBottomSheetProps {
+  lead: FactoryLead | null;
+  onClose: () => void;
+  isLoggedIn: boolean;
+  onRequireAuth: () => void;
+  userLocation: { lat: number; lng: number };
+}
+
+function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
+  lead,
+  onClose,
+  isLoggedIn,
+  onRequireAuth,
+  userLocation,
+}) => {
+  const { t } = useLanguage();
+  const [currentStatus, setCurrentStatus] = useState<LeadStatus>('NEW');
+  const [note, setNote] = useState<string>('');
+  const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
+  const [copiedEmail, setCopiedEmail] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (lead) {
+      const records = getLeadStatuses();
+      const record = records[lead.place_id];
+      if (record) {
+        setCurrentStatus(record.status);
+        setNote(record.note || '');
+      } else {
+        setCurrentStatus('NEW');
+        setNote('');
+      }
+      setCopiedEmail(false);
+    }
+  }, [lead]);
+
+  if (!lead) return null;
+
+  const handleStatusChange = (newStatus: LeadStatus) => {
+    setCurrentStatus(newStatus);
+    saveLeadStatus(lead.place_id, newStatus, note);
+    setSavedSuccess(true);
+    setTimeout(() => setSavedSuccess(false), 1500);
+  };
+
+  const handleNoteSave = () => {
+    saveLeadStatus(lead.place_id, currentStatus, note);
+    setSavedSuccess(true);
+    setTimeout(() => setSavedSuccess(false), 1500);
+  };
+
+  const handleCopyEmail = (emailStr: string) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(emailStr);
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2000);
+    }
+  };
+
+  const distKm = lead.lat && lead.lng ? calculateDistanceKm(userLocation.lat, userLocation.lng, lead.lat, lead.lng) : 0;
+  const estMinutes = Math.max(1, Math.round(distKm * 2.2));
+  const locationTag = lead.subdistrict && lead.subdistrict !== 'ไม่ระบุตำบล' ? `${lead.subdistrict} • ${lead.district}` : lead.district;
+
+  const cleanPhone = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : '';
+  const cleanEmail = lead.email ? lead.email.split(',')[0].trim() : '';
+
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-50 p-3 sm:hidden animate-in slide-in-from-bottom duration-300">
+      <div className="bg-slate-900/95 backdrop-blur-xl border border-slate-700/80 rounded-3xl p-5 shadow-2xl text-white space-y-3.5 max-h-[85vh] overflow-y-auto">
+        
+        {/* Swipe Handle Indicator */}
+        <div className="flex justify-center -mt-2">
+          <div className="w-12 h-1.5 rounded-full bg-slate-700"></div>
+        </div>
+
+        {/* Header & Close */}
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 text-[10px] font-black border border-blue-500/30">
+              <span>📍</span>
+              <span>{locationTag}</span>
+            </div>
+            <h3 className="font-black text-base text-white mt-1.5 leading-snug">
+              {isLoggedIn ? lead.name : `${t('guestLockedTitle')} (${lead.district})`}
+            </h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="h-8 w-8 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-sm shrink-0 active:scale-90 transition cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Address */}
+        <p className="text-xs text-slate-300 leading-tight">
+          {isLoggedIn ? lead.address : `${t('addressLabel')}: ${lead.district} (${t('guestLockedDesc')})`}
+        </p>
+
+        {/* Distance Badge */}
+        <div className="flex items-center gap-2 p-2.5 rounded-2xl bg-blue-950/60 border border-blue-800/60 text-blue-200 text-xs font-bold">
+          <Car className="w-4 h-4 text-blue-400 shrink-0" />
+          <span>{t('distanceAway')} <strong>{distKm.toFixed(1)} km</strong> ({t('drivingTime')} {estMinutes} {t('minutesUnit')})</span>
+        </div>
+
+        {/* Content depending on Logged In vs Guest */}
+        {isLoggedIn ? (
+          <div className="space-y-3 pt-1">
+            
+            {/* Status & Notes Tracking Box */}
+            <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2.5">
+              <div className="flex items-center justify-between text-[11px] font-bold">
+                <span className="text-slate-300 font-black">📋 {t('statusLabel')}</span>
+                {savedSuccess && (
+                  <span className="text-emerald-400 text-[10px] font-bold flex items-center gap-1 animate-pulse">
+                    <Check className="w-3 h-3" /> บันทึกแล้ว!
+                  </span>
+                )}
+              </div>
+              
+              <select
+                value={currentStatus}
+                onChange={(e) => handleStatusChange(e.target.value as LeadStatus)}
+                className="w-full text-xs font-bold p-2 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none"
+              >
+                <option value="NEW">⚪ {t('statusNew')}</option>
+                <option value="CONTACTED">🟡 {t('statusContacted')}</option>
+                <option value="MEETING">🟣 {t('statusMeeting')}</option>
+                <option value="WON">🟢 {t('statusWon')}</option>
+                <option value="LOST">🔴 {t('statusLost')}</option>
+              </select>
+
+              {/* Note input */}
+              <div className="flex items-center gap-1.5 pt-1">
+                <input
+                  type="text"
+                  placeholder={t('notePlaceholder')}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  onBlur={handleNoteSave}
+                  className="flex-1 text-[11px] p-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 outline-none"
+                />
+                <button
+                  onClick={handleNoteSave}
+                  className="px-3 py-2 rounded-xl bg-blue-600 active:bg-blue-500 text-white text-[11px] font-bold shrink-0"
+                >
+                  บันทึก
+                </button>
+              </div>
+            </div>
+
+            {/* Email Card with 1-Click Copy */}
+            {cleanEmail && (
+              <button
+                onClick={() => handleCopyEmail(cleanEmail)}
+                className="w-full text-xs text-violet-300 font-mono flex items-center justify-between bg-slate-800/80 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-700 active:scale-95 transition cursor-pointer"
+                title="แตะเพื่อคัดลอกอีเมล"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Mail className="w-4 h-4 text-violet-400 shrink-0" />
+                  <span className="truncate">{cleanEmail}</span>
+                </div>
+                <div className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-violet-500/20 text-violet-300 border border-violet-500/30 font-bold shrink-0">
+                  {copiedEmail ? (
+                    <>
+                      <Check className="w-3 h-3 text-emerald-400" />
+                      <span className="text-emerald-400">คัดลอกแล้ว</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3" />
+                      <span>คัดลอก</span>
+                    </>
+                  )}
+                </div>
+              </button>
+            )}
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              {lead.phone ? (
+                <a
+                  href={`tel:${cleanPhone}`}
+                  className="py-3 px-4 rounded-2xl bg-emerald-600 active:bg-emerald-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 active:scale-95 transition"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>{t('callNow')}</span>
+                </a>
+              ) : (
+                <div className="py-3 px-4 rounded-2xl bg-slate-800 text-slate-500 font-bold text-xs text-center flex items-center justify-center">
+                  {t('noPhone')}
+                </div>
+              )}
+
+              {lead.maps_url ? (
+                <a
+                  href={lead.maps_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-3 px-4 rounded-2xl bg-amber-500 active:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/30 active:scale-95 transition"
+                >
+                  <Navigation className="w-4 h-4" />
+                  <span>{t('navigateGoogle')}</span>
+                </a>
+              ) : null}
+            </div>
+
+            {lead.website && (
+              <a
+                href={lead.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-blue-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>{t('visitWebsite')}</span>
+              </a>
+            )}
+          </div>
+        ) : (
+          /* GUEST LOCKED STATE */
+          <div className="space-y-3 pt-1">
+            <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700 text-center space-y-1">
+              <div className="flex items-center justify-center gap-1 text-amber-400 font-bold text-xs">
+                <Lock className="w-3.5 h-3.5" />
+                <span>{t('lockedDataBadge')}</span>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                {t('guestBannerDesc')}
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                onClose();
+                onRequireAuth();
+              }}
+              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 active:from-amber-300 active:to-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 active:scale-95 transition cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{t('unlockThisFactoryBtn')}</span>
+            </button>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+};
