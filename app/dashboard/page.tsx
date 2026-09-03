@@ -14,6 +14,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { MobileBottomSheet } from '@/components/MobileBottomSheet';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { CompanyOnboardingModal } from '@/components/CompanyOnboardingModal';
+import { AuthModal } from '@/components/AuthModal';
 import {
   Layers,
   Map,
@@ -93,6 +94,20 @@ export default function DashboardPage() {
 
   const [leadStatuses, setLeadStatuses] = useState<Record<string, { status: LeadStatus; note?: string }>>({});
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup');
+
+  // Protect Dashboard: if not authenticated, redirect to landing page
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
+    }
+  }, [loading, user, router]);
+
+  const handleOpenAuth = (mode: 'signin' | 'signup') => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
 
   const [userLocation, setUserLocation] = useState<{
     lat: number;
@@ -419,7 +434,7 @@ export default function DashboardPage() {
 
             {/* User Menu */}
             <UserMenu
-              onOpenAuth={() => {}}
+              onOpenAuth={handleOpenAuth}
               onOpenCompanyProfile={() => setIsCompanyModalOpen(true)}
             />
 
@@ -1123,6 +1138,13 @@ export default function DashboardPage() {
         isOpen={isCompanyModalOpen}
         onClose={() => setIsCompanyModalOpen(false)}
         isInitialOnboarding={!profile?.company_name || profile?.company_name === 'บริษัทของฉัน'}
+      />
+
+      {/* 6. AUTH MODAL (SIGN IN / SIGN UP) */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authModalMode}
       />
 
     </div>
