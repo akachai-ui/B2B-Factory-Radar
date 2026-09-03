@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AuthModal } from '@/components/AuthModal';
+import { PdpaTermsModal } from '@/components/PdpaTermsModal';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { MobileBottomSheet } from '@/components/MobileBottomSheet';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
@@ -124,6 +125,8 @@ export default function HomePage() {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
+  const [isPdpaModalOpen, setIsPdpaModalOpen] = useState<boolean>(false);
+  const [pdpaTab, setPdpaTab] = useState<'pdpa' | 'terms'>('pdpa');
 
   const [selectedDistrict, setSelectedDistrict] = useState<string>('ALL');
   const [selectedSubdistrict, setSelectedSubdistrict] = useState<string>('ALL');
@@ -604,12 +607,36 @@ export default function HomePage() {
 
       {/* 5. FOOTER */}
       <footer className="border-t border-slate-800/80 bg-[#04060c] py-6 sm:py-8 text-slate-500 text-xs text-center">
-        <div className="max-w-7xl mx-auto px-4 space-y-2">
+        <div className="max-w-7xl mx-auto px-4 space-y-2.5">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-slate-300 font-bold">
             <span>{t('appName')}</span>
             <span className="hidden sm:inline text-slate-600">•</span>
             <span className="text-slate-400 font-normal">{t('footerCopy')}</span>
           </div>
+          
+          {/* PDPA & Terms Legal Links */}
+          <div className="flex items-center justify-center gap-4 text-[11px] text-slate-400">
+            <button
+              onClick={() => {
+                setPdpaTab('terms');
+                setIsPdpaModalOpen(true);
+              }}
+              className="hover:text-amber-300 transition underline underline-offset-2 cursor-pointer"
+            >
+              ข้อกำหนดการให้บริการ (Terms)
+            </button>
+            <span>•</span>
+            <button
+              onClick={() => {
+                setPdpaTab('pdpa');
+                setIsPdpaModalOpen(true);
+              }}
+              className="hover:text-amber-300 transition underline underline-offset-2 cursor-pointer"
+            >
+              นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)
+            </button>
+          </div>
+
           <div className="text-[11px] text-slate-600">
             {t('appSubtitle')}
           </div>
@@ -644,6 +671,13 @@ export default function HomePage() {
           if (user) router.push('/dashboard');
         }}
         initialMode={authModalMode}
+      />
+
+      {/* PDPA & Terms Modal */}
+      <PdpaTermsModal
+        isOpen={isPdpaModalOpen}
+        onClose={() => setIsPdpaModalOpen(false)}
+        defaultTab={pdpaTab}
       />
 
     </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Lock, Mail, Building2, User, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { PdpaTermsModal } from './PdpaTermsModal';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const { t, language } = useLanguage();
   const router = useRouter();
   const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
+  const [isPdpaModalOpen, setIsPdpaModalOpen] = useState<boolean>(false);
   
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -289,9 +291,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </button>
           </div>
 
+          <div className="pt-1 text-center">
+            <p className="text-[10px] text-slate-400">
+              การเข้าใช้งานถือว่าท่านยอมรับ{' '}
+              <button
+                type="button"
+                onClick={() => setIsPdpaModalOpen(true)}
+                className="text-blue-600 hover:underline font-semibold cursor-pointer"
+              >
+                ข้อกำหนด & นโยบาย PDPA
+              </button>
+            </p>
+          </div>
+
         </form>
 
       </div>
+
+      <PdpaTermsModal
+        isOpen={isPdpaModalOpen}
+        onClose={() => setIsPdpaModalOpen(false)}
+      />
     </div>
   );
 };
