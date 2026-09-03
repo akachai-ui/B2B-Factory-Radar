@@ -49,23 +49,55 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
     setErrorMsg(null);
 
     try {
-      const updatePayload = {
+      let currentCompanyId = profile?.company_id;
+
+      if (currentCompanyId) {
+        // Update existing Company
+        await supabase
+          .from('companies')
+          .update({
+            name: companyName.trim(),
+            phone: phone.trim(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', currentCompanyId);
+      } else {
+        // Create new Company for Owner
+        const { data: newCompany, error: compError } = await supabase
+          .from('companies')
+          .insert({
+            name: companyName.trim(),
+            phone: phone.trim(),
+            address: 'สมุทรปราการ',
+            subscription_tier: 'pro',
+            max_seats: 5,
+            invite_code: 'RH-' + Math.floor(1000 + Math.random() * 9000),
+          })
+          .select('id')
+          .single();
+
+        if (!compError && newCompany) {
+          currentCompanyId = newCompany.id;
+        }
+      }
+
+      const updateProfilePayload = {
         id: user.id,
         email: user.email || '',
         full_name: fullName.trim() || user.email?.split('@')[0] || 'สมาชิกทีมขาย',
+        phone: phone.trim(),
+        role: profile?.role || 'owner',
+        company_id: currentCompanyId || null,
         company_name: companyName.trim(),
-        company_phone: phone.trim(),
-        company_address: 'สมุทรปราการ',
-        subscription_tier: profile?.subscription_tier || 'pro',
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase
+      const { error: profError } = await supabase
         .from('profiles')
-        .upsert(updatePayload);
+        .upsert(updateProfilePayload);
 
-      if (error) {
-        setErrorMsg('เกิดข้อผิดพลาดในการบันทึก: ' + error.message);
+      if (profError) {
+        setErrorMsg('เกิดข้อผิดพลาดในการบันทึกโปรไฟล์: ' + profError.message);
       } else {
         await refreshProfile();
         onClose();

@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, company:companies(*)')
         .eq('id', userId)
         .single();
 
@@ -51,18 +51,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const defaultProf: UserProfile = {
           id: userId,
           email: userEmail,
-          full_name: userMetadata?.full_name || userMetadata?.name || userEmail.split('@')[0] || 'สมาชิก PRO',
+          full_name: userMetadata?.full_name || userMetadata?.name || userEmail.split('@')[0] || 'สมาชิกทีมขาย',
           company_name: userMetadata?.company_name || 'บริษัทของฉัน',
-          company_address: 'สมุทรปราการ',
-          company_phone: '',
-          company_lat: 13.6304636,
-          company_lng: 100.708154,
-          company_radius_km: 15,
+          phone: '',
+          role: 'owner',
           subscription_tier: 'pro',
         };
         setProfile(defaultProf);
 
-        supabase.from('profiles').upsert(defaultProf).then(() => {});
+        supabase.from('profiles').upsert({
+          id: userId,
+          email: userEmail,
+          full_name: defaultProf.full_name,
+          company_name: defaultProf.company_name,
+          role: 'owner',
+          updated_at: new Date().toISOString(),
+        }).then(() => {});
       }
     } catch (err) {
       console.warn('Error fetching profile:', err);
