@@ -7777,24 +7777,6 @@
   },
   {
     "id": 433,
-    "place_id": "ChIJD1COxuim4jARz2mSbpq0OaQ",
-    "name": "บริษัท เดนโก้ อินดัสทรี จำกัด",
-    "phone": "02 408 5800",
-    "email": "sales@denco.co.th, react-dom@18.3.1, focus-within-polyfill@5.0.9, prapon@denco.co.th, sale@denco.co.th, lodash@4.17.23, rspack@1.6.8, core-js-bundle@3.2.1, intl-segmenter@11.7.10, react@18.3.1",
-    "subdistrict": "นาเกลือ",
-    "district": "อำเภอพระสมุทรเจดีย์",
-    "province": "สมุทรปราการ",
-    "address": "เลขที่ 999 ถนน สมุทรปราการ-สมุทรสาคร ตำบล นาเกลือ อำเภอพระสมุทรเจดีย์ สมุทรปราการ 10290 ประเทศไทย",
-    "website": "http://www.denco.co.th/",
-    "lat": 13.5558219,
-    "lng": 100.5093271,
-    "maps_url": "https://maps.google.com/?cid=11833688071265741263",
-    "status": "ยังไม่ได้ติดต่อ",
-    "contact_person": "",
-    "notes": ""
-  },
-  {
-    "id": 434,
     "place_id": "ChIJtYKLU3Oh4jARKokyKHY6-oI",
     "name": "รุ่งเจริญ (ช่างหม่อง)",
     "phone": "061 978 7946",
@@ -7812,7 +7794,7 @@
     "notes": ""
   },
   {
-    "id": 435,
+    "id": 434,
     "place_id": "ChIJO3c3Zcum4jARW1CU2lLQMPg",
     "name": "World Steel Pallet Co.,Ltd",
     "phone": "02 425 8855",
@@ -7830,7 +7812,7 @@
     "notes": ""
   },
   {
-    "id": 436,
+    "id": 435,
     "place_id": "ChIJGexdG_2n4jARTjcOuTq1VL0",
     "name": "PTY",
     "phone": "02 463 3506",
@@ -7848,7 +7830,7 @@
     "notes": ""
   },
   {
-    "id": 437,
+    "id": 436,
     "place_id": "ChIJlYRXVEGh4jARniIYW2r1b9I",
     "name": "SJ PLASTIC (เอส.เจ.พลาสติก)",
     "phone": "063 549 5456",
@@ -7866,7 +7848,7 @@
     "notes": ""
   },
   {
-    "id": 438,
+    "id": 437,
     "place_id": "ChIJ_ydsPBmk4jAR6Mzzq6KSnS4",
     "name": "บริษัท โมเดิร์น พลาสติกส์ เมนูแฟคเจอริ่ง จำกัด",
     "phone": "02 816 9145",
@@ -7884,7 +7866,7 @@
     "notes": ""
   },
   {
-    "id": 439,
+    "id": 438,
     "place_id": "ChIJF6j85Yuk4jARwm0wvF_NJoE",
     "name": "ห้างหุ้นส่วนจำกัด พี. พี. เมคคาเทค & บริษัท ม้าแปด โซลูชั่น จำกัด",
     "phone": "02 490 1138",
@@ -7902,7 +7884,7 @@
     "notes": ""
   },
   {
-    "id": 440,
+    "id": 439,
     "place_id": "ChIJ01zC0c2m4jAR_uMoqJzAnyE",
     "name": "บริษัท ทินแคน อินดัสทรี่ จำกัด (สาขา1)",
     "phone": "02 461 1461",
@@ -7920,7 +7902,7 @@
     "notes": ""
   },
   {
-    "id": 441,
+    "id": 440,
     "place_id": "ChIJQeaG9x-j4jARV1F3zkoAEdM",
     "name": "บริษัท พี.เจ. บรรจุภัณฑ์ จำกัด",
     "phone": "081 356 4083",
@@ -7938,7 +7920,7 @@
     "notes": ""
   },
   {
-    "id": 442,
+    "id": 441,
     "place_id": "ChIJZwE-7vih4jAR9hRNsEQ8Cuk",
     "name": "บริษัท ธนะรุ่ง โปรดักส์ จำกัด",
     "phone": "099 164 5283",
@@ -7956,7 +7938,7 @@
     "notes": ""
   },
   {
-    "id": 443,
+    "id": 442,
     "place_id": "ChIJ94J3wPKj4jARUtEQPHcZw4U",
     "name": "บริษัท ที.พี.เอ็ม. อินดัสตรี จำกัด",
     "phone": "02 461 5448",
@@ -7974,7 +7956,7 @@
     "notes": ""
   },
   {
-    "id": 444,
+    "id": 443,
     "place_id": "ChIJmTqK1Iuk4jAR_U04ap-L5gk",
     "name": "บจก. พี.ซี.เอส อินดัสตรี้",
     "phone": "02 490 1357",
@@ -7992,7 +7974,7 @@
     "notes": ""
   },
   {
-    "id": 445,
+    "id": 444,
     "place_id": "ChIJl8oKY9-m4jARbJ0BiZ71V8M",
     "name": "บริษัท เอกสงวนอุตสาหกรรมร่ม จำกัด",
     "phone": "084 361 9978",
@@ -8010,7 +7992,7 @@
     "notes": ""
   },
   {
-    "id": 446,
+    "id": 445,
     "place_id": "ChIJAUScFr2m4jARVZIZCMkFRUo",
     "name": "บริษัท ไทยไฟเบอร์ออพติคส์ จำกัด",
     "phone": "02 817 5590",
@@ -8028,7 +8010,7 @@
     "notes": ""
   },
   {
-    "id": 447,
+    "id": 446,
     "place_id": "ChIJyRS7me2j4jARpkgQLXT-ci0",
     "name": "บจก.แสงฟ้าอุตสาหกรรม",
     "phone": "02 461 6232",
@@ -8046,7 +8028,7 @@
     "notes": ""
   },
   {
-    "id": 448,
+    "id": 447,
     "place_id": "ChIJY8v7cCxcHTERhYqCED46Ggk",
     "name": "บจก. สหไทยเปลือกหม้อพลาสติก",
     "phone": "02 316 6022",
@@ -8064,7 +8046,7 @@
     "notes": ""
   },
   {
-    "id": 449,
+    "id": 448,
     "place_id": "ChIJtzOXXvVcHTER5Oc5lyWe2sE",
     "name": "บริษัท เอ็ม.พี.พลาสเทค จำกัด",
     "phone": "081 818 7638",
@@ -8082,7 +8064,7 @@
     "notes": ""
   },
   {
-    "id": 450,
+    "id": 449,
     "place_id": "ChIJL_TCT8hfHTERrtSQY3BQctM",
     "name": "Munekata Thai Co.,Ltd.",
     "phone": "02 170 4735",
@@ -8100,7 +8082,7 @@
     "notes": ""
   },
   {
-    "id": 451,
+    "id": 450,
     "place_id": "ChIJdXIrolFDHTER3AXh7nRVXe8",
     "name": "บจก. เพียรเจริญพลาสติก",
     "phone": "02 346 1618",
@@ -8118,7 +8100,7 @@
     "notes": ""
   },
   {
-    "id": 452,
+    "id": 451,
     "place_id": "ChIJY8v7cCxcHTERLPnuS7RgEfU",
     "name": "บริษัท ไทยฟิวเจอร์อินคอร์ปอเรชั่น จำกัด (มหาชน)",
     "phone": "02 316 9558",
@@ -8136,7 +8118,7 @@
     "notes": ""
   },
   {
-    "id": 453,
+    "id": 452,
     "place_id": "ChIJY8v7cCxcHTER4HuUZmrCMOs",
     "name": "บริษัท ดิจิ-เมท-เทค จำกัด",
     "phone": "084 388 3516",
@@ -8154,7 +8136,7 @@
     "notes": ""
   },
   {
-    "id": 454,
+    "id": 453,
     "place_id": "ChIJa-7CHWVDHTERz38pxAgKrkw",
     "name": "บจก. ไทยยูรีเทนพลาสติก",
     "phone": "02 708 5200",
@@ -8172,7 +8154,7 @@
     "notes": ""
   },
   {
-    "id": 455,
+    "id": 454,
     "place_id": "ChIJ_6rlbftfHTER-qRLjY57Eaw",
     "name": "บริษัท ไอเซโล (ประเทศไทย) จำกัด",
     "phone": "02 752 2584",
@@ -8190,7 +8172,7 @@
     "notes": ""
   },
   {
-    "id": 456,
+    "id": 455,
     "place_id": "ChIJQ_o0029dHTER917sR3L5cqw",
     "name": "บริษัท ทีแพค แพคเกจจิ้ง(บางนา) จำกัด",
     "phone": "02 312 6148",
@@ -8208,7 +8190,7 @@
     "notes": ""
   },
   {
-    "id": 457,
+    "id": 456,
     "place_id": "ChIJgQkge3dnHTERMfzIgGvuNYk",
     "name": "บริษัท คิว พี อี เอ็นจิเนียริ่ง จำกัด",
     "phone": "086 320 9025",
@@ -8226,7 +8208,7 @@
     "notes": ""
   },
   {
-    "id": 458,
+    "id": 457,
     "place_id": "ChIJ85UfBWFcHTERGMuBYn6wl74",
     "name": "บริษัท​ เจ็ทต้าเทคโนโลยี่​ จำกัด",
     "phone": "081 778 1554",
@@ -8244,7 +8226,7 @@
     "notes": ""
   },
   {
-    "id": 459,
+    "id": 458,
     "place_id": "ChIJq-17wXxeHTER1rBqOWFCEIY",
     "name": "บริษัท ที บี ซี เอนจิเนียร์ จำกัด",
     "phone": "02 186 9308",
@@ -8262,7 +8244,7 @@
     "notes": ""
   },
   {
-    "id": 460,
+    "id": 459,
     "place_id": "ChIJ3Tv1_lNbHTERD0Qx3iLNRcU",
     "name": "บริษัท ฟรอม พลาสติก เอเชีย จำกัด",
     "phone": "02 397 9465",
@@ -8280,7 +8262,7 @@
     "notes": ""
   },
   {
-    "id": 461,
+    "id": 460,
     "place_id": "ChIJdXIrolFDHTERLinCCs1iLxE",
     "name": "บริษัท โนวา พิกเม้นท์ ซัพพลาย จำกัด",
     "phone": "02 312 8990",
@@ -8298,7 +8280,7 @@
     "notes": ""
   },
   {
-    "id": 462,
+    "id": 461,
     "place_id": "ChIJY39E0VhDHTERb-WaLi_0iFU",
     "name": "บริษัท เพาเวอร์ วิชั่น อุตสาหกรรม จำกัด",
     "phone": "02 312 8165 ext. 12",
@@ -8316,7 +8298,7 @@
     "notes": ""
   },
   {
-    "id": 463,
+    "id": 462,
     "place_id": "ChIJkzgJplFDHTERIYkkU5kgogY",
     "name": "บริษัท เอ พลาส อุตสาหกรรม จำกัด",
     "phone": "02 740 0940",
@@ -8334,7 +8316,7 @@
     "notes": ""
   },
   {
-    "id": 464,
+    "id": 463,
     "place_id": "ChIJ7aZWj1tcHTERcLQYro7dvro",
     "name": "Thai Toyo Foam Industry Co., Ltd. (บริษัท ไทยโตโยโฟม อินดัสทรี จำกัด)",
     "phone": "02 337 0173",
@@ -8352,7 +8334,7 @@
     "notes": ""
   },
   {
-    "id": 465,
+    "id": 464,
     "place_id": "ChIJS7sXw6ZeHTERI1KejZ8CqPg",
     "name": "บริษัท เค แอนด์ พี ไฮดรอ - เมติค อิควิปเมนท์ จำกัด",
     "phone": "081 583 6569",
@@ -8370,7 +8352,7 @@
     "notes": ""
   },
   {
-    "id": 466,
+    "id": 465,
     "place_id": "ChIJrZZHlgxfHTER_-i0KK2QKqQ",
     "name": "บ.เจเอ็นที แมนูแฟคเจอร์ริ่ง",
     "phone": "081 331 9609",
@@ -8388,7 +8370,7 @@
     "notes": ""
   },
   {
-    "id": 467,
+    "id": 466,
     "place_id": "ChIJg-jI7Hid4jARbJkwPWWAoKw",
     "name": "Wurth (Thailand) Co., Ltd.",
     "phone": "02 170 5099",
@@ -8406,7 +8388,7 @@
     "notes": ""
   },
   {
-    "id": 468,
+    "id": 467,
     "place_id": "ChIJwbrEk5dcHTERw6YSgJ8Mhv8",
     "name": "บริษัท ไทยรุ่งเท็กซ์ไทล์ จำกัด",
     "phone": "02 337 2325",
@@ -8424,7 +8406,7 @@
     "notes": ""
   },
   {
-    "id": 469,
+    "id": 468,
     "place_id": "ChIJY8v7cCxcHTERsauQTG25vu0",
     "name": "ลินเด้",
     "phone": "02 338 6100",
@@ -8442,7 +8424,7 @@
     "notes": ""
   },
   {
-    "id": 470,
+    "id": 469,
     "place_id": "ChIJY8v7cCxcHTERJRx-baHlQFA",
     "name": "บริษัท ไทยซัมมิท โอโตพาร์ท อินดัสตรี จำกัด",
     "phone": "02 325 8000",
@@ -8460,7 +8442,7 @@
     "notes": ""
   },
   {
-    "id": 471,
+    "id": 470,
     "place_id": "ChIJ-8IPbWZeHTERQzd_ItMwJqU",
     "name": "บุญถาวร สาขาบางนา",
     "phone": "02 174 6888",
@@ -8478,7 +8460,7 @@
     "notes": ""
   },
   {
-    "id": 472,
+    "id": 471,
     "place_id": "ChIJTT3yf7ETAzEReH29XIa8lKk",
     "name": "Juken",
     "phone": "",
@@ -8496,7 +8478,7 @@
     "notes": ""
   },
   {
-    "id": 473,
+    "id": 472,
     "place_id": "ChIJdXIrolFDHTERPP02R20NjMk",
     "name": "บจก. อีสเทอร์น โฟม โปรดั๊ก",
     "phone": "095 246 4535",
@@ -8514,7 +8496,7 @@
     "notes": ""
   },
   {
-    "id": 474,
+    "id": 473,
     "place_id": "ChIJY8v7cCxcHTERo9oSNIKTXq0",
     "name": "บริษัท เดลต้า ไทย เมทัล จำกัด",
     "phone": "02 740 6482",
@@ -8532,7 +8514,7 @@
     "notes": ""
   },
   {
-    "id": 475,
+    "id": 474,
     "place_id": "ChIJ-d7h3RpfHTERFUzowjRnetM",
     "name": "Sale CNC",
     "phone": "082 972 9329",
@@ -8550,7 +8532,7 @@
     "notes": ""
   },
   {
-    "id": 476,
+    "id": 475,
     "place_id": "ChIJuc1vHzNeHTERqdvy4whv1TA",
     "name": "บริษัท พี.อี. ไทย เซลส์ แอนด์ เซอร์วิส จำกัด",
     "phone": "02 743 0188",
@@ -8568,7 +8550,7 @@
     "notes": ""
   },
   {
-    "id": 477,
+    "id": 476,
     "place_id": "ChIJw7IaebtcHTERyCBmix5oStY",
     "name": "บริษัท เอเอสดับบลิว.เปเปอร์ แอนด์ ทรานสปอร์ตเทชั่น จำกัด",
     "phone": "087 745 4646",
@@ -8586,7 +8568,7 @@
     "notes": ""
   },
   {
-    "id": 478,
+    "id": 477,
     "place_id": "ChIJdVAzUEhcHTERqw65wjY0i8Q",
     "name": "บริษัท ทองไชย แมนูแฟคเจอริ่ง จำกัด",
     "phone": "02 312 5141",
@@ -8604,7 +8586,7 @@
     "notes": ""
   },
   {
-    "id": 479,
+    "id": 478,
     "place_id": "ChIJkyg5XPBcHTERD2z_y8utNWI",
     "name": "บจก. นำยงอุตสาหกรรมเคมี",
     "phone": "02 337 1321",
@@ -8622,7 +8604,7 @@
     "notes": ""
   },
   {
-    "id": 480,
+    "id": 479,
     "place_id": "ChIJFzpDa0peHTERCCJfjmL_F_Y",
     "name": "Vispac บจก. วิสแพค",
     "phone": "02 316 0888",
@@ -8640,7 +8622,7 @@
     "notes": ""
   },
   {
-    "id": 481,
+    "id": 480,
     "place_id": "ChIJm25vlFtDHTERnYWYp33mHG8",
     "name": "ห้างหุ้นส่วนจำกัด ดีเอดี พาร์ท พรีซิชั่น",
     "phone": "02 397 9334",
@@ -8658,7 +8640,7 @@
     "notes": ""
   },
   {
-    "id": 482,
+    "id": 481,
     "place_id": "ChIJzTZnT95eHTERbk8Gdr80kNY",
     "name": "บริษัท เอ.เอส.ไอ. พรีซิชั่น จำกัด (โรงงาน เทพารักษ์)",
     "phone": "02 757 5500",
@@ -8676,7 +8658,7 @@
     "notes": ""
   },
   {
-    "id": 483,
+    "id": 482,
     "place_id": "ChIJ56rhaAVcHTERwWoA9rBLOGE",
     "name": "บริษัท เคมิคอล วิลเลจ จำกัด",
     "phone": "02 757 5290",
@@ -8694,7 +8676,7 @@
     "notes": ""
   },
   {
-    "id": 484,
+    "id": 483,
     "place_id": "ChIJweTqF-BeHTER_CC94YPsA1A",
     "name": "บริษัท เดเลนเด้ จำกัด",
     "phone": "081 804 6493",
@@ -8712,7 +8694,7 @@
     "notes": ""
   },
   {
-    "id": 485,
+    "id": 484,
     "place_id": "ChIJB__2ksReHTERmkAMG_ItbI0",
     "name": "บริษัท เอ็มดี โมลด์ จำกัด",
     "phone": "02 385 5613",
@@ -8730,7 +8712,7 @@
     "notes": ""
   },
   {
-    "id": 486,
+    "id": 485,
     "place_id": "ChIJXQRoYYhbHTERYdZxFvheqKg",
     "name": "บริษัท นำดีวัฒน์ เคมีเคิล จำกัด (สำนักงาน & โรงงาน)",
     "phone": "02 312 1755",
@@ -8748,7 +8730,7 @@
     "notes": ""
   },
   {
-    "id": 487,
+    "id": 486,
     "place_id": "ChIJr9mIYQtcHTERHgWDN6jOYqs",
     "name": "บริษัทเอ.ดี.เอส. ไทยเจริญเอ็นจิเนียริ่ง จำกัด",
     "phone": "02 750 0175",
@@ -8766,7 +8748,7 @@
     "notes": ""
   },
   {
-    "id": 488,
+    "id": 487,
     "place_id": "ChIJ56rhaAVcHTERS2liGf_h378",
     "name": "ASSAB Steels (Thailand) Ltd.",
     "phone": "02 385 5937",
@@ -8784,7 +8766,7 @@
     "notes": ""
   },
   {
-    "id": 489,
+    "id": 488,
     "place_id": "ChIJJ12fGvag4jARlueB3DOPIsc",
     "name": "บริษัท เอ็กซเพรสพลาสแพค (ประเทศไทย) จำกัด",
     "phone": "095 735 4465",
@@ -8802,7 +8784,7 @@
     "notes": ""
   },
   {
-    "id": 490,
+    "id": 489,
     "place_id": "ChIJx_nzwqZeHTER1NVZdulb6ak",
     "name": "บริษัท ศรจินดาโมลด์ จำกัด",
     "phone": "02 752 1598",
@@ -8820,7 +8802,7 @@
     "notes": ""
   },
   {
-    "id": 491,
+    "id": 490,
     "place_id": "ChIJa5_zhqKg4jARuqUXPML_JrY",
     "name": "ไทยเทียนพาณิชย์",
     "phone": "02 383 2261",
@@ -8838,7 +8820,7 @@
     "notes": ""
   },
   {
-    "id": 492,
+    "id": 491,
     "place_id": "ChIJjd0pVFdYHTERV-u2lu7MTSQ",
     "name": "แอ็พพลาย ดีบี จำกัด (มหาชน)",
     "phone": "02 709 4040",
@@ -8856,7 +8838,7 @@
     "notes": ""
   },
   {
-    "id": 493,
+    "id": 492,
     "place_id": "ChIJ6-jhJVCn4jARsWPCTnXp-mE",
     "name": "เดอะ เพรสซิเด้นท์ สุขุมวิท สมุทรปราการ",
     "phone": "096 749 4411",
@@ -8874,7 +8856,7 @@
     "notes": ""
   },
   {
-    "id": 494,
+    "id": 493,
     "place_id": "ChIJNe-DBV9dHTERciiOb_DdJzc",
     "name": "ปิยี๊ สาขาบางพลี",
     "phone": "097 456 6394",
@@ -8892,7 +8874,7 @@
     "notes": ""
   },
   {
-    "id": 495,
+    "id": 494,
     "place_id": "ChIJWxfDsASg4jARDGb6to2gF5I",
     "name": "Rabbit Pro Industries Co., Ltd. (Rabbit Manufacturing Services)",
     "phone": "063 829 5411",
@@ -8910,7 +8892,7 @@
     "notes": ""
   },
   {
-    "id": 496,
+    "id": 495,
     "place_id": "ChIJHys4sEtZHTERVGufcuxJn6Q",
     "name": "บริษัท แอล อาร์ เค โกลบอล จำกัด (LRK) รับบดพลาสติก รับหลอมเม็ด PE PP HD (Plastic Shredding and Pelletization Service)",
     "phone": "094 282 9939",
@@ -8928,7 +8910,7 @@
     "notes": ""
   },
   {
-    "id": 497,
+    "id": 496,
     "place_id": "ChIJ2zfpTlpZHTERzpdC8h1CDVM",
     "name": "Intensive Mould Co.,Ltd.",
     "phone": "02 174 7249",
@@ -8946,7 +8928,7 @@
     "notes": ""
   },
   {
-    "id": 498,
+    "id": 497,
     "place_id": "ChIJ09WwCgBdHTER1QFij8hS3Q0",
     "name": "บุญมาพลาสติก",
     "phone": "",
@@ -8964,7 +8946,7 @@
     "notes": ""
   },
   {
-    "id": 499,
+    "id": 498,
     "place_id": "ChIJh-nZY2VfHTERDpmx0507-aY",
     "name": "บริษัท เอ็น วาย พี แพ็คเกจจิ้ง จำกัด",
     "phone": "02 130 0981",
@@ -8982,7 +8964,7 @@
     "notes": ""
   },
   {
-    "id": 500,
+    "id": 499,
     "place_id": "ChIJs7fZ7uJdHTERZLcyyKkNeyw",
     "name": "รับซ่อมเครื่องฉีดพลาสติก(injection molding)",
     "phone": "",
@@ -9000,7 +8982,7 @@
     "notes": ""
   },
   {
-    "id": 501,
+    "id": 500,
     "place_id": "ChIJKR_eWbag4jART63XZRmyXwM",
     "name": "บริษัท เอ็ม แอนด์ เอ็น แมนูแฟคเจอร์ริ่ง จำกัด",
     "phone": "02 174 7334",
@@ -9018,7 +9000,7 @@
     "notes": ""
   },
   {
-    "id": 502,
+    "id": 501,
     "place_id": "ChIJdTcjAiJZHTER9EzqK2UHxCk",
     "name": "ซื้อขายเม็ดพลาสติกรีไซเคิล จี พี อินเตอร์พลาสต์",
     "phone": "089 797 9779",
@@ -9036,7 +9018,7 @@
     "notes": ""
   },
   {
-    "id": 503,
+    "id": 502,
     "place_id": "ChIJA9spdixcHTERRLXFgjj2N84",
     "name": "บริษัท ไฮมิก จำกัด",
     "phone": "02 384 4611",
@@ -9054,7 +9036,7 @@
     "notes": ""
   },
   {
-    "id": 504,
+    "id": 503,
     "place_id": "ChIJ6-9GUUJcHTERqUFbgFJuuKg",
     "name": "บริษัท ไทยเจริญพาเลท (1998) จำกัด",
     "phone": "02 183 9088",
@@ -9072,7 +9054,7 @@
     "notes": ""
   },
   {
-    "id": 505,
+    "id": 504,
     "place_id": "ChIJ90q2sIZcHTERcq2Yhquut3s",
     "name": "บจก. ส.เทพกิจ กรุ๊ป (STG)",
     "phone": "02 315 5216",
@@ -9090,7 +9072,7 @@
     "notes": ""
   },
   {
-    "id": 506,
+    "id": 505,
     "place_id": "ChIJOa7vv0hZHTERVtqgOasTpmA",
     "name": "บริษัท ซีออน เคมีคอล | รับผลิตสเปรย์ OEM/ODM ครบวงจร",
     "phone": "02 173 4484",
@@ -9108,7 +9090,7 @@
     "notes": ""
   },
   {
-    "id": 507,
+    "id": 506,
     "place_id": "ChIJI0OI6FZZHTERSXRhsKJNPbA",
     "name": "CPIM (Thailand)Co.,Ltd.",
     "phone": "02 174 5162",
@@ -9126,7 +9108,7 @@
     "notes": ""
   },
   {
-    "id": 508,
+    "id": 507,
     "place_id": "ChIJjToGDPddHTERgjiuMjSlTSk",
     "name": "บริษัท พี.อี.เอ็น.(ประเทศไทย) จำกัด",
     "phone": "02 134 6420",
@@ -9144,7 +9126,7 @@
     "notes": ""
   },
   {
-    "id": 509,
+    "id": 508,
     "place_id": "ChIJWfvKLEJnHTERTGx67cIN9Dw",
     "name": "บจก. มาห์เล สยาม ฟิลเตอร์ ซิสเต็มส์ (MAHLE Siam Filter Systems Co.,Ltd.)",
     "phone": "02 738 9034",
@@ -9162,7 +9144,7 @@
     "notes": ""
   },
   {
-    "id": 510,
+    "id": 509,
     "place_id": "ChIJbzkitMJbHTERXgahOsIBRD4",
     "name": "บริษัทเอสเอ็มพี อีโวลูชั่นจำกัด",
     "phone": "",
@@ -9180,7 +9162,7 @@
     "notes": ""
   },
   {
-    "id": 511,
+    "id": 510,
     "place_id": "ChIJ67I9R4Gg4jARxYgLHZsvW48",
     "name": "บริษัท บี.โอ.อุตสาหกรรม จำกัด",
     "phone": "02 753 1910",
@@ -9198,7 +9180,7 @@
     "notes": ""
   },
   {
-    "id": 512,
+    "id": 511,
     "place_id": "ChIJqWPbUKpZHTERAyASq1hf0jM",
     "name": "บจก. เคอร์รี่ อินกรีเดียนท์ (ไทยแลนด์)",
     "phone": "02 324 6100",
@@ -9216,7 +9198,7 @@
     "notes": ""
   },
   {
-    "id": 513,
+    "id": 512,
     "place_id": "ChIJkbN22_hYHTERbefENwG5MTQ",
     "name": "บริษัท โคคูโย-ไอเค (ประเทศไทย) จำกัด",
     "phone": "02 709 4675",
@@ -9234,7 +9216,7 @@
     "notes": ""
   },
   {
-    "id": 514,
+    "id": 513,
     "place_id": "ChIJZc7NvKpZHTER33sQI45H1ag",
     "name": "Fuji Electric Manufacturing (Thailand) Co.,Ltd. - Bangpoo Branch",
     "phone": "02 324 0100",
@@ -9252,7 +9234,7 @@
     "notes": ""
   },
   {
-    "id": 515,
+    "id": 514,
     "place_id": "ChIJM0XVw_5YHTER-D_lIFxhnEg",
     "name": "บริษัทเอ็นเอชเค สปริง (ประเทศไทย) จำกัด (โรงงานบางปู)",
     "phone": "02 323 0800",
@@ -9270,7 +9252,7 @@
     "notes": ""
   },
   {
-    "id": 516,
+    "id": 515,
     "place_id": "ChIJx3YVigBZHTERR_T_4kPnqmk",
     "name": "แมทเทล กรุงเทพ",
     "phone": "02 324 0373",
@@ -9288,7 +9270,7 @@
     "notes": ""
   },
   {
-    "id": 517,
+    "id": 516,
     "place_id": "ChIJc4NCaXpaHTERKRjLYcAqMJs",
     "name": "หจก. กรับ-โกร์ อินโนเวชั่น",
     "phone": "081 889 3928",
@@ -9306,7 +9288,7 @@
     "notes": ""
   },
   {
-    "id": 518,
+    "id": 517,
     "place_id": "ChIJf9aPjXhZHTERtWTBtuDgXck",
     "name": "ส่งออก",
     "phone": "093 279 4895",
@@ -9324,7 +9306,7 @@
     "notes": ""
   },
   {
-    "id": 519,
+    "id": 518,
     "place_id": "ChIJ1zcDJZNbHTERSCxaupyEjqM",
     "name": "GSK AUTO CO.,LTD.",
     "phone": "02 002 4609",
@@ -9342,7 +9324,7 @@
     "notes": ""
   },
   {
-    "id": 520,
+    "id": 519,
     "place_id": "ChIJP101pEhZHTER2YktMTm5DII",
     "name": "บริษัท ซันไรส์ เทคโนโลยี จำกัด",
     "phone": "02 030 0092",
@@ -9360,7 +9342,7 @@
     "notes": ""
   },
   {
-    "id": 521,
+    "id": 520,
     "place_id": "ChIJMbDcvrxZHTERarQL-0XheK8",
     "name": "CJT Industry Co. Ltd",
     "phone": "02 001 5051",
@@ -9378,7 +9360,7 @@
     "notes": ""
   },
   {
-    "id": 522,
+    "id": 521,
     "place_id": "ChIJ5_PfbJVZHTERF5SF4qtHU1s",
     "name": "รับซื้อเศษถุงสะอาด PE PP HD เปลือกถุง ขั้นต่ำ300kg รับจ้างหลอมเม็ดพลาสติก เม็ดกลมจากงานเศษใหม่",
     "phone": "094 282 9939",
@@ -9396,7 +9378,7 @@
     "notes": ""
   },
   {
-    "id": 523,
+    "id": 522,
     "place_id": "ChIJD9USUWFdHTERqKTYkeSgDP0",
     "name": "บางพลี พลาสต์ แพ็ก (ขาย/เช่า/รับซื้อ พาเลทพลาสติก)",
     "phone": "086 329 5176",
@@ -9414,7 +9396,7 @@
     "notes": ""
   },
   {
-    "id": 524,
+    "id": 523,
     "place_id": "ChIJQUS2rPlZHTERy2ctmBy7dVk",
     "name": "ศรีโกเมนทร์ พลาสติก",
     "phone": "098 448 2816",
@@ -9432,7 +9414,7 @@
     "notes": ""
   },
   {
-    "id": 525,
+    "id": 524,
     "place_id": "ChIJs42o8I5fHTERIWobQNogDsY",
     "name": "เป้ พลาสติก",
     "phone": "089 673 1916",
@@ -9450,7 +9432,7 @@
     "notes": ""
   },
   {
-    "id": 526,
+    "id": 525,
     "place_id": "ChIJD7BaBl5ZHTERipah_MIbRKY",
     "name": "สมพร โมลด์ แอนด์ พาร์ท (Somporn Mould And Part Ltd., Partnership",
     "phone": "02 382 5273",
@@ -9468,7 +9450,7 @@
     "notes": ""
   },
   {
-    "id": 527,
+    "id": 526,
     "place_id": "ChIJgQkge3dnHTERlIpbpZe6O4w",
     "name": "บริษัท ชารีรักษ์ อินดัสตรี้ส์ จำกัด",
     "phone": "02 346 5091",
@@ -9486,7 +9468,7 @@
     "notes": ""
   },
   {
-    "id": 528,
+    "id": 527,
     "place_id": "ChIJzRaU7Uyh4jARUfqQi4b0YpQ",
     "name": "รับซ่อมเครื่องฉีดพลาสติก",
     "phone": "098 983 9555",
@@ -9504,7 +9486,7 @@
     "notes": ""
   },
   {
-    "id": 529,
+    "id": 528,
     "place_id": "ChIJG-kPndan4jARydv8_4eSyYA",
     "name": "นัทกะนิวขวดพลาสติกใส่น้ำผลไม้",
     "phone": "092 282 0239",
@@ -9522,7 +9504,7 @@
     "notes": ""
   },
   {
-    "id": 530,
+    "id": 529,
     "place_id": "ChIJhbsIRQCn4jARTndWQJG09vU",
     "name": "โรงพิมพ์ ออฟเซ็ท ยูวี พลาสติก สมุทรปราการ",
     "phone": "081 828 4673",
@@ -9540,7 +9522,7 @@
     "notes": ""
   },
   {
-    "id": 531,
+    "id": 530,
     "place_id": "ChIJxb1NUoCn4jARLJsz2kYvdbQ",
     "name": "บริษัท แบตเตอรี่ เทคนิค เทรดดิ้ง จำกัด",
     "phone": "081 556 8239",
@@ -9558,7 +9540,7 @@
     "notes": ""
   },
   {
-    "id": 532,
+    "id": 531,
     "place_id": "ChIJNWYkAABdHTERh7kjsC6SFsA",
     "name": "บจก.นำรุ่งอุตสาหกรรม",
     "phone": "02 313 1408",
@@ -9576,7 +9558,7 @@
     "notes": ""
   },
   {
-    "id": 533,
+    "id": 532,
     "place_id": "ChIJxyBQ_J5gHTERs9QT9AWmAQg",
     "name": "บริษัท ซีไอซี เมทอล อินดัสตรี จำกัด",
     "phone": "089 939 7884",
@@ -9594,7 +9576,7 @@
     "notes": ""
   },
   {
-    "id": 534,
+    "id": 533,
     "place_id": "ChIJl01UeaFcHTERs-YGRtD1QaM",
     "name": "บจก กรีนพลัส พลาสติก",
     "phone": "087 822 3401",
@@ -9612,7 +9594,7 @@
     "notes": ""
   },
   {
-    "id": 535,
+    "id": 534,
     "place_id": "ChIJ_____xNDHTERqG39FBt3UaM",
     "name": "บริษัท เจ.เค.เค พลาส จำกัด",
     "phone": "086 995 3998",
@@ -9630,7 +9612,7 @@
     "notes": ""
   },
   {
-    "id": 536,
+    "id": 535,
     "place_id": "ChIJo_Om355cHTERa2YWZtlVXEA",
     "name": "บริษัท สยามโฟมแพค จำกัด",
     "phone": "02 315 4616",
@@ -9648,7 +9630,7 @@
     "notes": ""
   },
   {
-    "id": 537,
+    "id": 536,
     "place_id": "ChIJ5TmcymBbHTER1ArjyrVl5iA",
     "name": "ทวีผลพลาสติก",
     "phone": "",
@@ -9666,7 +9648,7 @@
     "notes": ""
   },
   {
-    "id": 538,
+    "id": 537,
     "place_id": "ChIJm-NHUoBDHTERoblfFXatkqc",
     "name": "ซัคเซสเน็ทเวิร์ค",
     "phone": "098 636 2356",
@@ -9684,7 +9666,7 @@
     "notes": ""
   },
   {
-    "id": 539,
+    "id": 538,
     "place_id": "ChIJd4WeN8FYHTERLKd-zyi8IpM",
     "name": "ห้างหุ้นส่วนจำกัด พี.ดี. เทรดดิ้ง เมทเทิล ( สำนักงานใหญ่ )",
     "phone": "080 066 3656",
@@ -9702,7 +9684,7 @@
     "notes": ""
   },
   {
-    "id": 540,
+    "id": 539,
     "place_id": "ChIJocd-1N5bHTERZtmUEUHi5Ew",
     "name": "Union J. Plus (THAILAND) Co.,Ltd [Free Trade Zone]",
     "phone": "02 408 5151",
@@ -9720,7 +9702,7 @@
     "notes": ""
   },
   {
-    "id": 541,
+    "id": 540,
     "place_id": "ChIJCQZxYihFHTERX7XShehZs_4",
     "name": "รับขนย้ายเครืองจักรและจัดชื้อจัดทำงานเหล็กงานไฟฟ้าและซ่อมเครื่องฉีดพลาสติก",
     "phone": "082 868 8523",
@@ -9738,7 +9720,7 @@
     "notes": ""
   },
   {
-    "id": 542,
+    "id": 541,
     "place_id": "ChIJoeUDxQuh4jARHJjDB8zZ_ck",
     "name": "บริษัท สวารินทร์ จำกัด",
     "phone": "02 756 6149",
@@ -9756,7 +9738,7 @@
     "notes": ""
   },
   {
-    "id": 543,
+    "id": 542,
     "place_id": "ChIJiagNe--h4jARXfVoBx8efgM",
     "name": "บริษัท รูเบียอุตสาหกรรม จำกัด",
     "phone": "02 146 5459",
@@ -9774,7 +9756,7 @@
     "notes": ""
   },
   {
-    "id": 544,
+    "id": 543,
     "place_id": "ChIJ7ZFcGRSh4jAR3LsKDTOzZ0A",
     "name": "บริษัท รวมกิจเลิศ เอ็นจิเนียริ่ง จำกัด",
     "phone": "02 014 7988",
@@ -9792,7 +9774,7 @@
     "notes": ""
   },
   {
-    "id": 545,
+    "id": 544,
     "place_id": "ChIJP0XK49yj4jAR1eV4AYJ1aYg",
     "name": "CHIEWCHAN INDUSTRY (1989) CO.,LTD. บริษัทเชี่ยวชาญ อินดัสทรี่ (1989) จำกัด สำนักงานใหญ่",
     "phone": "02 840 7048",
@@ -9810,7 +9792,7 @@
     "notes": ""
   },
   {
-    "id": 546,
+    "id": 545,
     "place_id": "ChIJJdWNwCSi4jARJ3mKsVoRey8",
     "name": "ศรีวัฒนา",
     "phone": "02 462 7161",
@@ -9828,7 +9810,7 @@
     "notes": ""
   },
   {
-    "id": 547,
+    "id": 546,
     "place_id": "ChIJdflPZFGg4jARK5cL40AINhc",
     "name": "บจก. กราเวียร์ เทค",
     "phone": "062 590 2228",
@@ -9846,7 +9828,7 @@
     "notes": ""
   },
   {
-    "id": 548,
+    "id": 547,
     "place_id": "ChIJVVVVVVVcHTERdr8MjnMctRg",
     "name": "สมสะอาดการชุบ-รับชุบอลูมิเนียม ชุบอโนไดซ์",
     "phone": "098 789 9529",
@@ -9864,7 +9846,7 @@
     "notes": ""
   },
   {
-    "id": 549,
+    "id": 548,
     "place_id": "ChIJ_bxsZw1fHTER1WnadnurydY",
     "name": "รับยิงทราย by mold@plast",
     "phone": "098 536 6426",
@@ -9882,7 +9864,7 @@
     "notes": ""
   },
   {
-    "id": 550,
+    "id": 549,
     "place_id": "ChIJZQV4usOn4jAROaN4CzGXO60",
     "name": "ปรีชา รีไซเคิล หมอบาง",
     "phone": "096 876 8141",
@@ -9900,7 +9882,7 @@
     "notes": ""
   },
   {
-    "id": 551,
+    "id": 550,
     "place_id": "ChIJgWor8Fun4jARfbqH4nUtK3s",
     "name": "บริษัทเอเวอร์แคร",
     "phone": "083 850 1010",
@@ -9918,7 +9900,7 @@
     "notes": ""
   },
   {
-    "id": 552,
+    "id": 551,
     "place_id": "ChIJF6Nr8U-n4jARmhgVQ1-a4Qs",
     "name": "บริษัท มาสเตอร์เทค แอนด์ ซีสเต็มส์ จำกัด",
     "phone": "02 756 0000",
@@ -9936,7 +9918,7 @@
     "notes": ""
   },
   {
-    "id": 553,
+    "id": 552,
     "place_id": "ChIJ-ee_tUii4jARPDbq591pVsc",
     "name": "บริษัทสยามอินเตอร์โมลด์",
     "phone": "",
@@ -9954,7 +9936,7 @@
     "notes": ""
   },
   {
-    "id": 554,
+    "id": 553,
     "place_id": "ChIJq6ouY3Wk4jAR78MgUPRSWTk",
     "name": "TAKSIN PLASTIC CO., LTD",
     "phone": "088 022 8160",
@@ -9972,7 +9954,7 @@
     "notes": ""
   },
   {
-    "id": 555,
+    "id": 554,
     "place_id": "ChIJXZsAKUeh4jARlwJAGLbnpjg",
     "name": "AGC Vinythai Public Company Limited (PPD1 Plant)",
     "phone": "02 463 6346",
@@ -9990,7 +9972,7 @@
     "notes": ""
   },
   {
-    "id": 556,
+    "id": 555,
     "place_id": "ChIJE6RUSeWh4jAR2-TmsTTa668",
     "name": "บริษัท เอส.จี.เค. อินโนเวชั่น จำกัด",
     "phone": "080 195 6241",
@@ -10008,7 +9990,7 @@
     "notes": ""
   },
   {
-    "id": 557,
+    "id": 556,
     "place_id": "ChIJL2h0QMVeHTER1JBrbqpCvc8",
     "name": "บริษัท สหะภัทรนววิศวะ อินดัสทรี้ จำกัด",
     "phone": "02 386 6184",
@@ -10026,7 +10008,7 @@
     "notes": ""
   },
   {
-    "id": 558,
+    "id": 557,
     "place_id": "ChIJqbgQ2ylaHTERL9cKM8_lqTE",
     "name": "ว.ทิพยมงคลพลาสติก(WP Limited Partnership)",
     "phone": "098 193 6555",
@@ -10044,7 +10026,7 @@
     "notes": ""
   },
   {
-    "id": 559,
+    "id": 558,
     "place_id": "ChIJfT4ftlFZHTER93NoDUUbcwM",
     "name": "หมิง เชิ่น พรีซิชั่น โมลด์ส (ประเทศไทย) จำกัด",
     "phone": "02 382 5299",
@@ -10062,7 +10044,7 @@
     "notes": ""
   },
   {
-    "id": 560,
+    "id": 559,
     "place_id": "ChIJr7u3ZQtcHTERilRuRNs75Wc",
     "name": "เวียงอุดมพัฒนา พลาสติกวิศวกรรม",
     "phone": "02 752 2032",
@@ -10080,7 +10062,7 @@
     "notes": ""
   },
   {
-    "id": 561,
+    "id": 560,
     "place_id": "ChIJfcrXo5FdHTERgEsz3Rf3lk8",
     "name": "YI EN PRECISION Co.,LTD",
     "phone": "02 118 3849",
@@ -10098,7 +10080,7 @@
     "notes": ""
   },
   {
-    "id": 562,
+    "id": 561,
     "place_id": "ChIJdWxt-q1eHTERqF3zjaydXY4",
     "name": "บริษัท ไชยเจริญเทค จำกัด",
     "phone": "02 173 4507",
@@ -10116,7 +10098,7 @@
     "notes": ""
   },
   {
-    "id": 563,
+    "id": 562,
     "place_id": "ChIJPQwLtsxeHTERQnLAt9e_aog",
     "name": "บริษัท เจ.ที.โซลูชั่น (ประเทศไทย) จำกัด",
     "phone": "02 130 7207",
@@ -10134,7 +10116,7 @@
     "notes": ""
   },
   {
-    "id": 564,
+    "id": 563,
     "place_id": "ChIJS7sXw6ZeHTERmgGYWzxQIRw",
     "name": "บจก. อีโคโมลด์ (ประเทศไทย)",
     "phone": "02 382 5311",
@@ -10152,7 +10134,7 @@
     "notes": ""
   },
   {
-    "id": 565,
+    "id": 564,
     "place_id": "ChIJTW5cfW1dHTEReZ7Nk0FSBU8",
     "name": "RUAMPOLPLASTIC",
     "phone": "095 119 1190",
@@ -10170,7 +10152,7 @@
     "notes": ""
   },
   {
-    "id": 566,
+    "id": 565,
     "place_id": "ChIJ1d4vQrhEHTERo_ILoaxMB78",
     "name": "ศิริลักษณ์พลาสติก",
     "phone": "081 723 4564",
@@ -10188,7 +10170,7 @@
     "notes": ""
   },
   {
-    "id": 567,
+    "id": 566,
     "place_id": "ChIJOREZdgWf4jARS0ZhwpPrnMc",
     "name": "บริษัท อาร์ซี อินดัสตรี้",
     "phone": "02 136 6148",
@@ -10206,7 +10188,7 @@
     "notes": ""
   },
   {
-    "id": 568,
+    "id": 567,
     "place_id": "ChIJM7KAsvBdHTERktgPBzKZYoY",
     "name": "บมจ. ที.กรุงไทย อุตสาหกรรม",
     "phone": "02 175 2181",
@@ -10224,7 +10206,7 @@
     "notes": ""
   },
   {
-    "id": 569,
+    "id": 568,
     "place_id": "ChIJj3paM_pdHTERWb0LlRaKVbw",
     "name": "บจก. ที โอ พี เอ็นจิเนียริ่ง (ประเทศไทย)",
     "phone": "083 095 2275",
@@ -10242,7 +10224,7 @@
     "notes": ""
   },
   {
-    "id": 570,
+    "id": 569,
     "place_id": "ChIJy_1THmpnHTERRbPQnBi6PAQ",
     "name": "KK Parts and Coat Co., Ltd.",
     "phone": "02 175 2124",
@@ -10260,7 +10242,7 @@
     "notes": ""
   },
   {
-    "id": 571,
+    "id": 570,
     "place_id": "ChIJk27oxUNnHTERJPrjOjeoTFU",
     "name": "POOL&SPA (Showroom & Head Office)",
     "phone": "02 738 5088",
@@ -10278,7 +10260,7 @@
     "notes": ""
   },
   {
-    "id": 572,
+    "id": 571,
     "place_id": "ChIJxX_STPddHTER_Oudhk3mSE0",
     "name": "บมจ. แอมคอร์ เฟล็กซิเบิ้ล กรุงเทพ",
     "phone": "02 312 4122",
@@ -10296,7 +10278,7 @@
     "notes": ""
   },
   {
-    "id": 573,
+    "id": 572,
     "place_id": "ChIJIV78kapgHTERFg1HZUNYRos",
     "name": "สยามดราก้อน พาร์ท (โอริง)",
     "phone": "02 136 5291",
@@ -10314,7 +10296,7 @@
     "notes": ""
   },
   {
-    "id": 574,
+    "id": 573,
     "place_id": "ChIJ5eWnmAaf4jARd5H3ZBs0htI",
     "name": "บจก. รอยัล คิงดอม อินดัสทรี่ย์",
     "phone": "02 181 2523",
@@ -10332,7 +10314,7 @@
     "notes": ""
   },
   {
-    "id": 575,
+    "id": 574,
     "place_id": "ChIJJ8pzNllnHTER-UZXdVUgfec",
     "name": "หจก. ราชาเทวะค้าไม้",
     "phone": "086 998 6832",
@@ -10350,7 +10332,7 @@
     "notes": ""
   },
   {
-    "id": 576,
+    "id": 575,
     "place_id": "ChIJRftvV9eRfWARt6bMKv_WU8k",
     "name": "Prima Artificial Flowers Thailand 68/53-54 หมู่ที่ 5",
     "phone": "096 186 9641",
@@ -10368,7 +10350,7 @@
     "notes": ""
   },
   {
-    "id": 577,
+    "id": 576,
     "place_id": "ChIJQ0wgMMZdHTERc0AhM5xBa1o",
     "name": "CAPCO",
     "phone": "02 178 2312",
@@ -10386,7 +10368,7 @@
     "notes": ""
   },
   {
-    "id": 578,
+    "id": 577,
     "place_id": "ChIJy1K2sbteHTER_ynm2fIkqrg",
     "name": "เอ็น วาย พลาสติก (สำนักงานใหญ่)",
     "phone": "096 618 6953",
@@ -10404,7 +10386,7 @@
     "notes": ""
   },
   {
-    "id": 579,
+    "id": 578,
     "place_id": "ChIJKXJ4iEhbHTERhUy0csDx9HY",
     "name": "SP Plastic Recycle",
     "phone": "02 175 9248",
@@ -10422,7 +10404,7 @@
     "notes": ""
   },
   {
-    "id": 580,
+    "id": 579,
     "place_id": "ChIJcWnYl2lZHTEROAvV51gP7cg",
     "name": "บริษัท เค.อะราต้า จำกัด",
     "phone": "02 174 5184",
@@ -10440,7 +10422,7 @@
     "notes": ""
   },
   {
-    "id": 581,
+    "id": 580,
     "place_id": "ChIJ73CuOMFZHTERUYoOTf5YvgA",
     "name": "F.G. PRECISION MOULDS (THAILAND) CO.,LTD.",
     "phone": "02 029 9678",
@@ -10458,7 +10440,7 @@
     "notes": ""
   },
   {
-    "id": 582,
+    "id": 581,
     "place_id": "ChIJt0rlmnBcHTERKJ-QXXjBSP0",
     "name": "S.P. Metal Part Co., Ltd.",
     "phone": "02 750 7702",
@@ -10476,7 +10458,7 @@
     "notes": ""
   },
   {
-    "id": 583,
+    "id": 582,
     "place_id": "ChIJAUbcQ7VfHTERMa048qTEFIs",
     "name": "Engineering Expert Co.,Ltd",
     "phone": "097 064 0403",
@@ -10494,7 +10476,7 @@
     "notes": ""
   },
   {
-    "id": 584,
+    "id": 583,
     "place_id": "ChIJMU-LQmVDHTERadsH3QOko1k",
     "name": "บริษัท เซ้าท์ เวสท์ มาร์เก็ตติ้ง จำกัด",
     "phone": "02 740 0988",
@@ -10512,7 +10494,7 @@
     "notes": ""
   },
   {
-    "id": 585,
+    "id": 584,
     "place_id": "ChIJE8hyJ3BZHTERBKUAYcrPOOo",
     "name": "รัตนโชคพลาซ่า",
     "phone": "092 938 8313",
@@ -10530,7 +10512,7 @@
     "notes": ""
   },
   {
-    "id": 586,
+    "id": 585,
     "place_id": "ChIJyWnw42xdHTER16IlT6jkYbw",
     "name": "มายพีเอสกรุ๊ป",
     "phone": "096 880 6859",
@@ -10548,7 +10530,7 @@
     "notes": ""
   },
   {
-    "id": 587,
+    "id": 586,
     "place_id": "ChIJ12TmRgdZHTERC0fMc1zKaqw",
     "name": "บริษัท เอเอจี พลาสติก จำกัด",
     "phone": "",
@@ -10566,7 +10548,7 @@
     "notes": ""
   },
   {
-    "id": 588,
+    "id": 587,
     "place_id": "ChIJF7Z3jCBbHTER5BEDWP9l5So",
     "name": "วิวัฒน์ แฟคทอรี่",
     "phone": "02 174 6107",
@@ -10584,7 +10566,7 @@
     "notes": ""
   },
   {
-    "id": 589,
+    "id": 588,
     "place_id": "ChIJ3bkSNAdpHTERZlEjOoKZtEw",
     "name": "CNC Machining & Engineering Plastics By MY P.S GROUP",
     "phone": "092 254 7971",
@@ -10602,7 +10584,7 @@
     "notes": ""
   },
   {
-    "id": 590,
+    "id": 589,
     "place_id": "ChIJeUmuMypdHTER6e3246915-M",
     "name": "เบกาไลท์ไทยแลนด์ bakelitethailand",
     "phone": "096 880 6859",
@@ -10620,7 +10602,7 @@
     "notes": ""
   },
   {
-    "id": 591,
+    "id": 590,
     "place_id": "ChIJewpfp-VdHTER5Br3q4A8xBs",
     "name": "บริษัท เคที อินเตอร์ฟู้ด จำกัด",
     "phone": "063 969 6636",
@@ -10638,7 +10620,7 @@
     "notes": ""
   },
   {
-    "id": 592,
+    "id": 591,
     "place_id": "ChIJKcj5HI9bHTERiZwyCe6rUS0",
     "name": "เพาเดอร์โคทติ้งส์ ซัพพลาย",
     "phone": "02 136 7429",
@@ -10656,7 +10638,7 @@
     "notes": ""
   },
   {
-    "id": 593,
+    "id": 592,
     "place_id": "ChIJA5SRIrhZHTERItbaRLxKO7E",
     "name": "ถุงขยะหนาพิเศษ",
     "phone": "091 882 8098",
@@ -10674,7 +10656,7 @@
     "notes": ""
   },
   {
-    "id": 594,
+    "id": 593,
     "place_id": "ChIJ0xGoDK1ZHTERrZ1g_2hC4Mc",
     "name": "Otis Thai Co., Ltd.",
     "phone": "02 709 4071",
@@ -10692,7 +10674,7 @@
     "notes": ""
   },
   {
-    "id": 595,
+    "id": 594,
     "place_id": "ChIJT4-4LA1cHTER8ur-_Fiwceg",
     "name": "Allied Manufacturing Service Co,.Ltd.",
     "phone": "02 705 3385",
@@ -10710,7 +10692,7 @@
     "notes": ""
   },
   {
-    "id": 596,
+    "id": 595,
     "place_id": "ChIJN4Fe8V1bHTERBnvzvOMDzxQ",
     "name": "โรงงานชุบซิงค์ ลิ้มเจริญ เพลทติ้ง",
     "phone": "064 296 4942",
@@ -10728,7 +10710,7 @@
     "notes": ""
   },
   {
-    "id": 597,
+    "id": 596,
     "place_id": "ChIJJfX7dOlbHTERYVvpP9cSXPw",
     "name": "GENERAL CHEMICALS (THAILAND) CO.,LTD.",
     "phone": "02 763 8780",
@@ -10746,7 +10728,7 @@
     "notes": ""
   },
   {
-    "id": 598,
+    "id": 597,
     "place_id": "ChIJrzC_GqdcHTERH2hQTf9dCoQ",
     "name": "ห้างหุ้นส่วนจำกัด ฟอร์ เวิดส์ พรีซีชั่น",
     "phone": "02 706 1912",
@@ -10764,7 +10746,7 @@
     "notes": ""
   },
   {
-    "id": 599,
+    "id": 598,
     "place_id": "ChIJAQAAABBZHTERL66dInsRykM",
     "name": "บริษัท เฉียวฟู (ไทยแลนด์) จำกัด",
     "phone": "02 709 4449",
@@ -10782,7 +10764,7 @@
     "notes": ""
   },
   {
-    "id": 600,
+    "id": 599,
     "place_id": "ChIJx6rtjfhYHTERVktDAfoDelo",
     "name": "SHINIH (Thailand) Co.,LTD.-BP",
     "phone": "02 324 0058",
@@ -10800,7 +10782,7 @@
     "notes": ""
   },
   {
-    "id": 601,
+    "id": 600,
     "place_id": "ChIJmxcbOeJYHTERXsNQk1rqqWM",
     "name": "บริษัท ท็อปซัน จำกัด",
     "phone": "02 709 4381",
@@ -10818,7 +10800,7 @@
     "notes": ""
   },
   {
-    "id": 602,
+    "id": 601,
     "place_id": "ChIJH117un6n4jARIjxp2y7VW_8",
     "name": "บริษัท ซันเน็กซ์ อินดัสเตรียล จำกัด",
     "phone": "02 324 0825",
@@ -10836,7 +10818,7 @@
     "notes": ""
   },
   {
-    "id": 603,
+    "id": 602,
     "place_id": "ChIJ4QkRUlVYHTERkRonP8T6fpc",
     "name": "บมจ. ศรีไทยซุปเปอร์แวร์ • บางปู",
     "phone": "02 324 0922",
@@ -10854,7 +10836,7 @@
     "notes": ""
   },
   {
-    "id": 604,
+    "id": 603,
     "place_id": "ChIJd4WeN8FYHTER8tJzx2iTcz4",
     "name": "บริษัท ที.บี.เอ็ม. อินเตอร์พลาส จำกัด",
     "phone": "094 987 8881",
@@ -10872,7 +10854,7 @@
     "notes": ""
   },
   {
-    "id": 605,
+    "id": 604,
     "place_id": "ChIJVVVVVVVcHTERu3JN7nOjYl4",
     "name": "บริษัท เซนคะ (ไทยแลนด์) จำกัด",
     "phone": "02 323 0926",
@@ -10890,7 +10872,7 @@
     "notes": ""
   },
   {
-    "id": 606,
+    "id": 605,
     "place_id": "ChIJWT1eqWin4jARqE9CYk4jYQA",
     "name": "บริษัท ไทยฮาท โรลเลอร์ จำกัด",
     "phone": "02 701 1671",
@@ -10908,7 +10890,7 @@
     "notes": ""
   },
   {
-    "id": 607,
+    "id": 606,
     "place_id": "ChIJwxgzy0BZHTERbivsK5DYLV0",
     "name": "S.V.K. INTERNATIONAL",
     "phone": "02 346 5022",
@@ -10926,7 +10908,7 @@
     "notes": ""
   },
   {
-    "id": 608,
+    "id": 607,
     "place_id": "ChIJHbyO1RlZHTERZ-wT6UGua1o",
     "name": "บริษัท ไทยดับเบิล อินเจคชั่น จำกัด",
     "phone": "02 382 6862",
@@ -10944,7 +10926,7 @@
     "notes": ""
   },
   {
-    "id": 609,
+    "id": 608,
     "place_id": "ChIJc4NCaXpaHTERKDOv0ta20Bg",
     "name": "บริษัท เฟลตัลอุตสาหกรรม จำกัด(สำนักงานใหญ่)",
     "phone": "02 324 0888",
@@ -10962,7 +10944,7 @@
     "notes": ""
   },
   {
-    "id": 610,
+    "id": 609,
     "place_id": "ChIJQWxzdeJYHTERPhcxvZYsxeg",
     "name": "บริษัท แล็บเทคเอนจิเนียริ่ง จำกัด",
     "phone": "02 709 6959",
@@ -10980,7 +10962,7 @@
     "notes": ""
   },
   {
-    "id": 611,
+    "id": 610,
     "place_id": "ChIJAcJP-wNZHTERvHePYVH18zE",
     "name": "บมจ. เดลต้า อีเลคโทรนิคส์ (ประเทศไทย)",
     "phone": "02 709 2800",
@@ -10998,7 +10980,7 @@
     "notes": ""
   },
   {
-    "id": 612,
+    "id": 611,
     "place_id": "ChIJu944G3JZHTER4DSADjP70ys",
     "name": "บริษัท โสภา พลาสติก จำกัด",
     "phone": "099 617 3603",
@@ -11016,7 +10998,7 @@
     "notes": ""
   },
   {
-    "id": 613,
+    "id": 612,
     "place_id": "ChIJDWBUIwBZHTERcz7QENFaV3c",
     "name": "บริษัท อาร์ซี อินดัสตรี้ (โรงงาน พลาสติก)",
     "phone": "092 297 4455",
@@ -11034,7 +11016,7 @@
     "notes": ""
   },
   {
-    "id": 614,
+    "id": 613,
     "place_id": "ChIJhWYs6TWn4jARjzcwYROnbXY",
     "name": "ตกแต่งรถตู้ VIP ยนต์เจริญ",
     "phone": "089 894 5922",
@@ -11052,7 +11034,7 @@
     "notes": ""
   },
   {
-    "id": 615,
+    "id": 614,
     "place_id": "ChIJSzC_2FRYHTER2KRzFgr2RKI",
     "name": "บจก. กลุ่มสยามบรรจุภัณฑ์ (โรงงานสมุทรปราการ)",
     "phone": "02 709 3040",
@@ -11070,7 +11052,7 @@
     "notes": ""
   },
   {
-    "id": 616,
+    "id": 615,
     "place_id": "ChIJVVVVVVVcHTERAFZLY0z9nTU",
     "name": "บริษัท สยามทบพันแพคเกจจิ้ง จำกัด",
     "phone": "02 709 3110",
@@ -11088,7 +11070,7 @@
     "notes": ""
   },
   {
-    "id": 617,
+    "id": 616,
     "place_id": "ChIJ17mIUYFgHTERQGLwQYTZx4s",
     "name": "บริษัท เคมแฟค จำกัด",
     "phone": "02 324 1048",
@@ -11106,7 +11088,7 @@
     "notes": ""
   },
   {
-    "id": 618,
+    "id": 617,
     "place_id": "ChIJVyh_AgBZHTERmuNxt8jwyF8",
     "name": "Molymer polytec (Thailand) co.,ltd Fac 2 (Thermoset)",
     "phone": "",
@@ -11124,7 +11106,7 @@
     "notes": ""
   },
   {
-    "id": 619,
+    "id": 618,
     "place_id": "ChIJ1wy1KHxDHTERzOSy8tayhLA",
     "name": "บริษัท ดิพโซล (ประเทศไทย) จำกัด",
     "phone": "02 315 2156",
@@ -11142,7 +11124,7 @@
     "notes": ""
   },
   {
-    "id": 620,
+    "id": 619,
     "place_id": "ChIJv_58uqpEHTERfSL4_FLCyR0",
     "name": "Swan Industries (Thailand) Limited.",
     "phone": "02 705 3051",
@@ -11160,7 +11142,7 @@
     "notes": ""
   },
   {
-    "id": 621,
+    "id": 620,
     "place_id": "ChIJ_7RYEM9nHTERVJlQ4Uxz9w0",
     "name": "my coating co.,ltd.",
     "phone": "02 315 3577",
@@ -11178,7 +11160,7 @@
     "notes": ""
   },
   {
-    "id": 622,
+    "id": 621,
     "place_id": "ChIJE3t2fGJbHTERMROJpIMriBI",
     "name": "SNC FORMER PCL.(Branch 2)",
     "phone": "02 763 8961",
@@ -11196,7 +11178,7 @@
     "notes": ""
   },
   {
-    "id": 623,
+    "id": 622,
     "place_id": "ChIJuVWY-l1bHTERfiMzpnMLjYI",
     "name": "บจก. สยามซีเนเตอร์ จำกัด",
     "phone": "02 763 8890",
@@ -11214,7 +11196,7 @@
     "notes": ""
   },
   {
-    "id": 624,
+    "id": 623,
     "place_id": "ChIJrzC_GqdcHTERmgsnX5ZWIx4",
     "name": "ENKEI THAI CO.,LTD.",
     "phone": "02 315 3749",
@@ -11232,7 +11214,7 @@
     "notes": ""
   },
   {
-    "id": 625,
+    "id": 624,
     "place_id": "ChIJE3pgNQBfHTERn__qdhDnBaI",
     "name": "บริษัท ทีแพ็ค บางพลี จำกัด (T PACK BANGPLEE(TPB) CO.,LTD",
     "phone": "088 930 8526",
@@ -11250,7 +11232,7 @@
     "notes": ""
   },
   {
-    "id": 626,
+    "id": 625,
     "place_id": "ChIJzXLveWVDHTERWFc_vsR7XDA",
     "name": "บจก. สยาม ดาเทค อินดัสตรี",
     "phone": "02 397 9280",
@@ -11268,7 +11250,7 @@
     "notes": ""
   },
   {
-    "id": 627,
+    "id": 626,
     "place_id": "ChIJIQs9VVBDHTERhfBeotdd_cU",
     "name": "ซัมมิท เอ็นจิเนียริ่ง เซ็นเตอร์",
     "phone": "",
@@ -11286,7 +11268,7 @@
     "notes": ""
   },
   {
-    "id": 628,
+    "id": 627,
     "place_id": "ChIJsStFWd1BHTERTncryPMsz28",
     "name": "Mikasa Cap (Thailand) Co., Ltd.",
     "phone": "02 136 6091",
@@ -11304,7 +11286,7 @@
     "notes": ""
   },
   {
-    "id": 629,
+    "id": 628,
     "place_id": "ChIJkX0rut9BHTERrqDpj4G8q6k",
     "name": "JSP Foam Products",
     "phone": "02 136 9136",
@@ -11322,7 +11304,7 @@
     "notes": ""
   },
   {
-    "id": 630,
+    "id": 629,
     "place_id": "ChIJITHXRYdDHTERCC5jV8k6oVc",
     "name": "Snn​ Tool&die​",
     "phone": "02 337 6660",
@@ -11340,7 +11322,7 @@
     "notes": ""
   },
   {
-    "id": 631,
+    "id": 630,
     "place_id": "ChIJGzNuHg6n4jARtq0tsSOqNew",
     "name": "Thai Delmar Co., Ltd.",
     "phone": "02 326 1738",
@@ -11358,7 +11340,7 @@
     "notes": ""
   },
   {
-    "id": 632,
+    "id": 631,
     "place_id": "ChIJUzr3GplZHTERLUR8oMF-Sv8",
     "name": "RYK Engineering",
     "phone": "061 950 9663",
@@ -11376,7 +11358,7 @@
     "notes": ""
   },
   {
-    "id": 633,
+    "id": 632,
     "place_id": "ChIJd0RFUgZEHTERKgcNQziwzX0",
     "name": "นิฮอง พรีซีชั่น (ประเทศไทย)",
     "phone": "02 705 5085",
@@ -11394,7 +11376,7 @@
     "notes": ""
   },
   {
-    "id": 634,
+    "id": 633,
     "place_id": "ChIJj8TZ8jBAHTERgr9ES-FTNZY",
     "name": "นิคมอุตสาหกรรมเอเซียสุวรรณภูมิ",
     "phone": "02 362 7688",
@@ -11412,7 +11394,7 @@
     "notes": ""
   },
   {
-    "id": 635,
+    "id": 634,
     "place_id": "ChIJ7V06Z6-h4jARvsfJw9imhag",
     "name": "บริษัท ไพบูลย์อุตสาหกรรมการพิมพ์ จำกัด",
     "phone": "02 754 4321",
@@ -11430,7 +11412,7 @@
     "notes": ""
   },
   {
-    "id": 636,
+    "id": 635,
     "place_id": "ChIJf0rTslih4jARV5KiIZKZV1k",
     "name": "บจก. เกษตรภัณฑ์อุตสาหกรรม",
     "phone": "02 817 6410",
@@ -11448,7 +11430,7 @@
     "notes": ""
   },
   {
-    "id": 637,
+    "id": 636,
     "place_id": "ChIJr2IMZtGl4jARqySMisBG4uQ",
     "name": "เชื่อมพลาสติกพระประแดงสมุทรปราการ",
     "phone": "094 468 3733",
@@ -11466,7 +11448,7 @@
     "notes": ""
   },
   {
-    "id": 638,
+    "id": 637,
     "place_id": "ChIJIeExXuiY4jAR_X1eYZSvMYI",
     "name": "บจก. ศรีไทยมาร์เก็ตติ้ง",
     "phone": "02 861 3333",
@@ -11484,7 +11466,7 @@
     "notes": ""
   },
   {
-    "id": 639,
+    "id": 638,
     "place_id": "ChIJ7V06Z6-h4jARTT5fP9TDmcE",
     "name": "บริษัท พลัส เทค อินโนเวชั่น จำกัด (มหาชน)",
     "phone": "02 754 2650",
@@ -11502,7 +11484,7 @@
     "notes": ""
   },
   {
-    "id": 640,
+    "id": 639,
     "place_id": "ChIJabzfDlmg4jAROs_El5co0zE",
     "name": "บริษัท โรงงานส่งเสริมไทยอุตสาหกรรม จำกัด",
     "phone": "02 183 3858",
@@ -11520,7 +11502,7 @@
     "notes": ""
   },
   {
-    "id": 641,
+    "id": 640,
     "place_id": "ChIJtcjPkRCh4jARMelmrlZusXM",
     "name": "บริษัท สยามทราฟฟิค จำกัด (โรงงาน)",
     "phone": "02 383 0362",
@@ -11538,7 +11520,7 @@
     "notes": ""
   },
   {
-    "id": 642,
+    "id": 641,
     "place_id": "ChIJAb2bKKqh4jAR7TD5E1yjYcg",
     "name": "บริษัท โซนาเทค เอ็นจิเนียริ่ง จำกัด",
     "phone": "02 707 9100",
@@ -11556,7 +11538,7 @@
     "notes": ""
   },
   {
-    "id": 643,
+    "id": 642,
     "place_id": "ChIJ17LzN_6h4jARCHVIO64Ch4s",
     "name": "บริษัท คลิกส์ทูบาย 2009 จำกัด",
     "phone": "081 351 6399",
@@ -11574,7 +11556,7 @@
     "notes": ""
   },
   {
-    "id": 644,
+    "id": 643,
     "place_id": "ChIJUxClaomh4jARcRR9tV_1PuE",
     "name": "หจก.บีบีเอ็น ทูลลิ่ง ซัพพลาย",
     "phone": "081 498 1542",
@@ -11592,7 +11574,7 @@
     "notes": ""
   },
   {
-    "id": 645,
+    "id": 644,
     "place_id": "ChIJ732Pv0eh4jARqN8ivyhsEhM",
     "name": "BPS United Co., Ltd.",
     "phone": "02 816 3888",
@@ -11610,7 +11592,7 @@
     "notes": ""
   },
   {
-    "id": 646,
+    "id": 645,
     "place_id": "ChIJf0c3cfCl4jARZ5JL_kcbPgE",
     "name": "บจก.ปัญญ์ พลาสติก และเคมีภัณฑ์",
     "phone": "02 463 2182",
@@ -11628,7 +11610,7 @@
     "notes": ""
   },
   {
-    "id": 647,
+    "id": 646,
     "place_id": "ChIJMwhoX2Wk4jAR9_O7G5GW4wE",
     "name": "บริษัท พลาสสตีลเทค จำกัด",
     "phone": "082 913 5621",
@@ -11646,7 +11628,7 @@
     "notes": ""
   },
   {
-    "id": 648,
+    "id": 647,
     "place_id": "ChIJ_VXhYwCj4jARD3q8fd1bepY",
     "name": "ทีพีซี พลาสติก TPC PLASTIC",
     "phone": "",
@@ -11664,7 +11646,7 @@
     "notes": ""
   },
   {
-    "id": 649,
+    "id": 648,
     "place_id": "ChIJTV77sIqj4jARRwVlsmw95lM",
     "name": "POST2PACK",
     "phone": "085 807 4704",
@@ -11682,7 +11664,7 @@
     "notes": ""
   },
   {
-    "id": 650,
+    "id": 649,
     "place_id": "ChIJdfE6P7mk4jARldq99mZJBbc",
     "name": "บริษัท สหรวมทองพลาสติก จำกัด",
     "phone": "02 461 6552",
@@ -11700,7 +11682,7 @@
     "notes": ""
   },
   {
-    "id": 651,
+    "id": 650,
     "place_id": "ChIJEzog4dai4jARKcEx53Ei6n0",
     "name": "บริษัท ริชชี่พลาสติก ดอท คอม จำกัด",
     "phone": "062 491 4291",
@@ -11718,7 +11700,7 @@
     "notes": ""
   },
   {
-    "id": 652,
+    "id": 651,
     "place_id": "ChIJo3LMg_2l4jAR29q8g_cpBBk",
     "name": "บริษัท เจิ้งบาง พลาสติก อิเล็คทรอนิค โปรดักส์ (ไทยแลนด์) จำกัด",
     "phone": "",
@@ -11736,7 +11718,7 @@
     "notes": ""
   },
   {
-    "id": 653,
+    "id": 652,
     "place_id": "ChIJTRBTqjui4jARv9G_Dj_Vl6M",
     "name": "บริษัท สหยิ่งทวีกิจ จำกัด (สำนักงานใหญ่)",
     "phone": "02 408 4200",
@@ -11754,7 +11736,7 @@
     "notes": ""
   },
   {
-    "id": 654,
+    "id": 653,
     "place_id": "ChIJsyBrkTSl4jARaTp4cu4AlMM",
     "name": "บริษัท สมาร์ท มัลติแบ็ก จำกัด",
     "phone": "061 416 6834",
@@ -11772,7 +11754,7 @@
     "notes": ""
   },
   {
-    "id": 655,
+    "id": 654,
     "place_id": "ChIJWzwGqCyn4jARe9GkdFvKL8s",
     "name": "หจก. มี แมชชีนเนอรี่",
     "phone": "02 461 5780",
@@ -11790,7 +11772,7 @@
     "notes": ""
   },
   {
-    "id": 656,
+    "id": 655,
     "place_id": "ChIJWzwGqCyn4jARoX_gR9k9lnA",
     "name": "บริษัท เพชรเจริญรุ่งเรือง จำกัด",
     "phone": "02 490 1286",
@@ -11808,7 +11790,7 @@
     "notes": ""
   },
   {
-    "id": 657,
+    "id": 656,
     "place_id": "ChIJFcX1abik4jARpbGkEN1waTs",
     "name": "บริษัทกนกคาวีจำกัด",
     "phone": "062 386 5830",
@@ -11826,7 +11808,7 @@
     "notes": ""
   },
   {
-    "id": 658,
+    "id": 657,
     "place_id": "ChIJoVOl6dyl4jARIMu2Eqsmm_o",
     "name": "บจก.รุ่งทองพลาสติก",
     "phone": "02 490 1144",
@@ -11844,7 +11826,7 @@
     "notes": ""
   },
   {
-    "id": 659,
+    "id": 658,
     "place_id": "ChIJqexLwyyl4jARwJutcd19LWs",
     "name": "บริษัท สหยิ่งทวีกิจ จำกัด (คลัง3)",
     "phone": "02 128 0183",
@@ -11862,7 +11844,7 @@
     "notes": ""
   },
   {
-    "id": 660,
+    "id": 659,
     "place_id": "ChIJMegIHkql4jARE4ao4boPbI8",
     "name": "ป้าวรรณพร พลาสติก",
     "phone": "089 760 2295",
@@ -11880,7 +11862,7 @@
     "notes": ""
   },
   {
-    "id": 661,
+    "id": 660,
     "place_id": "ChIJozDtt8K84jARX_bKiywJSfM",
     "name": "บริษัท โปรเฟสชั่นแนล เซอร์วิส ยูไนเต็ด จำกัด",
     "phone": "02 461 5764",
@@ -11898,7 +11880,7 @@
     "notes": ""
   },
   {
-    "id": 662,
+    "id": 661,
     "place_id": "ChIJp0iSptmk4jARuT05E0CUOsU",
     "name": "บริษัท ไทยเมจิกเทป จำกัด",
     "phone": "02 452 3904",
@@ -11916,7 +11898,7 @@
     "notes": ""
   },
   {
-    "id": 663,
+    "id": 662,
     "place_id": "ChIJRWbYJR-l4jARIMtNsvU8bA8",
     "name": "พี.เอ.เอส เทรดดิ้งแอนด์แพ็คเก็จจิ้ง",
     "phone": "095 551 9884",
@@ -11934,7 +11916,7 @@
     "notes": ""
   },
   {
-    "id": 664,
+    "id": 663,
     "place_id": "ChIJbVEl_b6l4jARjQ01Mlf0L8g",
     "name": "U.T. Company Limited",
     "phone": "02 848 4563",
@@ -11952,7 +11934,7 @@
     "notes": ""
   },
   {
-    "id": 665,
+    "id": 664,
     "place_id": "ChIJxWXwtI2n4jARUnwQlk8w0cQ",
     "name": "ณดาแพคเกจจิ้ง",
     "phone": "",
@@ -11970,7 +11952,7 @@
     "notes": ""
   },
   {
-    "id": 666,
+    "id": 665,
     "place_id": "ChIJa1s39W-k4jARh3BG5FWgX1s",
     "name": "เอ็กซ์ตร้า เทคโนโลยี เคมีคอล - เคมีงานชุบโลหะ เอ็กซ์ตร้าเทค",
     "phone": "02 452 3511",
@@ -11988,7 +11970,7 @@
     "notes": ""
   },
   {
-    "id": 667,
+    "id": 666,
     "place_id": "ChIJ6bMLmBdfHTERLkp_Ubu_Qe8",
     "name": "โกดังแสงฟ้า",
     "phone": "",
@@ -12006,7 +11988,7 @@
     "notes": ""
   },
   {
-    "id": 668,
+    "id": 667,
     "place_id": "ChIJz22iUFJbHTERA5vr-N5kuT4",
     "name": "SKB TECH.",
     "phone": "096 650 3906",
@@ -12024,7 +12006,7 @@
     "notes": ""
   },
   {
-    "id": 669,
+    "id": 668,
     "place_id": "ChIJ99de_Heg4jARth3h0olxM5w",
     "name": "ไทย พลาสติก",
     "phone": "",
@@ -12042,7 +12024,7 @@
     "notes": ""
   },
   {
-    "id": 670,
+    "id": 669,
     "place_id": "ChIJz8fXDRhdHTER1zwZ6Bm4dmY",
     "name": "บริษัท พีเอ็นพี อินเตอร์พลาส จำกัด",
     "phone": "094 996 6663",
@@ -12060,7 +12042,7 @@
     "notes": ""
   },
   {
-    "id": 671,
+    "id": 670,
     "place_id": "ChIJ5xl8KOdbHTERrmBMyRrC7Mw",
     "name": "บริษัท น่ำเฮี่ยงพลาสติก จำกัด",
     "phone": "083 212 3955",
@@ -12078,7 +12060,7 @@
     "notes": ""
   },
   {
-    "id": 672,
+    "id": 671,
     "place_id": "ChIJ25XTVIReHTERMnmn7evNmDU",
     "name": "บริษัท จ.สี่เจริญอินดัสทรี จำกัด",
     "phone": "02 751 1121",
@@ -12096,7 +12078,7 @@
     "notes": ""
   },
   {
-    "id": 673,
+    "id": 672,
     "place_id": "ChIJtShmJlhnHTERPVmWlEVNamE",
     "name": "บริษัท เมกาโพลีเทค จำกัด",
     "phone": "02 007 0370",
@@ -12114,7 +12096,7 @@
     "notes": ""
   },
   {
-    "id": 674,
+    "id": 673,
     "place_id": "ChIJU20FAmhnHTERlAAJaPYQWhE",
     "name": "บริษัท โกลด์เวสท์ เทรดดิ้ง (ประเทศไทย) จำกัด",
     "phone": "02 738 4930",
@@ -12132,7 +12114,7 @@
     "notes": ""
   },
   {
-    "id": 675,
+    "id": 674,
     "place_id": "ChIJiYb8tH1dHTERZxdsyhShZiY",
     "name": "บริษัท โกลบอล คอนเน็คชั่นส์ จำกัด(มหาชน) สาขากิ่งแก้วซอย9",
     "phone": "",
@@ -12150,7 +12132,7 @@
     "notes": ""
   },
   {
-    "id": 676,
+    "id": 675,
     "place_id": "ChIJFaQEQqVeHTERI2zv0h9JXt4",
     "name": "Chao Wei Plastic Machinery Co., Ltd.",
     "phone": "081 791 1055",
@@ -12168,7 +12150,7 @@
     "notes": ""
   },
   {
-    "id": 677,
+    "id": 676,
     "place_id": "ChIJaYuOPBRnHTER5AM28G3aGtE",
     "name": "หจก. กิ่งแก้วบ๊อกซ์",
     "phone": "062 525 0095",
@@ -12186,7 +12168,7 @@
     "notes": ""
   },
   {
-    "id": 678,
+    "id": 677,
     "place_id": "ChIJu5cnL0BhHTER9F6e5jPNatM",
     "name": "บริษัท​ พี​ อินเตอร์​ซัพพลาย​ จำกัด",
     "phone": "02 185 8485",
@@ -12204,7 +12186,7 @@
     "notes": ""
   },
   {
-    "id": 679,
+    "id": 678,
     "place_id": "ChIJjToGDPddHTERgJpUiPD51wg",
     "name": "บจก. เจริญถาวร ไลท์ แอนด์ เคเบิ้ล",
     "phone": "02 750 4331",
@@ -12222,7 +12204,7 @@
     "notes": ""
   },
   {
-    "id": 680,
+    "id": 679,
     "place_id": "ChIJFby5ZjVdHTERbsHvcwfZlZo",
     "name": "Victory Global Co Ltd",
     "phone": "091 879 7946",
@@ -12240,7 +12222,7 @@
     "notes": ""
   },
   {
-    "id": 681,
+    "id": 680,
     "place_id": "ChIJ3elg8a1eHTER3p08MtXgZf4",
     "name": "บริษัท ไทย พี.อี. ฟิล์ม จำกัด",
     "phone": "02 174 7367",
@@ -12258,7 +12240,7 @@
     "notes": ""
   },
   {
-    "id": 682,
+    "id": 681,
     "place_id": "ChIJv_pdx1RZHTERKiSk5D7i6IE",
     "name": "บริษัท เจี่ยไทยพลาสติก จำกัด",
     "phone": "02 757 5453",
@@ -12276,7 +12258,7 @@
     "notes": ""
   },
   {
-    "id": 683,
+    "id": 682,
     "place_id": "ChIJWd7tUq1ZHTERQkAvw6pWd7g",
     "name": "D.X. Technik Co., Ltd",
     "phone": "092 955 9538",
@@ -12294,7 +12276,7 @@
     "notes": ""
   },
   {
-    "id": 684,
+    "id": 683,
     "place_id": "ChIJx7kUu1pZHTERmt2bTxFdvn0",
     "name": "Yudo (Thailand) Co.,Ltd.",
     "phone": "02 174 7236",
@@ -12312,7 +12294,7 @@
     "notes": ""
   },
   {
-    "id": 685,
+    "id": 684,
     "place_id": "ChIJKa1695RfHTERbuKD7zDtdAk",
     "name": "พีพีเอ็ม แพค จำกัด",
     "phone": "081 720 2644",
@@ -12330,7 +12312,7 @@
     "notes": ""
   },
   {
-    "id": 686,
+    "id": 685,
     "place_id": "ChIJI1dyg0RbHTERBKjs20VvQZw",
     "name": "บริษัท T.Y. INDUSTRIAL จำกัด",
     "phone": "083 007 3661",
@@ -12348,7 +12330,7 @@
     "notes": ""
   },
   {
-    "id": 687,
+    "id": 686,
     "place_id": "ChIJE9IZh5tcHTERyQ7FYtj2wiw",
     "name": "บริษัท พลาสติก ออโตเมชั่น อีควิปเมนท์ จำกัด",
     "phone": "02 752 2252",
@@ -12366,7 +12348,7 @@
     "notes": ""
   },
   {
-    "id": 688,
+    "id": 687,
     "place_id": "ChIJO5H2NHNcHTERmNYk0ntZJGQ",
     "name": "ไทยแน็ก อินดัสตรี้ส์",
     "phone": "",
@@ -12384,7 +12366,7 @@
     "notes": ""
   },
   {
-    "id": 689,
+    "id": 688,
     "place_id": "ChIJ4Z625TdbHTERZnRkN0M10TI",
     "name": "อะคริลิคจิน ปลีก-ส่ง ราคาโรงงาน",
     "phone": "062 175 1777",
@@ -12402,7 +12384,7 @@
     "notes": ""
   },
   {
-    "id": 690,
+    "id": 689,
     "place_id": "ChIJseMHbRpbHTERNHAJcSP6bok",
     "name": "บุญณรงค์อุตสาหกรรมพลาสติก",
     "phone": "091 721 3663",
@@ -12420,7 +12402,7 @@
     "notes": ""
   },
   {
-    "id": 691,
+    "id": 690,
     "place_id": "ChIJp463aPdbHTERvw2UlMwdmJg",
     "name": "บจก. เอช.ไอ.เอ็ม.เอ็นจิเนียริ่ง",
     "phone": "02 312 1173",
@@ -12438,7 +12420,7 @@
     "notes": ""
   },
   {
-    "id": 692,
+    "id": 691,
     "place_id": "ChIJTQMhN4dcHTEReKoie4kTJ5A",
     "name": "พีเอสวี โมลด์",
     "phone": "02 315 5161",
@@ -12456,7 +12438,7 @@
     "notes": ""
   },
   {
-    "id": 693,
+    "id": 692,
     "place_id": "ChIJjaCafeBbHTEReaVKexDiXw4",
     "name": "บริษัท ธนกรเพลทติ้ง จำกัด",
     "phone": "091 773 8608",
@@ -12474,7 +12456,7 @@
     "notes": ""
   },
   {
-    "id": 694,
+    "id": 693,
     "place_id": "ChIJuVnkq5NbHTERU5TsbdJIyfk",
     "name": "ไซเนอร์แมค จำกัด",
     "phone": "02 136 4501",
@@ -12492,7 +12474,7 @@
     "notes": ""
   },
   {
-    "id": 695,
+    "id": 694,
     "place_id": "ChIJY24rxXpbHTER7IivVPriH4Q",
     "name": "Panefri Industrial (Thailand) Co.,Ltd. (Head Office)",
     "phone": "02 181 6787",
@@ -12510,7 +12492,7 @@
     "notes": ""
   },
   {
-    "id": 696,
+    "id": 695,
     "place_id": "ChIJ115wbeFbHTERfZB-32kelYc",
     "name": "ไอ.คิว.พี.โปรดักส์",
     "phone": "081 552 6175",
@@ -12528,7 +12510,7 @@
     "notes": ""
   },
   {
-    "id": 697,
+    "id": 696,
     "place_id": "ChIJjSKwSltbHTERIpgWvD1BThc",
     "name": "บริษัท ฮง เส็ง พลาสติก จำกัด",
     "phone": "02 183 8615",
@@ -12546,7 +12528,7 @@
     "notes": ""
   },
   {
-    "id": 698,
+    "id": 697,
     "place_id": "ChIJkQvueZdbHTERd1GN-8erNos",
     "name": "บริษัทใบทองไทยจำกัด (จำหน่ายพาเลทไม้ตามสั่ง)",
     "phone": "099 289 3576",
@@ -12564,7 +12546,7 @@
     "notes": ""
   },
   {
-    "id": 699,
+    "id": 698,
     "place_id": "ChIJL3UOrmFdHTER7h2YAUItywU",
     "name": "ไทยโพลิเมอร์ ซัพพลาย (สนง.บางพลี)",
     "phone": "02 750 4852",
@@ -12582,7 +12564,7 @@
     "notes": ""
   },
   {
-    "id": 700,
+    "id": 699,
     "place_id": "ChIJJ9xCt_NbHTERTmc6tcFy5IE",
     "name": "ชัยเจริญ",
     "phone": "02 312 1294",
@@ -12600,7 +12582,7 @@
     "notes": ""
   },
   {
-    "id": 701,
+    "id": 700,
     "place_id": "ChIJ33vDZxpfHTERWEjQ6WQylts",
     "name": "บริษัท บางกอกโพลีโฟม จำกัด",
     "phone": "02 315 4193",
@@ -12618,7 +12600,7 @@
     "notes": ""
   },
   {
-    "id": 702,
+    "id": 701,
     "place_id": "ChIJiYXBYLleHTERYl92DFgH64k",
     "name": "บริษัท วีอาร์ซีบรรจุภัณฑ์ จำกัด",
     "phone": "02 182 1040",
@@ -12636,7 +12618,7 @@
     "notes": ""
   },
   {
-    "id": 703,
+    "id": 702,
     "place_id": "ChIJjchmRkBeHTERz05ywoF_7QA",
     "name": "บริษัท คิง พาวเวอร์ โพลีกล๊าส จำกัด",
     "phone": "02 755 4600",
@@ -12654,7 +12636,7 @@
     "notes": ""
   },
   {
-    "id": 704,
+    "id": 703,
     "place_id": "ChIJu7g1LQtcHTERhFnG4_KMtO0",
     "name": "บริษัท ไทยซันคิ จำกัด",
     "phone": "02 312 1804",
@@ -12672,7 +12654,7 @@
     "notes": ""
   },
   {
-    "id": 705,
+    "id": 704,
     "place_id": "ChIJT75HLulfHTERwAN8-LICBnc",
     "name": "บริษัท อีสเทิร์นโพลีเมอร์ กรุ๊ป จำกัด (มหาชน)",
     "phone": "02 383 6599",
@@ -12690,7 +12672,7 @@
     "notes": ""
   },
   {
-    "id": 706,
+    "id": 705,
     "place_id": "ChIJD5ZO6L9YHTERBUVmd5gkWAs",
     "name": "บริษัท พรีม่า โพลีเทค จำกัด",
     "phone": "02 709 4795",
@@ -12708,7 +12690,7 @@
     "notes": ""
   },
   {
-    "id": 707,
+    "id": 706,
     "place_id": "ChIJj3Q_9itfHTERmMfNaqcrI7I",
     "name": "บริษัท โฮป เทคโนโลยี่ (ประเทศไทย) จำกัด",
     "phone": "02 709 6800",
@@ -12726,7 +12708,7 @@
     "notes": ""
   },
   {
-    "id": 708,
+    "id": 707,
     "place_id": "ChIJY-2lZAJZHTERl14zMs80jrI",
     "name": "Thai Washin Company Limited (บริษัท ไทยวาชิน จำกัด)",
     "phone": "02 709 6509",
@@ -12744,7 +12726,7 @@
     "notes": ""
   },
   {
-    "id": 709,
+    "id": 708,
     "place_id": "ChIJXQK3fU5YHTER-QUyGb7OHwQ",
     "name": "โรงกลึงนิคมอุตสาหกรรมบางปู",
     "phone": "062 478 9972",
@@ -12762,7 +12744,7 @@
     "notes": ""
   },
   {
-    "id": 710,
+    "id": 709,
     "place_id": "ChIJDUEhrxRZHTERdv--Os6Ktto",
     "name": "ไทยเหยียนผลิตภัณฑ์พลาสติก (กรุงเทพ)",
     "phone": "02 701 1556",
@@ -12780,7 +12762,7 @@
     "notes": ""
   },
   {
-    "id": 711,
+    "id": 710,
     "place_id": "ChIJ4yvifPpfHTERnOM8mNrMGBg",
     "name": "บริษัท เอส.เอ็ม.เอ็น. ศิรพิพัฒน์ ทรัพย์ จำกัด",
     "phone": "062 397 8987",
@@ -12798,7 +12780,7 @@
     "notes": ""
   },
   {
-    "id": 712,
+    "id": 711,
     "place_id": "ChIJsYEkTMBYHTERCJsNh3wHNn0",
     "name": "ชาญเจริญ เทรดดิ้ง",
     "phone": "02 174 6400",
@@ -12816,7 +12798,7 @@
     "notes": ""
   },
   {
-    "id": 713,
+    "id": 712,
     "place_id": "ChIJAQAAABBZHTERkKmbTpe3vLc",
     "name": "บริษัท อินเตอร์เว็บโพรดักส์ จำกัด",
     "phone": "02 701 3300",
@@ -12834,7 +12816,7 @@
     "notes": ""
   },
   {
-    "id": 714,
+    "id": 713,
     "place_id": "ChIJXaQBgRVZHTER5czqgrA-2gk",
     "name": "Top Plaspack",
     "phone": "",
@@ -12852,7 +12834,7 @@
     "notes": ""
   },
   {
-    "id": 715,
+    "id": 714,
     "place_id": "ChIJ4RgCFw5ZHTERHFFTePBpXdo",
     "name": "VTW PLASTICS AND TRADE",
     "phone": "083 820 3030",
@@ -12870,7 +12852,7 @@
     "notes": ""
   },
   {
-    "id": 716,
+    "id": 715,
     "place_id": "ChIJHQ5PpyBZHTERmgdlgA-C2f8",
     "name": "บริษัท หล่งต๋า อินเตอร์เนชั่นแนล (ประเทศไทย) จำกัด",
     "phone": "081 861 5601",
@@ -12888,7 +12870,7 @@
     "notes": ""
   },
   {
-    "id": 717,
+    "id": 716,
     "place_id": "ChIJ2XSJ2FhnHTERsZhwqAVO9vc",
     "name": "บริษัท โยโด อินเตอร์เนชั่นแนล เทรดดิ้ง จำกัด",
     "phone": "02 001 6271",
@@ -12906,7 +12888,7 @@
     "notes": ""
   },
   {
-    "id": 718,
+    "id": 717,
     "place_id": "ChIJRy72GXGn4jAR8xg2-q7wFhg",
     "name": "บริษัท แอลเอสพี จำกัด (ทรัพย์รุ่งเรือง)",
     "phone": "061 814 7882",
@@ -12924,7 +12906,7 @@
     "notes": ""
   },
   {
-    "id": 719,
+    "id": 718,
     "place_id": "ChIJo7IdBACn4jARvTb9NbVmAPE",
     "name": "ธนัทพลาสติก",
     "phone": "092 835 3145",
@@ -12942,7 +12924,7 @@
     "notes": ""
   },
   {
-    "id": 720,
+    "id": 719,
     "place_id": "ChIJARmsaxKn4jAR0YrRhZYiTww",
     "name": "iceboxthailandshop",
     "phone": "081 801 8608",
@@ -12960,7 +12942,7 @@
     "notes": ""
   },
   {
-    "id": 721,
+    "id": 720,
     "place_id": "ChIJc3jxXAGn4jARCpgjgkor6ck",
     "name": "ศุภฤทธิ์พลาสติก",
     "phone": "084 534 6489",
@@ -12978,7 +12960,7 @@
     "notes": ""
   },
   {
-    "id": 722,
+    "id": 721,
     "place_id": "ChIJRQMTSwun4jAR1FnPnZdrL5A",
     "name": "บริษัท สุพาชัย แทงค์ เทรดดิ้ง จำกัด",
     "phone": "",
@@ -12996,7 +12978,7 @@
     "notes": ""
   },
   {
-    "id": 723,
+    "id": 722,
     "place_id": "ChIJAQAAABBZHTERxBjDytVXIBM",
     "name": "อุตสาหกรรมยูเนี่ยนเปเปอร์ทิ้ว",
     "phone": "02 387 0679",
@@ -13014,7 +12996,7 @@
     "notes": ""
   },
   {
-    "id": 724,
+    "id": 723,
     "place_id": "ChIJnRD7N51YHTERutk9go68ubk",
     "name": "Nexus Global Trading",
     "phone": "096 549 8935",
@@ -13032,7 +13014,7 @@
     "notes": ""
   },
   {
-    "id": 725,
+    "id": 724,
     "place_id": "ChIJU-iKb6ZYHTERFS1vkA2q0xw",
     "name": "บริษัท สยาม อินเตอร์ ดรัมส์ จำกัด",
     "phone": "081 423 3658",
@@ -13050,7 +13032,7 @@
     "notes": ""
   },
   {
-    "id": 726,
+    "id": 725,
     "place_id": "ChIJ7T5LIgBZHTERzC658e3uhds",
     "name": "บริษัท โฮมคัพ 2022 (ไทยแลนด์) จำกัด",
     "phone": "",
@@ -13068,7 +13050,7 @@
     "notes": ""
   },
   {
-    "id": 727,
+    "id": 726,
     "place_id": "ChIJ2WY08Fen4jAR5-zPcXEb9SE",
     "name": "บริษัท อิเลคทริเคิล แมน จำกัด",
     "phone": "02 730 9138",
@@ -13086,7 +13068,7 @@
     "notes": ""
   },
   {
-    "id": 728,
+    "id": 727,
     "place_id": "ChIJmzCTre2n4jARedLePdTBOqk",
     "name": "KSP COOLER BOX",
     "phone": "084 646 5426",
@@ -13104,7 +13086,7 @@
     "notes": ""
   },
   {
-    "id": 729,
+    "id": 728,
     "place_id": "ChIJ4QFtnVun4jARlufGMsr0mqU",
     "name": "บริษัท ซีเค เอ็นจิเนียริ่ง แอนด์ เทคโนโลยี จำกัด",
     "phone": "084 089 7996",
@@ -13122,7 +13104,7 @@
     "notes": ""
   },
   {
-    "id": 730,
+    "id": 729,
     "place_id": "ChIJc4NCaXpaHTER0S49X4onSmg",
     "name": "บริษัท อุดมโชคพัฒนา จำกัด",
     "phone": "02 323 3804",
@@ -13140,7 +13122,7 @@
     "notes": ""
   },
   {
-    "id": 731,
+    "id": 730,
     "place_id": "ChIJrYFGWtin4jARtgjaUcRtB-c",
     "name": "เอสพีพี แพคเกจจิ้ง แอนด์ เทรดดิ้ง เซ็นเตอร์",
     "phone": "089 799 0056",
@@ -13158,7 +13140,7 @@
     "notes": ""
   },
   {
-    "id": 732,
+    "id": 731,
     "place_id": "ChIJVedQ4UxfHTERtPi75oXHrY4",
     "name": "บริษัท โฟโมซ่าออร์แกนิคเคมีคอลอินดัสตรี จำกัด",
     "phone": "02 709 3016",
@@ -13176,7 +13158,7 @@
     "notes": ""
   },
   {
-    "id": 733,
+    "id": 732,
     "place_id": "ChIJSXpOGJ1eHTERLmZdadKk8lg",
     "name": "บริษัท แอดวานซ์ พลาสติก อินเตอร์เทรด จำกัด",
     "phone": "02 337 3941",
@@ -13194,7 +13176,7 @@
     "notes": ""
   },
   {
-    "id": 734,
+    "id": 733,
     "place_id": "ChIJu90vu1VDHTER2hZmKdRl5e0",
     "name": "บริษัท ไบรเทน โปลีเทรดดิ้ง จำกัด (โกดัง)-นิคมบางพลี",
     "phone": "02 330 3768",
@@ -13212,7 +13194,7 @@
     "notes": ""
   },
   {
-    "id": 735,
+    "id": 734,
     "place_id": "ChIJU07sTphdHTER60pz612uHzY",
     "name": "บริษัท ท็อปโพลิม่าร์ จำกัด",
     "phone": "02 046 6700",
@@ -13230,7 +13212,7 @@
     "notes": ""
   },
   {
-    "id": 736,
+    "id": 735,
     "place_id": "ChIJM7-gVyNEHTERJho4mNnS3HA",
     "name": "โรงงานดาวเรืองพลาสติก",
     "phone": "089 077 4219",
@@ -13248,7 +13230,7 @@
     "notes": ""
   },
   {
-    "id": 737,
+    "id": 736,
     "place_id": "ChIJ2cVPWQBFHTERXx9QcHLwFb0",
     "name": "บริษัท ทรัพย์อนันต์ อุตสาหกรรมพลาสติก จำกัด",
     "phone": "",
@@ -13266,7 +13248,7 @@
     "notes": ""
   },
   {
-    "id": 738,
+    "id": 737,
     "place_id": "ChIJuVthkxhEHTERjY93eZRKeMk",
     "name": "บริษัท เอ็นแอนด์ดับบลิวสยามพลาสติก จำกัด",
     "phone": "02 077 5066",
@@ -13284,7 +13266,7 @@
     "notes": ""
   },
   {
-    "id": 739,
+    "id": 738,
     "place_id": "ChIJX2qSoJpBHTERnX8iZQeAEzo",
     "name": "บริษัท ณ ไพรพลาสติก แอนด์ ซัพพลาย จำกัด",
     "phone": "062 601 2354",
@@ -13302,7 +13284,7 @@
     "notes": ""
   },
   {
-    "id": 740,
+    "id": 739,
     "place_id": "ChIJU3NKLEtCHTERqSDvw13fr0Q",
     "name": "บริษัทเกียรติถาวรพาราวู้ด จำกัด",
     "phone": "02 708 5079",
@@ -13320,7 +13302,7 @@
     "notes": ""
   },
   {
-    "id": 741,
+    "id": 740,
     "place_id": "ChIJpS6W_FVFHTERCTVDI1FplX0",
     "name": "WKP พลาสติก แอนด์ ทรานสปอร์ต",
     "phone": "089 671 5498",
@@ -13338,7 +13320,7 @@
     "notes": ""
   },
   {
-    "id": 742,
+    "id": 741,
     "place_id": "ChIJV_RvxKVFHTERE1lcnmlAsa0",
     "name": "บริษัท เค.อาร์.พลาสติก จำกัด (สำนักงานใหญ่)",
     "phone": "02 338 1244",
@@ -13356,7 +13338,7 @@
     "notes": ""
   },
   {
-    "id": 743,
+    "id": 742,
     "place_id": "ChIJcUesGQBBHTERysRQ1lZNHj8",
     "name": "บริษัท ซินด้า พลาสติก เทคโนโลยี (ประเทศไทย) จำกัด Cinda Plastic Technology (Thailand)",
     "phone": "",
@@ -13374,7 +13356,7 @@
     "notes": ""
   },
   {
-    "id": 744,
+    "id": 743,
     "place_id": "ChIJbb3ndsRGHTERGK5krubMFSk",
     "name": "POLYFOAM SUVARNABHUMI CO.,LTD.",
     "phone": "02 708 6711",
@@ -13392,7 +13374,7 @@
     "notes": ""
   },
   {
-    "id": 745,
+    "id": 744,
     "place_id": "ChIJraVGqjdFHTER0grQ4iDR-C8",
     "name": "บริษัท ธาวินการพลาสติก",
     "phone": "",
@@ -13410,7 +13392,7 @@
     "notes": ""
   },
   {
-    "id": 746,
+    "id": 745,
     "place_id": "ChIJBXCjKr_q4jARqbmGj8dqDAM",
     "name": "บริษัท ยูเอ็นดับบลิว พลาสติก จำกัด",
     "phone": "02 708 2842",
@@ -13428,7 +13410,7 @@
     "notes": ""
   },
   {
-    "id": 747,
+    "id": 746,
     "place_id": "ChIJYc_seLBFHTERveXng7JvkBo",
     "name": "บริษัท คราฟท์มอเตอร์ จำกัด (สำนักงานใหญ่)",
     "phone": "061 168 6166",
@@ -13446,7 +13428,7 @@
     "notes": ""
   },
   {
-    "id": 748,
+    "id": 747,
     "place_id": "ChIJyVpGYwBFHTERNfpffqnd03c",
     "name": "บริษัท กรีนพลัสพลาสติก จำกัด",
     "phone": "",
@@ -13464,7 +13446,7 @@
     "notes": ""
   },
   {
-    "id": 749,
+    "id": 748,
     "place_id": "ChIJl01IMHlfHTER0aaq4bgyqiM",
     "name": "บริษัท เพิ่มทรัพย์168แพ็คกิ้ง จำกัด",
     "phone": "062 368 5456",
@@ -13482,7 +13464,7 @@
     "notes": ""
   },
   {
-    "id": 750,
+    "id": 749,
     "place_id": "ChIJiQmwFJqh4jARGxmFvuZs1fo",
     "name": "บริษัท เตชะ แอ็นด ซัน จำกัด",
     "phone": "02 385 9289",
@@ -13500,7 +13482,7 @@
     "notes": ""
   },
   {
-    "id": 751,
+    "id": 750,
     "place_id": "ChIJ40_pzh2h4jARVA1cEelb9Pc",
     "name": "V-ninepackaging Company Limited.",
     "phone": "02 115 0328",
@@ -13518,7 +13500,7 @@
     "notes": ""
   },
   {
-    "id": 752,
+    "id": 751,
     "place_id": "ChIJiZfQytyj4jARjp4F0AcIwFc",
     "name": "โชคทวีทรัพย์พลาสติก",
     "phone": "087 075 9807",
@@ -13536,7 +13518,7 @@
     "notes": ""
   },
   {
-    "id": 753,
+    "id": 752,
     "place_id": "ChIJpaP-43mj4jAR7yWkA7_yk_M",
     "name": "บริษัท พลาสติกแชนเนิล จำกัด",
     "phone": "02 294 8899",
@@ -13554,7 +13536,7 @@
     "notes": ""
   },
   {
-    "id": 754,
+    "id": 753,
     "place_id": "ChIJxewBOQCj4jARaYbHcDL9rnY",
     "name": "บริษัทโสภณพลาสติกจำกัด",
     "phone": "081 828 0834",
@@ -13572,7 +13554,7 @@
     "notes": ""
   },
   {
-    "id": 755,
+    "id": 754,
     "place_id": "ChIJ7V06Z6-h4jARYG9WrgnBMJc",
     "name": "บริษัท ฟอร์ไมก้า (ประเทศไทย) จํากัด",
     "phone": "02 701 9600",
@@ -13590,7 +13572,7 @@
     "notes": ""
   },
   {
-    "id": 756,
+    "id": 755,
     "place_id": "ChIJ39S-fF6j4jARZwP2KgS6nXY",
     "name": "K&V Plastic Co., Ltd",
     "phone": "",
@@ -13608,7 +13590,7 @@
     "notes": ""
   },
   {
-    "id": 757,
+    "id": 756,
     "place_id": "ChIJI3npkHaX4jARMf2TubswE5A",
     "name": "โจเซฟ พลาสติก การ์ด Joseph Plastic Card",
     "phone": "086 785 3224",
@@ -13626,7 +13608,7 @@
     "notes": ""
   },
   {
-    "id": 758,
+    "id": 757,
     "place_id": "ChIJdWYuVsKj4jARjh3vpmKLXgs",
     "name": "บริษัท เจนเนอรัล พลาสติก แอนด์ เซลส์ จำกัด",
     "phone": "092 959 9798",
@@ -13644,7 +13626,7 @@
     "notes": ""
   },
   {
-    "id": 759,
+    "id": 758,
     "place_id": "ChIJBck2Ya-h4jARxn1JXBHbrE4",
     "name": "บริษัท พนมกรณ์ เมทัล จำกัด",
     "phone": "02 394 3627",
@@ -13662,7 +13644,7 @@
     "notes": ""
   },
   {
-    "id": 760,
+    "id": 759,
     "place_id": "ChIJpwWX1ySi4jARf3Fw7Cvvde0",
     "name": "บริษัท เอสบา จำกัด",
     "phone": "02 463 2500",
@@ -13680,7 +13662,7 @@
     "notes": ""
   },
   {
-    "id": 761,
+    "id": 760,
     "place_id": "ChIJG11NUMOj4jARlCaV1Q9Eatk",
     "name": "บริษัท ปาสคาล อินเตอร์เทค จำกัด",
     "phone": "02 464 2533",
@@ -13698,7 +13680,7 @@
     "notes": ""
   },
   {
-    "id": 762,
+    "id": 761,
     "place_id": "ChIJmygP5meh4jARAipIsyGKGOE",
     "name": "ซี เอ็น วี ซัพพลาย",
     "phone": "02 817 7982",
@@ -13716,7 +13698,7 @@
     "notes": ""
   },
   {
-    "id": 763,
+    "id": 762,
     "place_id": "ChIJE6d3DJqh4jARL2V5NtQh00Y",
     "name": "โกดังบริษัท สหไทยสตีล จำกัด",
     "phone": "02 754 2107",
@@ -13734,7 +13716,7 @@
     "notes": ""
   },
   {
-    "id": 764,
+    "id": 763,
     "place_id": "ChIJHy5PfwCj4jARxaXkesLVqbE",
     "name": "ซองไปรษณีย์พลาสติก - Dearly Industry",
     "phone": "061 979 3956",
@@ -13752,7 +13734,7 @@
     "notes": ""
   },
   {
-    "id": 765,
+    "id": 764,
     "place_id": "ChIJRYJcRwCh4jARVgIuVLUG_Vk",
     "name": "บริษัท ยูโรเปี้ยนฟู้ด สาขาปู่เจ้า",
     "phone": "",
@@ -13770,7 +13752,7 @@
     "notes": ""
   },
   {
-    "id": 766,
+    "id": 765,
     "place_id": "ChIJoaTo_rKh4jARQUg0J6F9ptA",
     "name": "บริษัท แผ่นเหล็กวิลาสไทย จำกัด",
     "phone": "02 754 4150",
@@ -13788,7 +13770,7 @@
     "notes": ""
   },
   {
-    "id": 767,
+    "id": 766,
     "place_id": "ChIJF1bl5ndfHTERgiFVFZEhxFc",
     "name": "บริษัท หลิน อินดัสทรี้ จำกัด",
     "phone": "",
@@ -13806,7 +13788,7 @@
     "notes": ""
   },
   {
-    "id": 768,
+    "id": 767,
     "place_id": "ChIJRUDrDopfHTERlCf2pEkJ13c",
     "name": "KN Packaging And Cleaning KN ไดคัท diecut",
     "phone": "02 394 3817",
@@ -13824,7 +13806,7 @@
     "notes": ""
   },
   {
-    "id": 769,
+    "id": 768,
     "place_id": "ChIJawA6xndfHTERxt2m3cv3DD0",
     "name": "PolyDec Co., Ltd.",
     "phone": "02 385 7863",
@@ -13842,7 +13824,7 @@
     "notes": ""
   },
   {
-    "id": 770,
+    "id": 769,
     "place_id": "ChIJgbCenb6h4jARLq5BU-cESyQ",
     "name": "ห้างหุ้นส่วนจำกัด พีที เอเซีย",
     "phone": "02 759 3605",
@@ -13860,7 +13842,7 @@
     "notes": ""
   },
   {
-    "id": 771,
+    "id": 770,
     "place_id": "ChIJcZzlaSmh4jAR5vC2ED5orE4",
     "name": "T S Propack Co.,Ltd.",
     "phone": "081 020 8771",
@@ -13878,7 +13860,7 @@
     "notes": ""
   },
   {
-    "id": 772,
+    "id": 771,
     "place_id": "ChIJa2YjbpSe4jAR2yyrWa5Sz0E",
     "name": "บริษัท ออสคอน จำกัด",
     "phone": "02 094 8455",
@@ -13896,7 +13878,7 @@
     "notes": ""
   },
   {
-    "id": 773,
+    "id": 772,
     "place_id": "ChIJswUvXSui4jARbbuFXc-4xqg",
     "name": "บริษัท บี.เอ.เอส.อินดัสเตรียล จำกัด",
     "phone": "02 462 5583",
@@ -13914,7 +13896,7 @@
     "notes": ""
   },
   {
-    "id": 774,
+    "id": 773,
     "place_id": "ChIJA7mUPYmh4jARmOyYXgcx2Gs",
     "name": "ไทยพลาสต์ เอ็นจิเนียริ่ง",
     "phone": "02 463 4405",
@@ -13932,7 +13914,7 @@
     "notes": ""
   },
   {
-    "id": 775,
+    "id": 774,
     "place_id": "ChIJfaDD4Ain4jARKUM-Mpc_vHw",
     "name": "บริษัท ไทยสัมพันธ์ พลาสติก จำกัด",
     "phone": "",
@@ -13950,7 +13932,7 @@
     "notes": ""
   },
   {
-    "id": 776,
+    "id": 775,
     "place_id": "ChIJ7bEOOFOl4jARETEJojcDx9k",
     "name": "รับซื้อเศษผ้าโพลี ทุกชนิด ให้ราคาดี",
     "phone": "082 719 4838",
@@ -13968,7 +13950,7 @@
     "notes": ""
   },
   {
-    "id": 777,
+    "id": 776,
     "place_id": "ChIJc6dkeACh4jARQlYn55WuCWg",
     "name": "โรงงานมีพลาสติก",
     "phone": "",
@@ -13986,7 +13968,7 @@
     "notes": ""
   },
   {
-    "id": 778,
+    "id": 777,
     "place_id": "ChIJD3w2Mu2l4jARExhfgv-EvuI",
     "name": "บริษัท ที.ที.คิทเช่นแวร์ จำกัด",
     "phone": "02 100 1161",
@@ -14004,7 +13986,7 @@
     "notes": ""
   },
   {
-    "id": 779,
+    "id": 778,
     "place_id": "ChIJLUhU8Nmj4jARQe9YkrJBnbc",
     "name": "บริษัท แหลมฟ้าผ่า โลจีสติก จำกัด",
     "phone": "092 838 6166",
@@ -14022,7 +14004,7 @@
     "notes": ""
   },
   {
-    "id": 780,
+    "id": 779,
     "place_id": "ChIJi_t6Vd-m4jARlHci2yKzuuc",
     "name": "บริษัท เอ็กซ์ตร้า วิน อินเตอร์เทรดดิ้ง จำกัด",
     "phone": "089 668 2286",
@@ -14040,7 +14022,7 @@
     "notes": ""
   },
   {
-    "id": 781,
+    "id": 780,
     "place_id": "ChIJ431WYZ9cHTERfauBjdt4Bys",
     "name": "OPURE THAILAND",
     "phone": "089 888 6106",
@@ -14058,7 +14040,7 @@
     "notes": ""
   },
   {
-    "id": 782,
+    "id": 781,
     "place_id": "ChIJYe_rMgBdHTERL9JvnWsG9Ks",
     "name": "บริษัท ไทยยูรีเทนพลาสติกสาขา2",
     "phone": "",
@@ -14076,7 +14058,7 @@
     "notes": ""
   },
   {
-    "id": 783,
+    "id": 782,
     "place_id": "ChIJY8v7cCxcHTERawiBbOiqS-4",
     "name": "บริษัท เหลียนเซิ่น จำกัด",
     "phone": "02 316 8866",
@@ -14094,7 +14076,7 @@
     "notes": ""
   },
   {
-    "id": 784,
+    "id": 783,
     "place_id": "ChIJf-hzNAddHTER5-799JXlUQE",
     "name": "Thai Summit Plastech Co.,Ltd. (Branch 1)",
     "phone": "",
@@ -14112,7 +14094,7 @@
     "notes": ""
   },
   {
-    "id": 785,
+    "id": 784,
     "place_id": "ChIJMYjrEVVDHTERKXKJjYKPuMk",
     "name": "Hanwha Chemical (Thailand) Co.,Ltd.",
     "phone": "02 315 3204",
@@ -14130,7 +14112,7 @@
     "notes": ""
   },
   {
-    "id": 786,
+    "id": 785,
     "place_id": "ChIJg6W1VXBcHTERZRJ5-UC0ThU",
     "name": "บ.เหรียญไทย อินเตอร์แพค จำกัด",
     "phone": "093 730 2280",
@@ -14148,7 +14130,7 @@
     "notes": ""
   },
   {
-    "id": 787,
+    "id": 786,
     "place_id": "ChIJFRBBXXZZHTERkgiobfp1UrE",
     "name": "Artisan Industries Co., Ltd.",
     "phone": "02 123 3880",
@@ -14166,7 +14148,7 @@
     "notes": ""
   },
   {
-    "id": 788,
+    "id": 787,
     "place_id": "ChIJ_14uwqVZHTERLrk3mpWpFJE",
     "name": "Dongxie precision mould(thailand) co.,ltd",
     "phone": "02 174 7288",
@@ -14184,7 +14166,7 @@
     "notes": ""
   },
   {
-    "id": 789,
+    "id": 788,
     "place_id": "ChIJFeAaOR1cHTER4treemWbmmY",
     "name": "บริษัท เวลเม (ประเทศไทย) จำกัด",
     "phone": "02 174 7141",
@@ -14202,7 +14184,7 @@
     "notes": ""
   },
   {
-    "id": 790,
+    "id": 789,
     "place_id": "ChIJrxZuG41bHTERwSMY0MSyBJQ",
     "name": "ขัดผิวแม่พิมพ์พลาสติก",
     "phone": "087 979 8840",
@@ -14220,7 +14202,7 @@
     "notes": ""
   },
   {
-    "id": 791,
+    "id": 790,
     "place_id": "ChIJD1eiRrtbHTER9dwUBfNb5Xs",
     "name": "บริษัทเจเอ็มบีโมลด์ จำกัด",
     "phone": "085 177 3738",
@@ -14238,7 +14220,7 @@
     "notes": ""
   },
   {
-    "id": 792,
+    "id": 791,
     "place_id": "ChIJi127DVJZHTERljTnw0E98l4",
     "name": "Pom Dies And Service Co.,Ltd",
     "phone": "089 192 4451",
@@ -14256,7 +14238,7 @@
     "notes": ""
   },
   {
-    "id": 793,
+    "id": 792,
     "place_id": "ChIJi4-WYDVZHTERjqt_wAFni1Y",
     "name": "GOLDEN",
     "phone": "095 519 2650",
@@ -14274,7 +14256,7 @@
     "notes": ""
   },
   {
-    "id": 794,
+    "id": 793,
     "place_id": "ChIJw7dw4iFfHTERNUrRTgMWfQc",
     "name": "บริษัท เจซี คาร์บอน-เทค(ประเทศไทย)จำกัด",
     "phone": "02 130 7211",
@@ -14292,7 +14274,7 @@
     "notes": ""
   },
   {
-    "id": 795,
+    "id": 794,
     "place_id": "ChIJQTe_GqdcHTERLxexCxVrBZw",
     "name": "บริษัท เวิลด์ ไวร์คัท จำกัด",
     "phone": "095 556 4898",
@@ -14310,7 +14292,7 @@
     "notes": ""
   },
   {
-    "id": 796,
+    "id": 795,
     "place_id": "ChIJ9ceD8-9ZHTERqgwsR8ECedU",
     "name": "บจก.พี.เอส.โมลด์แอนด์พาร์ท",
     "phone": "080 516 3296",
@@ -14328,7 +14310,7 @@
     "notes": ""
   },
   {
-    "id": 797,
+    "id": 796,
     "place_id": "ChIJ-YE7G4xbHTERvmhV-01sJJM",
     "name": "ห้างหุ้นส่วนจำกัด เจพีเอ็น3พีไวท์คัท",
     "phone": "088 009 2858",
@@ -14346,7 +14328,7 @@
     "notes": ""
   },
   {
-    "id": 798,
+    "id": 797,
     "place_id": "ChIJ6Rv0F_NbHTERP2JVjay73dc",
     "name": "บ้านพิมพ์พระ๑๙💞",
     "phone": "064 959 5546",
@@ -14364,7 +14346,7 @@
     "notes": ""
   },
   {
-    "id": 799,
+    "id": 798,
     "place_id": "ChIJVQhKCSZZHTERkp5obvn65hE",
     "name": "บริษัท เจ แอนด์ เค เทคนิค ทูล จำกัด",
     "phone": "095 048 2112",
@@ -14382,7 +14364,7 @@
     "notes": ""
   },
   {
-    "id": 800,
+    "id": 799,
     "place_id": "ChIJ3elg8a1eHTERuK0qYS4f2sY",
     "name": "T.A.G Molding Co.,Ltd. (Mold Factory)",
     "phone": "02 174 7109",
@@ -14400,7 +14382,7 @@
     "notes": ""
   },
   {
-    "id": 801,
+    "id": 800,
     "place_id": "ChIJt1SiEadcHTERwxLn-9zVZTM",
     "name": "Boonyarat Press & Dai",
     "phone": "02 708 2942",
@@ -14418,7 +14400,7 @@
     "notes": ""
   },
   {
-    "id": 802,
+    "id": 801,
     "place_id": "ChIJo1QRFnVZHTERkRGkuuo2fYU",
     "name": "SOWELL THAI CO.,LTD.",
     "phone": "097 067 8063",
@@ -14436,7 +14418,7 @@
     "notes": ""
   },
   {
-    "id": 803,
+    "id": 802,
     "place_id": "ChIJOVNdHPFZHTEReo5HKr0iodI",
     "name": "บริษัท ไมโครเทค กรุ๊ป",
     "phone": "02 312 2487",
@@ -14454,7 +14436,7 @@
     "notes": ""
   },
   {
-    "id": 804,
+    "id": 803,
     "place_id": "ChIJn0FhdwBdHTERiMMkBjA0ESE",
     "name": "บริษัท เกรทโกลด์ จำกัด GREAT GOLD CO.,LTD",
     "phone": "083 108 4242",
@@ -14472,7 +14454,7 @@
     "notes": ""
   },
   {
-    "id": 805,
+    "id": 804,
     "place_id": "ChIJ6wYgNUdZHTERJ-u6wnwrhvw",
     "name": "Homda Mold Manufacturing Co., Ltd.",
     "phone": "088 961 2430",
@@ -14490,7 +14472,7 @@
     "notes": ""
   },
   {
-    "id": 806,
+    "id": 805,
     "place_id": "ChIJm-O93HRZHTERGbDDhEaPdBg",
     "name": "KATO TOOL & DIE CO.,LTD.",
     "phone": "02 107 0723",
@@ -14508,7 +14490,7 @@
     "notes": ""
   },
   {
-    "id": 807,
+    "id": 806,
     "place_id": "ChIJta8WavdZHTER336cQz3uUbc",
     "name": "FTL PRECISION CO.,LTD.",
     "phone": "098 271 2367",
@@ -14526,7 +14508,7 @@
     "notes": ""
   },
   {
-    "id": 808,
+    "id": 807,
     "place_id": "ChIJ1U4CXmFnHTERKFCeaFZopns",
     "name": "Obor (Thailand) Co., Ltd.",
     "phone": "02 002 7112",
@@ -14544,7 +14526,7 @@
     "notes": ""
   },
   {
-    "id": 809,
+    "id": 808,
     "place_id": "ChIJcQYKQHFfHTERJnWMFR1iBsY",
     "name": "Hana EDM Wire Co.,Ltd",
     "phone": "083 032 9687",
@@ -14562,7 +14544,7 @@
     "notes": ""
   },
   {
-    "id": 810,
+    "id": 809,
     "place_id": "ChIJ25EpRAB9HTER0XLSvzOEEfE",
     "name": "GET RICH SERVICE CO.,LTD.",
     "phone": "081 626 1459",
@@ -14580,7 +14562,7 @@
     "notes": ""
   },
   {
-    "id": 811,
+    "id": 810,
     "place_id": "ChIJd53p9jZbHTER-tPHOChMwm0",
     "name": "บริษัท ยูเนี่ยน โซลูชั่น เทคโนโลยี ทูล แอนด์ ดาย จำกัด สาขา 00003",
     "phone": "02 077 8282",
@@ -14598,7 +14580,7 @@
     "notes": ""
   },
   {
-    "id": 812,
+    "id": 811,
     "place_id": "ChIJDwBfk9xbHTERnucWdT34Bbg",
     "name": "หจก.สหรุ่งโรจน์โลหะภัณฑ์",
     "phone": "096 959 1116",
@@ -14616,7 +14598,7 @@
     "notes": ""
   },
   {
-    "id": 813,
+    "id": 812,
     "place_id": "ChIJE4yUOp9cHTERizS3MxIzV58",
     "name": "บริษัท เอ็นดีวี.เอ็นจิเนียริ่ง จำกัด (บริษัทผลิตแม่พิมพ์ฉีดพลาสติก)",
     "phone": "02 763 8839",
@@ -14634,7 +14616,7 @@
     "notes": ""
   },
   {
-    "id": 814,
+    "id": 813,
     "place_id": "ChIJn98qpThbHTER3SxjENo0eB4",
     "name": "บริษัท​ จิง เฉิง 168​ โมลด์ แอนด์ พาร์ท จำกัด",
     "phone": "02 052 7766",
@@ -14652,7 +14634,7 @@
     "notes": ""
   },
   {
-    "id": 815,
+    "id": 814,
     "place_id": "ChIJT-hGgVNZHTERoYHAKAx8C5s",
     "name": "Intensive Industries Co.,Ltd.",
     "phone": "080 059 5592",
@@ -14670,7 +14652,7 @@
     "notes": ""
   },
   {
-    "id": 816,
+    "id": 815,
     "place_id": "ChIJgRvOaAVcHTERJIXynFMeWnI",
     "name": "Chaiyoot Factory (1988) Co.,Ltd. (Head Office)",
     "phone": "02 706 5055",
@@ -14688,7 +14670,7 @@
     "notes": ""
   },
   {
-    "id": 817,
+    "id": 816,
     "place_id": "ChIJH1a8DYRcHTERSv04W90liGk",
     "name": "บริษัท เอที อินซูเลชั่น จำกัด",
     "phone": "081 526 1016",
@@ -14706,7 +14688,7 @@
     "notes": ""
   },
   {
-    "id": 818,
+    "id": 817,
     "place_id": "ChIJw0fwArFfHTERgzQ3fWGamYw",
     "name": "บริษัท เอส พี ดี โมลด์ จำกัด",
     "phone": "097 014 2017",
@@ -14724,7 +14706,7 @@
     "notes": ""
   },
   {
-    "id": 819,
+    "id": 818,
     "place_id": "ChIJB1OrfpNfHTEROSjxnEzaSZ0",
     "name": "โพลี อินเจคชั่น",
     "phone": "",
@@ -14742,7 +14724,7 @@
     "notes": ""
   },
   {
-    "id": 820,
+    "id": 819,
     "place_id": "ChIJ333y1e2d4jAR0y8VaPbxli0",
     "name": "บริษัท เอ็นเอสซีแมชชีน จำกัด",
     "phone": "088 122 7052",
@@ -14760,7 +14742,7 @@
     "notes": ""
   },
   {
-    "id": 821,
+    "id": 820,
     "place_id": "ChIJn2DqJBZfHTER81K7DUG1VvI",
     "name": "บริษัท เทพารักษ์การพิมพ์ จำกัด",
     "phone": "081 456 2115",
@@ -14778,7 +14760,7 @@
     "notes": ""
   },
   {
-    "id": 822,
+    "id": 821,
     "place_id": "ChIJgRM7CHVZHTER-9iUd9N-0LE",
     "name": "นิคมอุตสาหกรรมบางปู(เหนือ)",
     "phone": "02 117 1500",
@@ -14796,7 +14778,7 @@
     "notes": ""
   },
   {
-    "id": 823,
+    "id": 822,
     "place_id": "ChIJlQjz3cim4jARaAEr7CiKbQM",
     "name": "เจ เค ดีเวลอป",
     "phone": "097 181 4379",
@@ -14814,7 +14796,7 @@
     "notes": ""
   },
   {
-    "id": 824,
+    "id": 823,
     "place_id": "ChIJPzT2kodDHTERg8x_ukk-QgM",
     "name": "บริษัท จริงใจ บรรจุภัณฑ์2018(ประเทศไทย)จำกัด",
     "phone": "081 533 4005",
@@ -14832,7 +14814,7 @@
     "notes": ""
   },
   {
-    "id": 825,
+    "id": 824,
     "place_id": "ChIJ2_RmdDtFHTERU1WFTkHZ7lU",
     "name": "บริษัท ไทย หย่งซิน จำกัด",
     "phone": "095 956 3708",
@@ -14850,7 +14832,7 @@
     "notes": ""
   },
   {
-    "id": 826,
+    "id": 825,
     "place_id": "ChIJI4KOD1BFHTER9N4eOPc6v1s",
     "name": "ห้างหุ้นส่วนจำกัด เอ.พี.เอ็ม.ออโต้โมลด์",
     "phone": "089 476 7640",
@@ -14868,7 +14850,7 @@
     "notes": ""
   },
   {
-    "id": 827,
+    "id": 826,
     "place_id": "ChIJ8bXVLo5FHTERpm2aCKLUTFI",
     "name": "บริษัทเพชรทาวี โมลด์ แอนด์ ดาย จำกัด",
     "phone": "084 933 8894",
@@ -14886,7 +14868,7 @@
     "notes": ""
   },
   {
-    "id": 828,
+    "id": 827,
     "place_id": "ChIJA5n0w6lZHTER_eIwlQH_E20",
     "name": "B.OK Engineering บ.บีโอเค",
     "phone": "",
@@ -14904,7 +14886,7 @@
     "notes": ""
   },
   {
-    "id": 829,
+    "id": 828,
     "place_id": "ChIJczMen_JFHTERzjXj6POyO5E",
     "name": "บริษัท ฟูโกโตะ อินดัสทรี จำกัด",
     "phone": "02 330 3798",
@@ -14922,7 +14904,7 @@
     "notes": ""
   },
   {
-    "id": 830,
+    "id": 829,
     "place_id": "ChIJOxoF5Zyh4jARwiu-h-TgT8w",
     "name": "ก๋วยจั๊บน้ำข้น ซ้อเก๋",
     "phone": "098 825 2688",
@@ -14940,7 +14922,7 @@
     "notes": ""
   },
   {
-    "id": 831,
+    "id": 830,
     "place_id": "ChIJD1T85fug4jARIVXMpUNCbdQ",
     "name": "บริษัท เจริญทรัพย์อุตสาหกรรม จำกัด",
     "phone": "02 394 1012",
@@ -14958,7 +14940,7 @@
     "notes": ""
   },
   {
-    "id": 832,
+    "id": 831,
     "place_id": "ChIJZX4_A4-h4jARZJd9ptgcT7k",
     "name": "ท่าเรือปู่เจ้าสมิงพราย",
     "phone": "086 003 3595",
@@ -14976,25 +14958,7 @@
     "notes": ""
   },
   {
-    "id": 833,
-    "place_id": "ChIJOVQZMCel4jAReyCrM0gVw1Y",
-    "name": "รุ่งเรืองการช่าง",
-    "phone": "090 595 5282",
-    "email": "",
-    "subdistrict": "ไม่ระบุตำบล",
-    "district": "อำเภอพระสมุทรเจดีย์",
-    "province": "สมุทรปราการ",
-    "address": "96 5 ม8 กรุงเทพมหานคร อำเภอพระสมุทรเจดีย์ สมุทรปราการ 10290 ประเทศไทย",
-    "website": "",
-    "lat": 13.5923223,
-    "lng": 100.4974491,
-    "maps_url": "https://maps.google.com/?cid=6251864107569062011",
-    "status": "ยังไม่ได้ติดต่อ",
-    "contact_person": "",
-    "notes": ""
-  },
-  {
-    "id": 834,
+    "id": 832,
     "place_id": "ChIJZy0tvjFfHTER7ez9j2Qe9Pk",
     "name": "Han Wei Enterprise Co., ltd",
     "phone": "082 551 6338",
@@ -15012,7 +14976,7 @@
     "notes": ""
   },
   {
-    "id": 835,
+    "id": 833,
     "place_id": "ChIJga9BrV1fHTERYqFO-cN-lnw",
     "name": "J&JBOX ร้านจำหน่ายกล่องไปรษณีย์",
     "phone": "094 742 6149",
@@ -15030,7 +14994,7 @@
     "notes": ""
   },
   {
-    "id": 836,
+    "id": 834,
     "place_id": "ChIJPTCLsw9dHTERPFomtKUDmgA",
     "name": "บุญณรงค์อุตสาหกรรมพลาสติก Br.1",
     "phone": "091 721 3663",
@@ -15048,7 +15012,7 @@
     "notes": ""
   },
   {
-    "id": 837,
+    "id": 835,
     "place_id": "ChIJaVaBJvZeHTERdRrqJmyTJqQ",
     "name": "print2u ปริ้นท์ทูยู บางนา รับทำเข็มกลัด รับทำพัด",
     "phone": "084 523 1212",
@@ -15066,7 +15030,7 @@
     "notes": ""
   },
   {
-    "id": 838,
+    "id": 836,
     "place_id": "ChIJ9_Lnyy5fHTERLQdARjAb-54",
     "name": "Woojin Plaimm Co.,Ltd. (King Kaew Branch)",
     "phone": "02 745 4746",
@@ -15084,7 +15048,7 @@
     "notes": ""
   },
   {
-    "id": 839,
+    "id": 837,
     "place_id": "ChIJC2MIJO5dHTERq9v6oabVQEE",
     "name": "กันสาดดีไลท์ D-Lite",
     "phone": "02 312 4300",
@@ -15102,7 +15066,7 @@
     "notes": ""
   },
   {
-    "id": 840,
+    "id": 838,
     "place_id": "ChIJBWv6N_1dHTER1fVFuuYbK5k",
     "name": "โตโฮโฟม (ไทยแลนด์)",
     "phone": "",
@@ -15120,7 +15084,7 @@
     "notes": ""
   },
   {
-    "id": 841,
+    "id": 839,
     "place_id": "ChIJs7XW_PldHTEROurbV7hXbAM",
     "name": "บริษัท อีสเทอร์เชด (ประเทศไทย) จำกัด",
     "phone": "02 175 2160",
@@ -15138,7 +15102,7 @@
     "notes": ""
   },
   {
-    "id": 842,
+    "id": 840,
     "place_id": "ChIJxX_STPddHTERAt4eJ2oLCYQ",
     "name": "บริษัท หย่งหลุงเอ็นเตอร์ไพรส์ จำกัด",
     "phone": "02 738 5040",
@@ -15156,7 +15120,7 @@
     "notes": ""
   },
   {
-    "id": 843,
+    "id": 841,
     "place_id": "ChIJZ_hTDPZbHTER4vhBOD-7CfY",
     "name": "Plastic Automation Equipment Co. Ltd.",
     "phone": "",
@@ -15174,7 +15138,7 @@
     "notes": ""
   },
   {
-    "id": 844,
+    "id": 842,
     "place_id": "ChIJZWHlzXxoHTERvQLbcAW4mJM",
     "name": "บริษัท วงศ์พิน จำกัด",
     "phone": "02 312 4758",
@@ -15192,7 +15156,7 @@
     "notes": ""
   },
   {
-    "id": 845,
+    "id": 843,
     "place_id": "ChIJ99XZ94ddHTERizOhfplpTBI",
     "name": "ร้านพลาสติกริมปิง",
     "phone": "081 040 7969",
@@ -15210,7 +15174,7 @@
     "notes": ""
   },
   {
-    "id": 846,
+    "id": 844,
     "place_id": "ChIJL_K2x8BeHTER81y5ToAX7rg",
     "name": "Rinchokechai Co., Ltd.",
     "phone": "02 755 3388",
@@ -15228,7 +15192,7 @@
     "notes": ""
   },
   {
-    "id": 847,
+    "id": 845,
     "place_id": "ChIJOWjY6LNeHTERFFSz_AD-Y_M",
     "name": "บริษัท ท็อป คอมโพซิชั่น จำกัด",
     "phone": "02 174 6207",
@@ -15246,7 +15210,7 @@
     "notes": ""
   },
   {
-    "id": 848,
+    "id": 846,
     "place_id": "ChIJX3m3GOFbHTERuXqWlV0L3O8",
     "name": "บจก. ไทยศิลป์ลาเบลแพค",
     "phone": "02 752 5252",
@@ -15264,7 +15228,7 @@
     "notes": ""
   },
   {
-    "id": 849,
+    "id": 847,
     "place_id": "ChIJnzwTBaFcHTERpfCtfitvK80",
     "name": "แพทพลาสติก",
     "phone": "087 433 8742",
@@ -15282,7 +15246,7 @@
     "notes": ""
   },
   {
-    "id": 850,
+    "id": 848,
     "place_id": "ChIJdeehRjZeHTERTbMaCpKxpKQ",
     "name": "บจก. ไทยรุ่ง พี.วี.ซี.แพ็คกิ้ง",
     "phone": "02 750 0185",
@@ -15300,7 +15264,7 @@
     "notes": ""
   },
   {
-    "id": 851,
+    "id": 849,
     "place_id": "ChIJeesESwtcHTERLG5JRfyU_sk",
     "name": "บริษัท เอส.เค.อัลฟ่า จำกัด",
     "phone": "",
@@ -15318,7 +15282,7 @@
     "notes": ""
   },
   {
-    "id": 852,
+    "id": 850,
     "place_id": "ChIJ7919ISVcHTERuTIjcxvfgDM",
     "name": "บริษัท ไคฟู พลาสติก อินดัสเตรียล จำกัด",
     "phone": "02 174 6219",
@@ -15336,7 +15300,7 @@
     "notes": ""
   },
   {
-    "id": 853,
+    "id": 851,
     "place_id": "ChIJCdN-WABdHTERt_gygSIEEGU",
     "name": "บริษัท อีมีโก้ ถ้วยรางวัล จำกัด (สาขาเทพารักษ์)",
     "phone": "065 391 5525",
@@ -15354,7 +15318,7 @@
     "notes": ""
   },
   {
-    "id": 854,
+    "id": 852,
     "place_id": "ChIJRWnr0NZbHTERVOG7bIqenXs",
     "name": "เอกวรรณ ออโต้พาร์ท บจก.",
     "phone": "02 108 5655",
@@ -15372,7 +15336,7 @@
     "notes": ""
   },
   {
-    "id": 855,
+    "id": 853,
     "place_id": "ChIJ51pSvDdfHTERqfbqe1ePJhY",
     "name": "บริษัท นิฮอน โกลบอลพลาส จำกัด",
     "phone": "02 713 4886",
@@ -15390,7 +15354,7 @@
     "notes": ""
   },
   {
-    "id": 856,
+    "id": 854,
     "place_id": "ChIJW9Tlc0JfHTERiIlmeYcWvgY",
     "name": "ช่างรินทร์ กรอบะพระกันน้ำ เหลี่ยมพลาสติก อะคริลิค (Acrylic) รับทำตามแบบ",
     "phone": "062 293 6595",
@@ -15408,7 +15372,7 @@
     "notes": ""
   },
   {
-    "id": 857,
+    "id": 855,
     "place_id": "ChIJvYlwm0xYHTERYkw0R3-bt0E",
     "name": "บริษัท ไอ แอนด์ พี กรุ้ป (1993) จำกัด",
     "phone": "02 709 7103",
@@ -15426,7 +15390,7 @@
     "notes": ""
   },
   {
-    "id": 858,
+    "id": 856,
     "place_id": "ChIJGVRrV0JYHTER2Pckut1yutE",
     "name": "บริษัท แอปเปิ้ล ฟิล์ม จำกัด",
     "phone": "02 709 3665",
@@ -15444,7 +15408,7 @@
     "notes": ""
   },
   {
-    "id": 859,
+    "id": 857,
     "place_id": "ChIJCYfm1VGn4jARVtmaboT2XZc",
     "name": "บริษัท ถิรไทย จำกัด (มหาชน)",
     "phone": "02 769 7699",
@@ -15462,7 +15426,7 @@
     "notes": ""
   },
   {
-    "id": 860,
+    "id": 858,
     "place_id": "ChIJV9D9TapZHTERzQFkNsKY1Eg",
     "name": "บริษัทเพื่อนพลาสติก จำกัด",
     "phone": "095 464 8829",
@@ -15480,7 +15444,7 @@
     "notes": ""
   },
   {
-    "id": 861,
+    "id": 859,
     "place_id": "ChIJ32ZvXgVZHTER6Akaaxb0a0Q",
     "name": "นำไทยพลาสติก",
     "phone": "061 258 3526",
@@ -15498,7 +15462,7 @@
     "notes": ""
   },
   {
-    "id": 862,
+    "id": 860,
     "place_id": "ChIJU6IyIqVeHTERhwPqfAJ2KFw",
     "name": "33production",
     "phone": "096 883 5807",
@@ -15516,7 +15480,7 @@
     "notes": ""
   },
   {
-    "id": 863,
+    "id": 861,
     "place_id": "ChIJicg5lHNZHTERasJe94CYxRY",
     "name": "บ้านต้นบุญ รับทำป้าย กรอบรูป สติ๊กเกอร์ เลเซอร์อะคริลิค",
     "phone": "081 903 3002",
@@ -15534,7 +15498,7 @@
     "notes": ""
   },
   {
-    "id": 864,
+    "id": 862,
     "place_id": "ChIJ0Vk2dEFZHTER43Rc44wbGvo",
     "name": "บริษัท พี.ยู.โฟม อินซูเลชั่น แอนด์ เทรดดิ้ง จำกัด",
     "phone": "081 315 3408",
@@ -15552,7 +15516,7 @@
     "notes": ""
   },
   {
-    "id": 865,
+    "id": 863,
     "place_id": "ChIJnXDjTipZHTERVP_6pBEWjVw",
     "name": "บริษัท บางปู รีไซเคิ้ล จำกัด",
     "phone": "081 937 6876",
@@ -15570,7 +15534,7 @@
     "notes": ""
   },
   {
-    "id": 866,
+    "id": 864,
     "place_id": "ChIJz4kFV1Kn4jARHfGjaZOXLMY",
     "name": "หจก.ปราการ กรุ๊ป",
     "phone": "02 759 8335",
@@ -15588,7 +15552,7 @@
     "notes": ""
   },
   {
-    "id": 867,
+    "id": 865,
     "place_id": "ChIJnw_Yo42g4jAR0Rm-FXAp7JY",
     "name": "บริษัท สุพรีม พลาสติก อินดัสตรี้ จำกัด",
     "phone": "02 758 2808",
@@ -15606,7 +15570,7 @@
     "notes": ""
   },
   {
-    "id": 868,
+    "id": 866,
     "place_id": "ChIJd45GgE1bHTERH6AG0myCPew",
     "name": "บริษัท เอสเอสเพิ่มพูนทรัพย์ กรุ๊ป จำกัด",
     "phone": "089 907 5930",
@@ -15624,7 +15588,7 @@
     "notes": ""
   },
   {
-    "id": 869,
+    "id": 867,
     "place_id": "ChIJuWOhY49EHTERSusU03RgHt8",
     "name": "บางบ่อโฟโต้",
     "phone": "02 066 2837",
@@ -15642,7 +15606,7 @@
     "notes": ""
   },
   {
-    "id": 870,
+    "id": 868,
     "place_id": "ChIJPdOSanZEHTERKE607_NoGkE",
     "name": "Nihon MTC Co.,Ltd",
     "phone": "02 708 3160",
@@ -15660,7 +15624,7 @@
     "notes": ""
   },
   {
-    "id": 871,
+    "id": 869,
     "place_id": "ChIJR1LWZQFEHTERX4kE8kShra8",
     "name": "ร้าน ไฮ-กรีน",
     "phone": "081 566 8561",
@@ -15678,7 +15642,7 @@
     "notes": ""
   },
   {
-    "id": 872,
+    "id": 870,
     "place_id": "ChIJAURwocGh4jARpcnaSGLFSbg",
     "name": "กิจอุดมพลาสติก",
     "phone": "094 459 0464",
@@ -15696,7 +15660,7 @@
     "notes": ""
   },
   {
-    "id": 873,
+    "id": 871,
     "place_id": "ChIJAdEIKbxeHTERa--amU-EyTI",
     "name": "หจก.สุขใจพรีเมี่ยม",
     "phone": "095 561 0212",
@@ -15714,7 +15678,7 @@
     "notes": ""
   },
   {
-    "id": 874,
+    "id": 872,
     "place_id": "ChIJ07Vpix6k4jARSd7pZiF85S8",
     "name": "ซองไปรษณีย์พลาสติก - Dearcowboy.com",
     "phone": "061 979 3956",
@@ -15732,7 +15696,7 @@
     "notes": ""
   },
   {
-    "id": 875,
+    "id": 873,
     "place_id": "ChIJPzg34bij4jARg4bWy_cHm_E",
     "name": "บริษัท นทีกุล จำกัด",
     "phone": "02 871 6694",
@@ -15750,7 +15714,7 @@
     "notes": ""
   },
   {
-    "id": 876,
+    "id": 874,
     "place_id": "ChIJzY1ikY6h4jAR2lNzA7JKBZA",
     "name": "บริษัท อิมเป็คอุตสาหกรรมเคมี จำกัด",
     "phone": "02 394 0591",
@@ -15768,7 +15732,7 @@
     "notes": ""
   },
   {
-    "id": 877,
+    "id": 875,
     "place_id": "ChIJ7V06Z6-h4jARWt1Hwl0Z5U8",
     "name": "บริษัท ไทย เอส.เอส. อิฐทนไฟ จำกัด",
     "phone": "02 394 1466",
@@ -15786,7 +15750,7 @@
     "notes": ""
   },
   {
-    "id": 878,
+    "id": 876,
     "place_id": "ChIJzcjud5qh4jAREwO1EPXB0MM",
     "name": "สหไทย เทอร์มินอล",
     "phone": "02 386 8000",
@@ -15804,7 +15768,7 @@
     "notes": ""
   },
   {
-    "id": 879,
+    "id": 877,
     "place_id": "ChIJ0dlawIWh4jARYI6M4lw4GWc",
     "name": "ศาลปู่เจ้าสมิงพราย",
     "phone": "",
@@ -15822,7 +15786,7 @@
     "notes": ""
   },
   {
-    "id": 880,
+    "id": 878,
     "place_id": "ChIJswUvXSui4jARPdvAytJQTT4",
     "name": "บริษัท เชือกภาษีเจริญอุตสาหกรรม จำกัด",
     "phone": "02 463 8728",
@@ -15840,7 +15804,7 @@
     "notes": ""
   },
   {
-    "id": 881,
+    "id": 879,
     "place_id": "ChIJN4suFuCh4jARy8DTODS_MQA",
     "name": "LookGraphic Thailand",
     "phone": "082 547 9453",
@@ -15858,7 +15822,7 @@
     "notes": ""
   },
   {
-    "id": 882,
+    "id": 880,
     "place_id": "ChIJVYbymqyh4jAR_O_L70bMf4E",
     "name": "AdliteandFavbric Co.,Ltd",
     "phone": "064 958 8859",
@@ -15876,7 +15840,7 @@
     "notes": ""
   },
   {
-    "id": 883,
+    "id": 881,
     "place_id": "ChIJRbEEYESj4jAR4os2xAlUUag",
     "name": "บริษัท พี.บี.ไฮเทค คอร์ปอเรชั่น จำกัด",
     "phone": "02 462 5512",
@@ -15894,7 +15858,7 @@
     "notes": ""
   },
   {
-    "id": 884,
+    "id": 882,
     "place_id": "ChIJh-nZY2VfHTERuHheY9ebx1E",
     "name": "ห้างหุ้นส่วนจำกัด อรุณเทรดดิ้ง",
     "phone": "02 758 1406",
@@ -15912,7 +15876,7 @@
     "notes": ""
   },
   {
-    "id": 885,
+    "id": 883,
     "place_id": "ChIJ4_VfoVSg4jAR7_3-U_c9Css",
     "name": "บริษัท มิค เซล จำกัด",
     "phone": "",
@@ -15930,7 +15894,7 @@
     "notes": ""
   },
   {
-    "id": 886,
+    "id": 884,
     "place_id": "ChIJTW1KM-mg4jAR9OvRszqWaVs",
     "name": "K.T.S STATIONERY",
     "phone": "02 756 3676",
@@ -15948,7 +15912,7 @@
     "notes": ""
   },
   {
-    "id": 887,
+    "id": 885,
     "place_id": "ChIJ03fJmVSi4jAR_gbLv4W4kCc",
     "name": "Igetprint",
     "phone": "081 490 9742",
@@ -15966,7 +15930,7 @@
     "notes": ""
   },
   {
-    "id": 888,
+    "id": 886,
     "place_id": "ChIJVxkvagCj4jARACwcAddfHIQ",
     "name": "บริษัท สรรหา พลาสท์เคม จำกัด",
     "phone": "081 905 5998",
@@ -15984,7 +15948,7 @@
     "notes": ""
   },
   {
-    "id": 889,
+    "id": 887,
     "place_id": "ChIJk4b6S8eh4jARTAYjkFdabp8",
     "name": "Nippon Paint Decorative Coatings (Thailand) Co.,Ltd.",
     "phone": "02 462 5299",
@@ -16002,7 +15966,7 @@
     "notes": ""
   },
   {
-    "id": 890,
+    "id": 888,
     "place_id": "ChIJxaTQWcij4jAR4EFmIAcKgsg",
     "name": "PSPพูนสิริพลาสติก",
     "phone": "062 896 4919",
@@ -16020,7 +15984,7 @@
     "notes": ""
   },
   {
-    "id": 891,
+    "id": 889,
     "place_id": "ChIJcW4M87Gm4jARHVmG1lFSriM",
     "name": "ห้างหุ้นส่วนจำกัด แอล.พี.ดี.พลาสติก",
     "phone": "02 816 0023",
@@ -16038,7 +16002,7 @@
     "notes": ""
   },
   {
-    "id": 892,
+    "id": 890,
     "place_id": "ChIJ3cyvBQCl4jARE_1R6n5TVTM",
     "name": "บอย เลี่ยมพระ เลเซอร์เลี่ยมพลาสติกกันน้ำ",
     "phone": "080 581 5592",
@@ -16056,7 +16020,7 @@
     "notes": ""
   },
   {
-    "id": 893,
+    "id": 891,
     "place_id": "ChIJ3cJaukqn4jARa2rkbh1oUzo",
     "name": "ร้านกรอบรูปหลังศาล",
     "phone": "094 559 0436",
@@ -16074,7 +16038,7 @@
     "notes": ""
   },
   {
-    "id": 894,
+    "id": 892,
     "place_id": "ChIJq7MIsEeh4jARJs6K4SLuqbQ",
     "name": "บริษัท สหมิตรโปลิโฟม จำกัด",
     "phone": "02 461 2004",
@@ -16092,7 +16056,7 @@
     "notes": ""
   },
   {
-    "id": 895,
+    "id": 893,
     "place_id": "ChIJh1o1BcWm4jAR42Rj1XFGVGI",
     "name": "เครื่องรัดกล่องโรงงานสายรัดพลาสติก บริษัท.เอ็มเอไอ.แพคเกจ",
     "phone": "092 267 4152",
@@ -16110,7 +16074,7 @@
     "notes": ""
   },
   {
-    "id": 896,
+    "id": 894,
     "place_id": "ChIJZSpx91O94jAR8oJ1METiYRU",
     "name": "เทเลพาร์ท คอร์ปอเรชั่น ซัพพลาย",
     "phone": "02 743 0188",
@@ -16128,7 +16092,7 @@
     "notes": ""
   },
   {
-    "id": 897,
+    "id": 895,
     "place_id": "ChIJB15S2CRfHTERvhqyTW6kQzU",
     "name": "บจ.ดับบลิวเอฟ พัลพ แพ็คเกจจิ้ง (WF Pulp Packaging Co.,Ltd)",
     "phone": "02 716 3174",
@@ -16146,7 +16110,7 @@
     "notes": ""
   },
   {
-    "id": 898,
+    "id": 896,
     "place_id": "ChIJUetUNwBfHTERKmmjEW2Dv1A",
     "name": "POLY INJECTION",
     "phone": "",
@@ -16164,7 +16128,7 @@
     "notes": ""
   },
   {
-    "id": 899,
+    "id": 897,
     "place_id": "ChIJZ2VRjhJbHTERhDlnIg9V-kI",
     "name": "THM INDUSTRIAL DEVELOPMENT CO.,LTD",
     "phone": "02 180 0222",
@@ -16182,7 +16146,7 @@
     "notes": ""
   },
   {
-    "id": 900,
+    "id": 898,
     "place_id": "ChIJvx6_At30NQQR4ONL7wTY8wU",
     "name": "บริษัท วายเคพี โมลด์ พาร์ท (ไทยแลนด์) จำกัด YKP MOULD PARTS (THAILAND) CO.,LTD",
     "phone": "099 330 3515",
@@ -16200,7 +16164,7 @@
     "notes": ""
   },
   {
-    "id": 901,
+    "id": 899,
     "place_id": "ChIJ6aWQ0VZZHTERIOJJR9I7Q5Y",
     "name": "บริษัท โคเออิ ทูล (ไทยแลนด์) จำกัด",
     "phone": "02 174 5205",
@@ -16218,7 +16182,7 @@
     "notes": ""
   },
   {
-    "id": 902,
+    "id": 900,
     "place_id": "ChIJkSoK9JhZHTERKkSIeQaKrpM",
     "name": "HUARUIXING INDUSTRIAL (THAILAND) CO., LTD - plastic injection/packaging/mold",
     "phone": "064 948 4318",
@@ -16236,7 +16200,7 @@
     "notes": ""
   },
   {
-    "id": 903,
+    "id": 901,
     "place_id": "ChIJ-csskjdfHTER7TfZCM0cZto",
     "name": "Magal Industrial Parts Co., Ltd.",
     "phone": "",
@@ -16254,7 +16218,7 @@
     "notes": ""
   },
   {
-    "id": 904,
+    "id": 902,
     "place_id": "ChIJn-n-bwBFHTERUE_VFiHjoxQ",
     "name": "ADVANCE PLUS MOULDS & INJECTIONS (THAILAND) COMPANY LIMITED",
     "phone": "",
@@ -16272,25 +16236,7 @@
     "notes": ""
   },
   {
-    "id": 905,
-    "place_id": "ChIJ2fJideZfHTERdwC-gKmHKbw",
-    "name": "A Plas Industrial Co., Ltd.",
-    "phone": "02 740 0942",
-    "email": "",
-    "subdistrict": "บางเสาธง",
-    "district": "อำเภอบางเสาธง",
-    "province": "สมุทรปราการ",
-    "address": "27/31-32 Moo 3, Bangna-Trad Rd., Km. 23, Bangsaothong, Kingamphur Bangsaothong, 10540, Samutprakarn, แขวงบางนาเหนือ เขตบางนา กรุงเทพมหานคร 10540 ประเทศไทย",
-    "website": "",
-    "lat": 13.674511,
-    "lng": 100.6365619,
-    "maps_url": "https://maps.google.com/?cid=13558517315254747255",
-    "status": "ยังไม่ได้ติดต่อ",
-    "contact_person": "",
-    "notes": ""
-  },
-  {
-    "id": 906,
+    "id": 903,
     "place_id": "ChIJa9_j209ZHTERZFNZbCna0VA",
     "name": "E.Molding International Co., Ltd",
     "phone": "02 382 5613",
@@ -16308,7 +16254,7 @@
     "notes": ""
   },
   {
-    "id": 907,
+    "id": 904,
     "place_id": "ChIJaaLRSF5bHTERExFd4A3RgRg",
     "name": "บจก. สยามโมลด์",
     "phone": "02 317 6100",
@@ -16326,7 +16272,7 @@
     "notes": ""
   },
   {
-    "id": 908,
+    "id": 905,
     "place_id": "ChIJuSSpISVnHTERRg0TKiYj3e0",
     "name": "บริษัท จิน ซิน โมลด์ จำกัด",
     "phone": "095 830 4300",
@@ -16344,7 +16290,7 @@
     "notes": ""
   },
   {
-    "id": 909,
+    "id": 906,
     "place_id": "ChIJi-zQuOJYHTERqum-4zYGS9Y",
     "name": "มูราคามิ โมลด์ เอ็นจิเนียริ่ง (ประเทศไทย)",
     "phone": "",
@@ -16362,7 +16308,7 @@
     "notes": ""
   },
   {
-    "id": 910,
+    "id": 907,
     "place_id": "ChIJHW_5M9BZHTERrvH7XXPPwcY",
     "name": "เอ โอ ดี เอ็นจิเนียริ่ง",
     "phone": "087 288 6023",
@@ -16380,7 +16326,7 @@
     "notes": ""
   },
   {
-    "id": 911,
+    "id": 908,
     "place_id": "ChIJx4B4aGNbHTERo0KBQBysuN0",
     "name": "บริษัทช.รับเบอร์ แอนด์ โมลด์จำกัด",
     "phone": "02 315 4508",
@@ -16398,7 +16344,7 @@
     "notes": ""
   },
   {
-    "id": 912,
+    "id": 909,
     "place_id": "ChIJR3I6dwBDHTERg8B87yaMRx8",
     "name": "Newland Manufacturing Co., Ltd.",
     "phone": "062 425 6399",
@@ -16416,7 +16362,7 @@
     "notes": ""
   },
   {
-    "id": 913,
+    "id": 910,
     "place_id": "ChIJ9Vpgl7VfHTERPr_sDbVVcxU",
     "name": "Tech Sansho Co.,Ltd.",
     "phone": "02 751 9640",
@@ -16434,7 +16380,7 @@
     "notes": ""
   },
   {
-    "id": 914,
+    "id": 911,
     "place_id": "ChIJ5ZS5VHNcHTER1KpguEcfJsA",
     "name": "บริษัท ภูมิใจ เอ็นจิเนียริ่ง จำกัด",
     "phone": "02 312 1539",
@@ -16452,7 +16398,7 @@
     "notes": ""
   },
   {
-    "id": 915,
+    "id": 912,
     "place_id": "ChIJ35Vwf_5bHTERVaXVExHjpEM",
     "name": "TD Printing & Design Co.ltd",
     "phone": "095 957 4941",
@@ -16470,7 +16416,7 @@
     "notes": ""
   },
   {
-    "id": 916,
+    "id": 913,
     "place_id": "ChIJ_-A0H1tZHTERhmUGd6fEu5M",
     "name": "Shoei Plastic Thailand",
     "phone": "02 174 7325",
@@ -16488,7 +16434,7 @@
     "notes": ""
   },
   {
-    "id": 917,
+    "id": 914,
     "place_id": "ChIJ2c-CcfZhHTER8vwW9KSuQDQ",
     "name": "Thaiexpress Polymax Co.,Ltd.",
     "phone": "091 734 8420",
@@ -16506,7 +16452,7 @@
     "notes": ""
   },
   {
-    "id": 918,
+    "id": 915,
     "place_id": "ChIJ89y7r09dHTERWBB4G2ReleE",
     "name": "บริษัท อุตสาหกรรมทำเครื่องแก้วไทย จำกัด (มหาชน) - โรงงานบางพลี",
     "phone": "02 146 9955",
@@ -16524,7 +16470,7 @@
     "notes": ""
   },
   {
-    "id": 919,
+    "id": 916,
     "place_id": "ChIJP068xspdHTERoUbrBoKFWn0",
     "name": "PackGo Products",
     "phone": "091 446 9396",
@@ -16542,7 +16488,7 @@
     "notes": ""
   },
   {
-    "id": 920,
+    "id": 917,
     "place_id": "ChIJi_RtkdxdHTERM1HpJkaQpmk",
     "name": "JINGZHENG PLASTIC(THAILAND) CO.,LTD",
     "phone": "",
@@ -16560,7 +16506,7 @@
     "notes": ""
   },
   {
-    "id": 921,
+    "id": 918,
     "place_id": "ChIJb4JjK8af4jARilbUt65HbzQ",
     "name": "บจก. สีไดโน",
     "phone": "02 738 4111",
@@ -16578,7 +16524,7 @@
     "notes": ""
   },
   {
-    "id": 922,
+    "id": 919,
     "place_id": "ChIJGduYp_hdHTER0Lcz41Bs91U",
     "name": "คูเมืองค้าเหล็ก",
     "phone": "089 518 5195",
@@ -16596,7 +16542,7 @@
     "notes": ""
   },
   {
-    "id": 923,
+    "id": 920,
     "place_id": "ChIJs7XW_PldHTEReYsd9zG0NYQ",
     "name": "บริษัท เอส.เอส.เอ.อุตสาหกรรม จำกัด",
     "phone": "02 312 4368",
@@ -16614,7 +16560,7 @@
     "notes": ""
   },
   {
-    "id": 924,
+    "id": 921,
     "place_id": "ChIJs6xYl3hnHTERkNisEfnhlww",
     "name": "ธีรวุฒิ ค้าพลาสติก",
     "phone": "095 519 9379",
@@ -16632,7 +16578,7 @@
     "notes": ""
   },
   {
-    "id": 925,
+    "id": 922,
     "place_id": "ChIJcfDP2x5dHTERCLMnndcURaY",
     "name": "Plastic Factory",
     "phone": "",
@@ -16650,7 +16596,7 @@
     "notes": ""
   },
   {
-    "id": 926,
+    "id": 923,
     "place_id": "ChIJVzRzWQBbHTERCukk6sy8lo4",
     "name": "Green Land Plastic",
     "phone": "",
@@ -16668,7 +16614,7 @@
     "notes": ""
   },
   {
-    "id": 927,
+    "id": 924,
     "place_id": "ChIJHZmPRjpdHTER7lrQFcDQRJg",
     "name": "บริษัท พีพีที แพ็คเกจจิ้ง จำกัด",
     "phone": "081 959 5329",
@@ -16686,7 +16632,7 @@
     "notes": ""
   },
   {
-    "id": 928,
+    "id": 925,
     "place_id": "ChIJz6A7bwBdHTERnujWBaAK3xc",
     "name": "บริษัท ต้นข้าว พลาส แอนด์ แพค จำกัด",
     "phone": "081 241 2416",
@@ -16704,7 +16650,7 @@
     "notes": ""
   },
   {
-    "id": 929,
+    "id": 926,
     "place_id": "ChIJW15M5-NbHTEROR1CFm-u7uc",
     "name": "ฉลากน้ำดื่ม",
     "phone": "080 209 4559",
@@ -16722,7 +16668,7 @@
     "notes": ""
   },
   {
-    "id": 930,
+    "id": 927,
     "place_id": "ChIJ9wSay9JbHTERkRIb9w9sCmM",
     "name": "Fasttechnic Ltd., Part.",
     "phone": "",
@@ -16740,7 +16686,7 @@
     "notes": ""
   },
   {
-    "id": 931,
+    "id": 928,
     "place_id": "ChIJQycjrXtcHTERKwyskGrpGbM",
     "name": "ห้างหุ้นส่วนจำกัด ประทีป พลาสติก",
     "phone": "02 705 1460",
@@ -16758,7 +16704,7 @@
     "notes": ""
   },
   {
-    "id": 932,
+    "id": 929,
     "place_id": "ChIJFfzC7AxcHTERD1J9Lrwzcvo",
     "name": "บริษัท วี.เอส.ซุปเปอร์ลีน แอนด์ ซัพพลาย จำกัด",
     "phone": "02 730 8870",
@@ -16776,7 +16722,7 @@
     "notes": ""
   },
   {
-    "id": 933,
+    "id": 930,
     "place_id": "ChIJU7NgTXtbHTERavNni9d6Sq8",
     "name": "Forbo Siegling (Thailand) Co.,ltd.",
     "phone": "02 130 0286",
@@ -16794,7 +16740,7 @@
     "notes": ""
   },
   {
-    "id": 934,
+    "id": 931,
     "place_id": "ChIJwWMtdzwhwEURoW5D4naoslg",
     "name": "บริษัท พีเอ็มพี แมททีเรียล (ประเทศไทย) จำกัด",
     "phone": "02 185 8370",
@@ -16812,7 +16758,7 @@
     "notes": ""
   },
   {
-    "id": 935,
+    "id": 932,
     "place_id": "ChIJ_eHAgypfHTERauRR8vC0HHQ",
     "name": "MP Plas Pack Co.,Ltd.",
     "phone": "065 693 6515",
@@ -16830,7 +16776,7 @@
     "notes": ""
   },
   {
-    "id": 936,
+    "id": 933,
     "place_id": "ChIJszrFtPhfHTERCUamppIQDbY",
     "name": "Pathanasuk Warehouse",
     "phone": "088 227 4113",
@@ -16848,7 +16794,7 @@
     "notes": ""
   },
   {
-    "id": 937,
+    "id": 934,
     "place_id": "ChIJwY_JzZ-j4jARa8NkCU_lnDs",
     "name": "บริษัท พี.เอ็น.พี โพรไวเดอร์ จำกัด",
     "phone": "081 306 6999",
@@ -16866,7 +16812,7 @@
     "notes": ""
   },
   {
-    "id": 938,
+    "id": 935,
     "place_id": "ChIJgRvOaAVcHTER97fzXLBKuw0",
     "name": "บริษัท พริมา แพค แอนด์ พลาส จำกัด",
     "phone": "02 382 5144",
@@ -16884,7 +16830,7 @@
     "notes": ""
   },
   {
-    "id": 939,
+    "id": 936,
     "place_id": "ChIJpeDfFwBbHTER-anoB7a3IT8",
     "name": "บริษัท แพค เดลต้า จำกัด (มหาชน) สำนักงานใหญ่",
     "phone": "02 705 4100",
@@ -16902,7 +16848,7 @@
     "notes": ""
   },
   {
-    "id": 940,
+    "id": 937,
     "place_id": "ChIJYRF9xZldHTER-NZy7LTIyqI",
     "name": "Plastic Phan",
     "phone": "096 956 4699",
@@ -16920,7 +16866,7 @@
     "notes": ""
   },
   {
-    "id": 941,
+    "id": 938,
     "place_id": "ChIJuYO4HoKg4jARxg8GNPaAbyg",
     "name": "บริษัท ต้าจงพิกเมนท์(ไทยแลนด์) จำกัด",
     "phone": "02 384 5333",
@@ -16938,7 +16884,7 @@
     "notes": ""
   },
   {
-    "id": 942,
+    "id": 939,
     "place_id": "ChIJM-20zfFYHTERptVuXyAOZdM",
     "name": "DaikyoNishikawa (Thailand) Co.,Ltd (Samutprakarn)",
     "phone": "02 709 6727",
@@ -16956,7 +16902,7 @@
     "notes": ""
   },
   {
-    "id": 943,
+    "id": 940,
     "place_id": "ChIJObMW31dYHTER_8vZ-oY7__c",
     "name": "Pure Tex Company Limited",
     "phone": "02 709 4404",
@@ -16974,7 +16920,7 @@
     "notes": ""
   },
   {
-    "id": 944,
+    "id": 941,
     "place_id": "ChIJ5ZO2vM9ZHTERhWAqs7CdxqI",
     "name": "syscon labels & packaging co.,ltd",
     "phone": "02 752 5656",
@@ -16992,7 +16938,7 @@
     "notes": ""
   },
   {
-    "id": 945,
+    "id": 942,
     "place_id": "ChIJ_cy_mHBZHTER4lJB3VgPdz4",
     "name": "S.S.R.T. Plastic Intergroup Co., Ltd.",
     "phone": "02 101 2492",
@@ -17010,7 +16956,7 @@
     "notes": ""
   },
   {
-    "id": 946,
+    "id": 943,
     "place_id": "ChIJC-zNMoFZHTERvU4bw_dkDno",
     "name": "Jp plastic",
     "phone": "065 117 1890",
@@ -17028,7 +16974,7 @@
     "notes": ""
   },
   {
-    "id": 947,
+    "id": 944,
     "place_id": "ChIJvyA8PhhZHTERCTUNOzDTcP0",
     "name": "บริษัท โง๊วเจียบไทย จำกัด",
     "phone": "099 030 2008",
@@ -17046,7 +16992,7 @@
     "notes": ""
   },
   {
-    "id": 948,
+    "id": 945,
     "place_id": "ChIJmeslXr5YHTERw0LDWNtVllc",
     "name": "บริษัท มณีมงคล อิมปอร์ต-เอ็กซปอร์ต จำกัด @ โรงงาน",
     "phone": "",
@@ -17064,7 +17010,7 @@
     "notes": ""
   },
   {
-    "id": 949,
+    "id": 946,
     "place_id": "ChIJ0Yn7f2pZHTERfxESBjmwll0",
     "name": "PLASTMAX",
     "phone": "02 703 6298",
@@ -17082,7 +17028,7 @@
     "notes": ""
   },
   {
-    "id": 950,
+    "id": 947,
     "place_id": "ChIJkcQqs-JYHTERJut_9n2dpbw",
     "name": "บริษัท ยูนิพรีมา จำกัด",
     "phone": "02 709 6841",
@@ -17100,7 +17046,7 @@
     "notes": ""
   },
   {
-    "id": 951,
+    "id": 948,
     "place_id": "ChIJ1-TAdgBfHTERlW2Kd6qN1Q0",
     "name": "บริษัท พี.เอ.ที แพ็คกิ้ง จำกัด",
     "phone": "",
@@ -17118,7 +17064,7 @@
     "notes": ""
   },
   {
-    "id": 952,
+    "id": 949,
     "place_id": "ChIJOa0jd0JYHTER18xR-Els0ng",
     "name": "บริษัท ไทยรุ่งเรืองพลาสติก จำกัด",
     "phone": "02 116 8291",
@@ -17136,7 +17082,7 @@
     "notes": ""
   },
   {
-    "id": 953,
+    "id": 950,
     "place_id": "ChIJUdxY_tmn4jARczDYzP5H63s",
     "name": "ThailandBigBag",
     "phone": "065 826 2951",
@@ -17154,7 +17100,7 @@
     "notes": ""
   },
   {
-    "id": 954,
+    "id": 951,
     "place_id": "ChIJWcEw_U5ZHTERXNSoQoRVhvs",
     "name": "โชคนิวัฒน์พลาสติก",
     "phone": "063 953 2659",
@@ -17172,7 +17118,7 @@
     "notes": ""
   },
   {
-    "id": 955,
+    "id": 952,
     "place_id": "ChIJgdnwr5dYHTER_pKZvdy45VQ",
     "name": "ถังพลาสติกกิจไพบูลย์",
     "phone": "081 624 9241",
@@ -17190,7 +17136,7 @@
     "notes": ""
   },
   {
-    "id": 956,
+    "id": 953,
     "place_id": "ChIJn3l2vDen4jARgMYWiV0pIqU",
     "name": "ห้างหุ้นส่วนจำกัด ที.เอ็ม.เอส.พลาสติกการพิมพ์",
     "phone": "02 759 0956",
@@ -17208,7 +17154,7 @@
     "notes": ""
   },
   {
-    "id": 957,
+    "id": 954,
     "place_id": "ChIJ3873cgCn4jARR1SW-fJ0WOQ",
     "name": "พรสวรรค์ ร้านขายถุงพลาสติก",
     "phone": "",
@@ -17226,7 +17172,7 @@
     "notes": ""
   },
   {
-    "id": 958,
+    "id": 955,
     "place_id": "ChIJPYE6nbpZHTER5WLF_ict7G0",
     "name": "OCEAN CHEMICAL FIBER INTERNATIONAL (THAILAND) CO.,LTD.",
     "phone": "02 102 9788",
@@ -17244,7 +17190,7 @@
     "notes": ""
   },
   {
-    "id": 959,
+    "id": 956,
     "place_id": "ChIJV6UMhT1ZHTERt3ZmTjUcIOk",
     "name": "POLYMER ADD (THAILAND) CO., LTD. / บริษัท โพลีเมอร์ แอด (ไทยแลนด์) จำกัด",
     "phone": "080 453 1391",
@@ -17262,7 +17208,7 @@
     "notes": ""
   },
   {
-    "id": 960,
+    "id": 957,
     "place_id": "ChIJtUOz47RZHTERRYnoHFxDvYw",
     "name": "พรชัยค้าถัง",
     "phone": "088 942 5220",
@@ -17280,7 +17226,7 @@
     "notes": ""
   },
   {
-    "id": 961,
+    "id": 958,
     "place_id": "ChIJMYjHoGSn4jAReM_7x23S6mQ",
     "name": "หจก. สิริวัฒนาสตรองพลาส",
     "phone": "02 323 2721",
@@ -17298,7 +17244,7 @@
     "notes": ""
   },
   {
-    "id": 962,
+    "id": 959,
     "place_id": "ChIJf-gUWg5ZHTERFHL94KxXGWU",
     "name": "อำนวยพร พลาสติก",
     "phone": "063 639 3625",
@@ -17316,7 +17262,7 @@
     "notes": ""
   },
   {
-    "id": 963,
+    "id": 960,
     "place_id": "ChIJzRuJk8ldHTERN367QCAKH60",
     "name": "LTP GLOBAL THAILAND",
     "phone": "0907 662 468",
@@ -17334,7 +17280,7 @@
     "notes": ""
   },
   {
-    "id": 964,
+    "id": 961,
     "place_id": "ChIJx7JepKFeHTERdFnUNqy6bvE",
     "name": "เฟล็กซ์ซี่-แพค",
     "phone": "02 136 2742",
@@ -17352,7 +17298,7 @@
     "notes": ""
   },
   {
-    "id": 965,
+    "id": 962,
     "place_id": "ChIJj14WcINdHTERVZzzIAYz0z4",
     "name": "นิคมบางพลี",
     "phone": "",
@@ -17370,7 +17316,7 @@
     "notes": ""
   },
   {
-    "id": 966,
+    "id": 963,
     "place_id": "ChIJMThvZbNbHTERbBD7qP61JGQ",
     "name": "โรงงานผลิต ถัง IBC 1000 ลิตร",
     "phone": "081 555 2244",
@@ -17388,7 +17334,7 @@
     "notes": ""
   },
   {
-    "id": 967,
+    "id": 964,
     "place_id": "ChIJxZLL0xRbHTERD-LK03SZ-DI",
     "name": "TAIYO",
     "phone": "02 182 5228",
@@ -17406,7 +17352,7 @@
     "notes": ""
   },
   {
-    "id": 968,
+    "id": 965,
     "place_id": "ChIJRRK2vZBFHTERIiyOIBalk4Y",
     "name": "บริษัท หย่งอี้พลาสติก(ประเทศไทย)จำกัด",
     "phone": "099 910 0733",
@@ -17424,7 +17370,7 @@
     "notes": ""
   },
   {
-    "id": 969,
+    "id": 966,
     "place_id": "ChIJacCRnv1dHTERqODAaZcRGqk",
     "name": "Tokyo Ink (Thailand) Co., Ltd. (Factory)",
     "phone": "02 170 9888",
@@ -17442,7 +17388,7 @@
     "notes": ""
   },
   {
-    "id": 970,
+    "id": 967,
     "place_id": "ChIJ-xj1kphdHTERRrdJ7Nf5l3I",
     "name": "เอซ แพคเกจจิ้ง - Ace Packaging",
     "phone": "02 315 4324",
@@ -17460,7 +17406,7 @@
     "notes": ""
   },
   {
-    "id": 971,
+    "id": 968,
     "place_id": "ChIJc2wDAu9DHTER4fRdj7SzWEg",
     "name": "ร้านเจี๊ยบสติกเกอร์ซอยบัวโรย",
     "phone": "094 449 8456",
@@ -17478,7 +17424,7 @@
     "notes": ""
   },
   {
-    "id": 972,
+    "id": 969,
     "place_id": "ChIJpyc-4C5nHTERsPmNkCIpYIk",
     "name": "ร้าน รับซื้อของเก่าวงษ์พาณิชย์ ลาดกระบัง 54",
     "phone": "",
@@ -17496,7 +17442,7 @@
     "notes": ""
   },
   {
-    "id": 973,
+    "id": 970,
     "place_id": "ChIJLXP_c5FEHTERVBomx2dh_m0",
     "name": "M.S. Foods Packaging Co.,Ltd.",
     "phone": "02 708 9182",
@@ -17514,7 +17460,7 @@
     "notes": ""
   },
   {
-    "id": 974,
+    "id": 971,
     "place_id": "ChIJCbZIZwhDHTERKbnjf8K7r9k",
     "name": "Imprenta ตัวแทนจำหน่ายบรรจุภัณฑ์ Doozy Pack",
     "phone": "065 254 1936",
@@ -17532,7 +17478,7 @@
     "notes": ""
   },
   {
-    "id": 975,
+    "id": 972,
     "place_id": "ChIJr-md_SpFHTERN6FdhfXzcWw",
     "name": "ผลิตถุงซิปและจำหน่าย",
     "phone": "083 004 3142",
@@ -17550,7 +17496,7 @@
     "notes": ""
   },
   {
-    "id": 976,
+    "id": 973,
     "place_id": "ChIJtR7H70RFHTERNIMXFRSJQtM",
     "name": "เจมส์ Unii Hub คลองด่าน สมุทรปราการ",
     "phone": "094 263 6264",
@@ -17568,7 +17514,7 @@
     "notes": ""
   },
   {
-    "id": 977,
+    "id": 974,
     "place_id": "ChIJ1dPPFqFFHTERCM0svrsSpjY",
     "name": "ทรัพย์อนันต์รีไซเคิล คลองด่าน",
     "phone": "089 764 5770",
@@ -17586,7 +17532,7 @@
     "notes": ""
   },
   {
-    "id": 978,
+    "id": 975,
     "place_id": "ChIJpXldRgBbHTER-aBIYGOhgR0",
     "name": "โรงงานมั่นคงยั่งยืนรีไซเคิล",
     "phone": "",
@@ -17604,7 +17550,7 @@
     "notes": ""
   },
   {
-    "id": 979,
+    "id": 976,
     "place_id": "ChIJqxVE9tij4jARVS2nCPIboqw",
     "name": "บริษัท ยูไนเต็ดคัลเลอร์คอร์ปอเรชั่น จำกัด",
     "phone": "02 818 6245",
@@ -17622,7 +17568,7 @@
     "notes": ""
   },
   {
-    "id": 980,
+    "id": 977,
     "place_id": "ChIJNdI6DSai4jARUmoZsKzaHwU",
     "name": "SSK KOLAKARN CO., LTD.",
     "phone": "02 463 1700",
@@ -17640,7 +17586,7 @@
     "notes": ""
   },
   {
-    "id": 981,
+    "id": 978,
     "place_id": "ChIJP-lV8ZOj4jARpNbbhttSUio",
     "name": "บริษัท แม็คเทคพริซิชั่น จำกัด",
     "phone": "090 008 0085",
@@ -17658,7 +17604,7 @@
     "notes": ""
   },
   {
-    "id": 982,
+    "id": 979,
     "place_id": "ChIJi0lpin6h4jARYfu1a4eNFUA",
     "name": "บริษัท ไทยชูรส จำกัด (โรงงาน)",
     "phone": "02 463 2495",
@@ -17676,7 +17622,7 @@
     "notes": ""
   },
   {
-    "id": 983,
+    "id": 980,
     "place_id": "ChIJjelti0Oh4jAR8qJ0WBoWw8E",
     "name": "บริษัท โชคบุญถาวร เทรดดิ้ง จำกัด",
     "phone": "02 803 0680",
@@ -17694,7 +17640,7 @@
     "notes": ""
   },
   {
-    "id": 984,
+    "id": 981,
     "place_id": "ChIJnxIzvIWh4jARgzJ780BOmsA",
     "name": "พัฒนาศิลป์อคิลิค",
     "phone": "02 393 8725",
@@ -17712,7 +17658,7 @@
     "notes": ""
   },
   {
-    "id": 985,
+    "id": 982,
     "place_id": "ChIJf6qqqpqg4jAR-ThbeaFzAKc",
     "name": "บริษัท วิน พลาสติก จำกัด",
     "phone": "089 897 4915",
@@ -17730,7 +17676,7 @@
     "notes": ""
   },
   {
-    "id": 986,
+    "id": 983,
     "place_id": "ChIJAZI8Pgqh4jARbtcvDHp3qvE",
     "name": "STS PACKAGING CO.,LTD",
     "phone": "063 562 9935",
@@ -17748,7 +17694,7 @@
     "notes": ""
   },
   {
-    "id": 987,
+    "id": 984,
     "place_id": "ChIJSWssv0eh4jARhUUrXZ7_Dgk",
     "name": "BPS Bangkok Co., Ltd. บริษัท บีพีเอส กรุงเทพ จำกัด",
     "phone": "02 816 3888",
@@ -17766,7 +17712,7 @@
     "notes": ""
   },
   {
-    "id": 988,
+    "id": 985,
     "place_id": "ChIJXbNfp9mk4jAReyWG0i0EnUQ",
     "name": "Thai Plastic Net Co., Ltd.",
     "phone": "02 452 3904",
@@ -17784,7 +17730,7 @@
     "notes": ""
   },
   {
-    "id": 989,
+    "id": 986,
     "place_id": "ChIJa2H_kd6n4jARWNGOflkoFYE",
     "name": "Airbubble",
     "phone": "097 209 4562",
@@ -17802,7 +17748,7 @@
     "notes": ""
   },
   {
-    "id": 990,
+    "id": 987,
     "place_id": "ChIJ7bTvMwCh4jAR1jy4oMG04TQ",
     "name": "โกดัง บิ๊กแบ็ก",
     "phone": "",
@@ -17820,7 +17766,7 @@
     "notes": ""
   },
   {
-    "id": 991,
+    "id": 988,
     "place_id": "ChIJf1VeWJ-j4jARrGYZNfU2yzI",
     "name": "Siam Castle Plastic Co.,Ltd",
     "phone": "02 815 7866",
@@ -17838,7 +17784,7 @@
     "notes": ""
   },
   {
-    "id": 992,
+    "id": 989,
     "place_id": "ChIJa8Pkem9DHTER2vg3-jDxU1E",
     "name": "บริษัท ทริปเปิ้ล ทูว์ พลาส แอนด์ โมลด์ จำกัด",
     "phone": "02 312 8990",
@@ -17856,7 +17802,7 @@
     "notes": ""
   },
   {
-    "id": 993,
+    "id": 990,
     "place_id": "ChIJ5am7xbteHTERBRoq6Fq_gjs",
     "name": "ห้างหุ้นส่วนจำกัด แสงทองวัฒนา พลาสติก",
     "phone": "02 386 9119",
