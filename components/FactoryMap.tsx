@@ -178,11 +178,10 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         zoomControl: true,
       });
 
-      // High Performance OpenStreetMap CartoDB Voyager Tiles
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; CARTO &copy; OpenStreetMap',
+      // Official Clean OpenStreetMap Tiles (No watermark / No API Key required)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
-        subdomains: 'abcd',
       }).addTo(map);
 
       // Initialize Marker Cluster Group
