@@ -4,27 +4,72 @@ export const translations: Record<Language, Record<string, string>> = {
   th: {
     // Brand & App
     appName: 'B2B Factory Radar',
-    appSubtitle: 'เสาหลักที่ 1: Verified Lead Intelligence (คลังเป้าหมายโรงงานพร้อมเจาะ)',
+    appSubtitle: 'ระบบจัดการข้อมูลและเรดาร์เป้าหมายโรงงาน (ประหยัดเวลา & ลดต้นทุนองค์กร)',
     proWorkspace: 'VERIFIED LEADS',
-    appBadge: 'Pillar 1',
+    appBadge: 'Sales Automation',
     proMember: 'Verified Sales Rep',
 
     // Top Navbar
     signIn: 'เข้าสู่ระบบ',
     signUp: 'สมัครสมาชิก',
     signOut: 'ออกจากระบบ',
-    goToDashboard: '🚀 ไปยังศูนย์บัญชาการเป้าหมาย',
+    goToDashboard: 'เข้าสู่ศูนย์บัญชาการ',
     dashboardMy: 'เข้าสู่ Dashboard เป้าหมาย',
+    freeTrialBtn: 'ทดลองใช้งานฟรี',
 
     // Hero Section
-    heroBadge: 'เสาหลักที่ 1: Verified Lead Intelligence (คลังเป้าหมายโรงงานพร้อมเจาะ)',
-    heroTitlePrefix: 'คลังเป้าหมายโรงงานฉีดพลาสติก & การผลิต',
-    heroTitleSuffix: '+ แห่ง พร้อมเจาะทันที',
-    heroTitleTime: 'เปิดจอแล้ววิ่งได้เลย',
-    heroSubtitle: 'ฐานข้อมูลโรงงานฉีดพลาสติก 1,000+ แห่ง พร้อมพิกัด GPS แม่นยำตรงประตูทางเข้า, เบอร์ตรงต่อสายฝ่ายจัดซื้อ/วิศวกรรม, ระบบคัดกรองโซน และ Company Quick Fact เช็กทุนจดทะเบียนประเมินไซส์โรงงาน',
-    heroExploreBtn: '🚀 สำรวจเป้าหมายโรงงานสด',
-    heroUnlockBtn: '🔓 เปิดใช้งานระบบเต็มรูปแบบ',
-    heroGoDashboardBtn: '🚀 เข้าสู่ศูนย์บัญชาการเป้าหมาย (Dashboard)',
+    heroExecutiveTag: 'ลดต้นทุนการจ้างงานพนักงานได้หลายตำแหน่ง • ยกระดับทีมขายสู่ระบบอัตโนมัติ',
+    heroHeadline1: 'ประหยัดค่าจ้างพนักงานได้หลายส่วน',
+    heroHeadline2: 'ฝ่ายขายไม่ต้องเสียเวลากับการวางแผน',
+    heroHeadline3: 'มีหน้าที่ออกไปขายและปิดดีลอย่างเดียว',
+    heroSub: 'รวบรวม 4 ระบบอัจฉริยะไว้ในที่เดียว: สืบค้นข้อมูลบริษัท + วางแผนการเดินทางด้วย Live GPS + บริหารจัดการข้อมูลโรงงาน 1,000+ แห่ง + แดชบอร์ดติดตามงานขาย จบปัญหาเซลส์เสียเวลานั่งงมหาทาง หรือจ้างคนมาทำเอกสาร',
+    
+    pillar1Title: '1. ค้นหาข้อมูลบริษัท & DBD',
+    pillar1Desc: 'เช็กทุนจดทะเบียน สถานะนิติบุคคล และเบอร์โทรศัพท์ตรงของบริษัทในคลิกเดียว ไม่ต้องจ้างคนนั่งค้นหาข้อมูล',
+    pillar2Title: '2. วางแผนการเดินทางอัจฉริยะ',
+    pillar2Desc: 'Live GPS คำนวณระยะทางจากรถ นำทางตรงถึงประตูทางเข้าโรงงาน 100% ประหยัดเวลาหลงทาง 3 ชม./วัน',
+    pillar3Title: '3. บริหารจัดการข้อมูลโรงงาน',
+    pillar3Desc: 'คลังเป้าหมาย 1,000+ แห่ง แบ่งตามโซนนิคมฯ บางพลี, บางปู, สุขสวัสดิ์ ฯลฯ เปิดจอแล้วเลือกเจาะได้ทันที',
+    pillar4Title: '4. แดชบอร์ดติดตามงานขาย',
+    pillar4Desc: 'บันทึกสถานะและโน้ตการโทรผ่านมือถือ ไม่ต้องจ้างแอดมินคอยกรอก Excel หรือตามงาน',
+
+    unlockFreeTrialBtn: 'ทดลองใช้งานฟรี (ปลดล็อก 1,000+ โรงงาน)',
+    viewLiveRadarBtn: 'ดูเรดาร์แผนที่สด',
+    enterCommandBtn: 'เข้าสู่ศูนย์บัญชาการเป้าหมาย',
+
+    // ROI Section
+    roiTag: 'ผลตอบแทนจากการลงทุน (Business ROI)',
+    roiTitle: 'ประหยัดต้นทุนองค์กรหลักแสน • เพิ่มยอดขายให้ทีมงานแบบก้าวกระโดด',
+    roiSub: 'เมื่อเปลี่ยนกระบวนการขายแบบเดิม ๆ ให้กลายเป็นระบบอัตโนมัติ องค์กรของคุณจะได้ผลลัพธ์ที่จับต้องได้ทันที',
+    
+    roi1Val: '฿360,000+',
+    roi1Unit: '/ ปี',
+    roi1Title: 'ประหยัดค่าจ้างพนักงาน Data & Admin',
+    roi1Desc: 'ไม่ต้องจ้างพนักงานคอยหาข้อมูลรายชื่อโรงงาน หรือจ้างแอดมินคอยทำรายงานสรุปสถานะการเข้าพบ',
+
+    roi2Val: '66 ชั่วโมง',
+    roi2Unit: '/ คน / เดือน',
+    roi2Title: 'คืนเวลาที่มีค่าให้เซลส์โฟกัสการขาย',
+    roi2Desc: 'ประหยัดเวลาการนั่งวางแผนเส้นทางวันละ 3 ชั่วโมง ให้เซลส์เอาเวลาไปโทรคุยและเข้าพบบริษัทเป้าหมายได้มากขึ้น 3 เท่า',
+
+    roi3Val: '100% แม่นยำ',
+    roi3Unit: 'ตรงประตูทางเข้า',
+    roi3Title: 'ลดค่าน้ำมันขับหลงทาง & ไม่ติด รปภ.',
+    roi3Desc: 'พิกัดประตูทางเข้าถูกต้อง พร้อมลิงก์เช็กขนาดธุรกิจ DBD ทราบขนาดโรงงานล่วงหน้าก่อนก้าวลงจากรถ',
+
+    compOldTitle: 'กระบวนการขายแบบดั้งเดิม (สิ้นเปลืองต้นทุน)',
+    compOld1: 'ต้องจ้างพนักงานหลายตำแหน่ง: ทั้งคนหาข้อมูล, คนโทรเช็กเบอร์, และแอดมินตามงาน',
+    compOld2: 'เซลส์เสียเวลาวางแผนครึ่งวัน: นั่งเปิด Google Maps หาซอย เสียค่าน้ำมันขับวนหาโรงงาน',
+    compOld3: 'ข้อมูลกระจัดกระจาย: บันทึกงานบนกระดาษหรือไลน์ ไม่รู้ว่าโรงงานไหนโทรแล้วหรือเสนอราคาไปแล้ว',
+
+    compRadarTitle: 'ใช้ B2B Factory Radar (เซลส์มีหน้าที่ขายอย่างเดียว)',
+    compRadar1: 'ระบบค้นหาและเตรียมข้อมูลให้เสร็จสรรพ: เบอร์โทรศัพท์ตรงของโรงงาน/บริษัท + ทุนจดทะเบียน DBD พร้อมใช้งาน',
+    compRadar2: 'Live GPS คำนวณเส้นทางและนำทางอัตโนมัติ: บอกโรงงานที่ใกล้ตัวที่สุด ขับตรงถึงประตูผู้ติดต่อ',
+    compRadar3: 'แดชบอร์ดอัปเดตสถานะทันทีบนมือถือ: ปรับสถานะ โทรแล้ว, นัดเข้าพบ, เสนอราคา ใน 1 วินาที',
+
+    radarTitle: 'ศูนย์บัญชาการพิกัดโรงงาน 1,000+ แห่ง (เปิดจอแล้ววิ่งได้ทันที)',
+    screeningLabel: 'ระบบคัดกรอง:',
+    gateVerifiedBadge: 'พิกัดประตูทางเข้า 100%',
 
     // Zones & Territories
     zoneAll: '🌐 ทุกโซน / ทุกพื้นที่ (1,000+ แห่ง)',
@@ -58,14 +103,13 @@ export const translations: Record<Language, Record<string, string>> = {
     statusWon: '🏆 ลูกค้าประจำ / ปิดการขาย (Customer / Won)',
     statusLost: '🔴 ปฏิเสธ / ยังไม่สนใจ',
     statusLabel: 'ป้ายกำกับสถานะ (Status Tag):',
-    notePlaceholder: 'บันทึกข้อมูลช่วยเปิดบทสนทนา (เช่น คุยกับจัดซื้อคุณสมศักดิ์, โรงงานมี 12 เครื่องฉีด)...',
+    notePlaceholder: 'บันทึกข้อมูลช่วยเปิดบทสนทนา (เช่น คุยกับคุณสมศักดิ์, โรงงานมี 12 เครื่องฉีด)...',
     savedNoteLabel: 'โน้ตล่าสุด:',
     saveStatusBtn: 'บันทึกสถานะ',
 
     // Company Quick Fact
     quickFactTitle: '🏢 Company Quick Fact (ข้อมูลเสริมช่วยเปิดบทสนทนา)',
     checkDbdBtn: '🔍 ตรวจสอบทุนจดทะเบียน & นิติบุคคล (DBD Dataforthai)',
-    checkCredenBtn: '📊 วิเคราะห์งบการเงิน & ไซส์บริษัท (Creden Data)',
     directLine: 'เบอร์โทรศัพท์ตรงของบริษัท',
 
     // Map Section
@@ -121,47 +165,90 @@ export const translations: Record<Language, Record<string, string>> = {
     createAccountBtn: 'สร้างบัญชีผู้ใช้ใหม่',
 
     // Footer
-    footerCopy: '© 2026 B2B Factory Radar • เสาหลักที่ 1: Verified Lead Intelligence Platform',
+    footerCopy: '© 2026 B2B Factory Radar • ระบบบริหารจัดการการขาย & เรดาร์เป้าหมายโรงงานอุตสาหกรรม',
   },
 
   en: {
     // Brand & App
     appName: 'B2B Factory Radar',
-    appSubtitle: 'Pillar 1: Verified Lead Intelligence (Target Industrial Factory Catalog)',
+    appSubtitle: 'Sales Intelligence & Factory Radar (Save Time & Cut Overhead Costs)',
     proWorkspace: 'VERIFIED LEADS',
-    appBadge: 'Pillar 1',
+    appBadge: 'Sales Automation',
     proMember: 'Verified Sales Rep',
 
     // Top Navbar
     signIn: 'Sign In',
     signUp: 'Sign Up',
     signOut: 'Sign Out',
-    goToDashboard: '🚀 Go to Radar Dashboard',
+    goToDashboard: 'Enter Command Center',
     dashboardMy: 'Enter My Target Radar',
+    freeTrialBtn: 'Start Free Trial',
 
     // Hero Section
-    heroBadge: 'Pillar 1: Verified Lead Intelligence',
-    heroTitlePrefix: 'Target Plastic Injection & Manufacturing Factories',
-    heroTitleSuffix: '+ Ready to Pitch',
-    heroTitleTime: 'Zero Guesswork',
-    heroSubtitle: 'Comprehensive database of 1,089+ plastic injection factories with entrance GPS coords, direct procurement/engineering phone numbers, smart zone filters, and Company Quick Facts for instant corporate size assessment.',
-    heroExploreBtn: '🚀 Explore Live Factory Radar',
-    heroUnlockBtn: '🔓 Access Full Intelligence',
-    heroGoDashboardBtn: '🚀 Enter Radar Dashboard',
+    heroExecutiveTag: 'Reduce Headcount & Overhead Costs • Elevate Sales to Full Automation',
+    heroHeadline1: 'Save Multiple Employee Salaries',
+    heroHeadline2: 'Sales Reps Waste Zero Time Planning',
+    heroHeadline3: 'Focus 100% on Pitching and Closing Deals',
+    heroSub: 'All-in-one smart platform: Instant Company & DBD Research + Live GPS Route Planning + 1,000+ Factory Lead Engine + Sales Pipeline CRM. Eliminate manual route planning and admin paperwork.',
+    
+    pillar1Title: '1. Instant Company & DBD Research',
+    pillar1Desc: 'Instant registered capital, legal status, and direct company phone lines in 1 click. Zero need for data research headcount.',
+    pillar2Title: '2. Smart Travel & Route Planning',
+    pillar2Desc: 'Live GPS calculates distances from your car and routes 100% to the entrance gate. Saves 3 hours of lost travel time daily.',
+    pillar3Title: '3. 1,000+ Factory Lead Management',
+    pillar3Desc: 'Comprehensive catalog of 1,000+ target factories segmented across Bang Phli, Bangpoo, Suksawat, etc. Ready to pitch instantly.',
+    pillar4Title: '4. Mobile Sales Pipeline Dashboard',
+    pillar4Desc: 'Log call stages and notes instantly on mobile. Eliminates the need for sales admins to manage messy Excel sheets.',
+
+    unlockFreeTrialBtn: 'Start Free Trial (Unlock 1,000+ Factories)',
+    viewLiveRadarBtn: 'Explore Live Map Radar',
+    enterCommandBtn: 'Enter Radar Command Center',
+
+    // ROI Section
+    roiTag: 'Business ROI & Cost Savings',
+    roiTitle: 'Save Hundreds of Thousands in Overhead • Exponentially Boost Sales Revenue',
+    roiSub: 'Transforming legacy sales operations into an automated system delivers immediate, measurable bottom-line returns.',
+    
+    roi1Val: '฿360,000+',
+    roi1Unit: '/ year',
+    roi1Title: 'Save on Data & Sales Admin Salaries',
+    roi1Desc: 'No need to hire dedicated researchers to find factory phone numbers or admins to compile manual visit reports.',
+
+    roi2Val: '66 Hours',
+    roi2Unit: '/ rep / month',
+    roi2Title: 'Reclaim High-Value Selling Time',
+    roi2Desc: 'Save 3 hours of daily route mapping, empowering reps to call and meet 3x more target factories each month.',
+
+    roi3Val: '100% Accurate',
+    roi3Unit: 'at Entrance Gate',
+    roi3Title: 'Reduce Fuel Waste & Avoid Security Rejections',
+    roi3Desc: 'Accurate entrance coordinates with direct DBD company facts to know business scale before stepping out of the car.',
+
+    compOldTitle: 'Legacy Sales Method (High Cost & Inefficiency)',
+    compOld1: 'Requires Multiple Headcounts: Data searchers, telesales checkers, and admin report compilers.',
+    compOld2: 'Half-Day Lost Planning: Reps spend hours on Google Maps and waste fuel driving in random circles.',
+    compOld3: 'Scattered Data: Notes on paper or chat apps, with zero visibility on who was called or quoted.',
+
+    compRadarTitle: 'With B2B Factory Radar (Reps Purely Pitch & Close)',
+    compRadar1: 'Pre-Engineered Intelligence: Direct company phone numbers + DBD registered capital ready to use.',
+    compRadar2: 'Live GPS Routing: Auto-detects closest factories and navigates directly to the contact entrance gate.',
+    compRadar3: 'Real-Time Mobile Dashboard: Update stages (Contacted, Meeting, Quoted) in 1 second.',
+
+    radarTitle: '1,000+ Factory Radar Command Center (Open & Drive Instantly)',
+    screeningLabel: 'Lead Verification:',
+    gateVerifiedBadge: '100% Gate Verified',
 
     // Zones & Territories
-    zoneAll: '🌐 All Industrial Zones (1,089)',
-    zoneBangPhli: '📍 Bang Phli Zone (384)',
-    zoneKingKaew: '📍 King Kaew - Racha Thewa Zone',
+    zoneAll: '🌐 All Industrial Zones (1,000+)',
+    zoneBangPhli: '📍 Bang Phli - King Kaew Zone (384)',
     zoneBangpoo: '📍 Bangpoo Industrial Estate Zone (328)',
     zoneAsiaSuvarnabhumi: '📍 Asia Suvarnabhumi Estate Zone',
     zoneBangSaoThong: '📍 Bang Sao Thong Zone (81)',
-    zonePhraPradaeng: '📍 Phra Pradaeng Zone (114)',
-    zoneSuksawat: '📍 Suksawat Road Zone',
+    zonePhraPradaeng: '📍 Phra Pradaeng - Suksawat Zone (114)',
     zonePhraSamut: '📍 Phra Samut Chedi Zone (115)',
     zoneBangBo: '📍 Bang Bo Zone (87)',
     zoneMueang: '📍 Mueang Samut Prakan Zone',
-    allDistricts: '🏛️ All Districts (1,089)',
+    allDistricts: '🏛️ All Districts (1,000+)',
     allSubdistricts: '🏘️ All Subdistricts',
 
     // Near Me & Radius Filter
@@ -183,14 +270,13 @@ export const translations: Record<Language, Record<string, string>> = {
     statusWon: '🏆 Customer / Closed Won',
     statusLost: '🔴 Not Interested / Lost',
     statusLabel: 'Status Tag:',
-    notePlaceholder: 'Add conversational intelligence notes (e.g. procurement contact name, 12 injection machines)...',
+    notePlaceholder: 'Add conversational intelligence notes (e.g. contact name, 12 injection machines)...',
     savedNoteLabel: 'Latest Note:',
     saveStatusBtn: 'Save Status',
 
     // Company Quick Fact
     quickFactTitle: '🏢 Company Quick Fact & Intelligence',
     checkDbdBtn: '🔍 Check Registered Capital & DBD Info (Dataforthai)',
-    checkCredenBtn: '📊 Company Size & Financials (Creden Data)',
     directLine: 'Direct Company Phone Line',
 
     // Map Section
@@ -246,33 +332,78 @@ export const translations: Record<Language, Record<string, string>> = {
     createAccountBtn: 'Create Account',
 
     // Footer
-    footerCopy: '© 2026 B2B Factory Radar • Pillar 1: Verified Lead Intelligence Platform',
+    footerCopy: '© 2026 B2B Factory Radar • Sales Automation & Industrial Target Radar Platform',
   },
 
   zh: {
     // Brand & App
     appName: 'B2B 工厂雷达',
-    appSubtitle: '第一支柱：Verified Lead Intelligence (精准注塑目标工厂库)',
+    appSubtitle: '企业销售智能与工厂雷达控制台 (降本增效・一键出海)',
     proWorkspace: '精准目标工厂库',
-    appBadge: '第一支柱',
+    appBadge: '全自动销售引擎',
     proMember: '认证销售代表',
 
     // Top Navbar
     signIn: '登录',
     signUp: '注册账号',
     signOut: '退出登录',
-    goToDashboard: '🚀 进入雷达控制台',
+    goToDashboard: '进入控制台',
     dashboardMy: '进入我的目标雷达',
+    freeTrialBtn: '免费试用',
 
     // Hero Section
-    heroBadge: '第一支柱：Verified Lead Intelligence (精准目标工厂库)',
-    heroTitlePrefix: '北榄府 1,000+ 家注塑与制造目标工厂',
-    heroTitleSuffix: '一键触达',
-    heroTitleTime: '开屏即跑',
-    heroSubtitle: '精准大门GPS定位、企业直通电话、智能园区筛选及企业工商注册资本一键核验。',
-    heroExploreBtn: '🚀 立即探索实时雷达',
-    heroUnlockBtn: '🔓 开启全量数据',
-    heroGoDashboardBtn: '🚀 进入雷达控制台 (Dashboard)',
+    heroExecutiveTag: '降低多岗位用人成本 • 升级全自动化销售引擎',
+    heroHeadline1: '节省多岗位员工薪资支出',
+    heroHeadline2: '销售团队无需耗时制定路线',
+    heroHeadline3: '专注于客户拜访与一键关单',
+    heroSub: '四大智能系统合一：企业工商即时核验 + 随车动态GPS路线规划 + 1,000+ 精准工厂线索库 + 移动端销售漏斗看板。告别传统繁琐规划与手工报表。',
+    
+    pillar1Title: '1. 企业工商与注册资本即时查询',
+    pillar1Desc: '一键核验注册资本、法人及企业直通电话，无需雇佣数据专员搜索。',
+    pillar2Title: '2. 智能随车导航与行程规划',
+    pillar2Desc: '动态GPS自动测距，100%精准定位至工厂大门，每天节省3小时迷路时间。',
+    pillar3Title: '3. 1,000+ 注塑工厂线索库',
+    pillar3Desc: '北榄府 Bang Phli、Bangpoo 等各大工业园区目标工厂一览无余，即开即拓。',
+    pillar4Title: '4. 移动端销售跟进看板 (CRM)',
+    pillar4Desc: '手机端一键切换跟进状态并记录破冰笔记，无需助理统计Excel表格。',
+
+    unlockFreeTrialBtn: '免费试用 (解锁 1,000+ 工厂)',
+    viewLiveRadarBtn: '查看实时雷达地图',
+    enterCommandBtn: '进入目标控制中心',
+
+    // ROI Section
+    roiTag: '企业投资回报率 (Business ROI)',
+    roiTitle: '年省数十万企业运营成本 • 销售业绩爆发式倍增',
+    roiSub: '将传统盲目外勤销售升级为数字化智能雷达，即刻享受可见的降本增效收益。',
+    
+    roi1Val: '฿360,000+',
+    roi1Unit: '/ 年',
+    roi1Title: '节省数据专员与跟单助理薪资',
+    roi1Desc: '无需聘请专人寻找工厂名单与电话，亦无需助理汇总整理拜访报表。',
+
+    roi2Val: '66 小时',
+    roi2Unit: '/ 人 / 月',
+    roi2Title: '把黄金时间还给销售一线',
+    roi2Desc: '每日节省3小时路线规划时间，每月可多触达拜访3倍以上精准目标企业。',
+
+    roi3Val: '100% 精准',
+    roi3Unit: '直达大门口',
+    roi3Title: '降低燃油损耗与保安拒访率',
+    roi3Desc: '大门级别GPS精准定位，下车前即已知晓企业规模与注册资本，成竹在胸。',
+
+    compOldTitle: '传统拓客模式 (成本高昂且效率低下)',
+    compOld1: '需设置多名岗位：搜集线索人员、电话核实人员与Excel统计助理。',
+    compOld2: '每天耗费半天规划：在地图上来回盲测，不仅耗油更极易在园区迷路。',
+    compOld3: '数据分散混乱：使用便签或微信群跟进，无法直观掌控客户所处阶段。',
+
+    compRadarTitle: '使用 B2B 工厂雷达 (销售人员专注于出单)',
+    compRadar1: '数据就绪：企业直通电话 + DBD注册资本全量准备就绪。',
+    compRadar2: '随车GPS智能测距：自动筛选附近最近工厂并直导正门。',
+    compRadar3: '移动端实时更新看板：已电联、已约见、已报价1秒完成标注。',
+
+    radarTitle: '1,000+ 家工厂雷达控制中心 (即开即走)',
+    screeningLabel: '数据核验：',
+    gateVerifiedBadge: '大门核验 100%',
 
     // Zones & Territories
     zoneAll: '🌐 全部工业区域 (1,000+ 家)',
@@ -315,7 +446,6 @@ export const translations: Record<Language, Record<string, string>> = {
     // Company Quick Fact
     quickFactTitle: '🏢 Company Quick Fact (企业工商速览)',
     checkDbdBtn: '🔍 查询注册资本与法定代表人 (DBD Dataforthai)',
-    checkCredenBtn: '📊 评估企业规模与财务 (Creden Data)',
     directLine: '企业直通电话',
 
     // Map Section
@@ -371,6 +501,6 @@ export const translations: Record<Language, Record<string, string>> = {
     createAccountBtn: '创建新账户',
 
     // Footer
-    footerCopy: '© 2026 B2B Factory Radar • 第一支柱：Verified Lead Intelligence Platform',
+    footerCopy: '© 2026 B2B Factory Radar • 全自动销售引擎与工业目标雷达控制中心',
   },
 };

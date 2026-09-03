@@ -19,25 +19,9 @@ import {
   ArrowRight,
   ShieldCheck,
   Building2,
-  Phone,
-  Compass,
-  CheckCircle2,
-  TrendingUp,
-  Lock,
-  Coins,
-  MapPin,
-  Flame,
-  Award,
-  BarChart3,
-  Check,
-  ChevronRight,
-  Users,
-  Clock,
-  Briefcase,
   DollarSign,
   Zap,
   Route,
-  Target,
   LayoutDashboard,
   Search,
 } from 'lucide-react';
@@ -64,7 +48,7 @@ const FactoryMap = dynamic(
     loading: () => (
       <div className="bg-slate-900/90 rounded-3xl p-8 sm:p-12 border border-slate-800 shadow-2xl flex flex-col items-center justify-center min-h-[480px] sm:min-h-[640px] text-slate-400 space-y-3">
         <div className="h-10 w-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-xs sm:text-sm font-bold text-amber-200">กำลังเชื่อมต่อศูนย์บัญชาการเรดาร์เป้าหมายโรงงาน...</p>
+        <p className="text-xs sm:text-sm font-bold text-amber-200">Loading Radar...</p>
       </div>
     ),
   }
@@ -290,14 +274,14 @@ export default function HomePage() {
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
                 <span className="text-sm sm:text-lg font-black tracking-tight text-white">
-                  B2B FACTORY RADAR
+                  {t('appName')}
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-gradient-to-r from-amber-400/20 to-amber-500/20 text-amber-300 border border-amber-400/30 uppercase tracking-wider">
-                  Sales Automation
+                  {t('appBadge')}
                 </span>
               </div>
               <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">
-                ระบบจัดการข้อมูลและเรดาร์เป้าหมายโรงงาน (ประหยัดเวลา & ลดต้นทุนองค์กร)
+                {t('appSubtitle')}
               </span>
             </div>
           </div>
@@ -311,7 +295,7 @@ export default function HomePage() {
                 onClick={() => router.push('/dashboard')}
                 className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 text-xs font-black shadow-lg shadow-amber-500/30 active:scale-95 transition cursor-pointer flex items-center gap-1.5"
               >
-                <span>เข้าสู่ศูนย์บัญชาการ</span>
+                <span>{t('goToDashboard')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             ) : (
@@ -327,7 +311,7 @@ export default function HomePage() {
                   className="px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 text-xs font-black transition shadow-lg shadow-amber-500/25 cursor-pointer active:scale-95 flex items-center gap-1"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-slate-950" />
-                  <span>ทดลองใช้งานฟรี</span>
+                  <span>{t('freeTrialBtn')}</span>
                 </button>
               </div>
             )}
@@ -347,22 +331,22 @@ export default function HomePage() {
           {/* Executive Tag */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-slate-900/90 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-black shadow-2xl backdrop-blur-md">
             <Zap className="w-4 h-4 text-emerald-400 animate-pulse" />
-            <span>ลดต้นทุนการจ้างงานพนักงานได้หลายตำแหน่ง • ยกระดับทีมขายสู่ระบบอัตโนมัติ</span>
+            <span>{t('heroExecutiveTag')}</span>
           </div>
 
           {/* Main Strategic Headline */}
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight sm:leading-tight max-w-4xl mx-auto">
-            ประหยัดค่าจ้างพนักงานได้หลายส่วน <br />
+            {t('heroHeadline1')} <br />
             <span className="bg-gradient-to-r from-amber-400 via-emerald-300 to-cyan-400 bg-clip-text text-transparent">
-              ฝ่ายขายไม่ต้องเสียเวลากับการวางแผน
+              {t('heroHeadline2')}
             </span>{' '}
             <br className="hidden sm:inline" />
-            มีหน้าที่ออกไปขายและปิดดีลอย่างเดียว
+            {t('heroHeadline3')}
           </h1>
 
           {/* Subtitle & Value Proposition */}
           <p className="text-xs sm:text-base md:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed font-light">
-            รวบรวม 4 ระบบอัจฉริยะไว้ในที่เดียว: <strong className="text-white font-bold">สืบค้นข้อมูลบริษัท + วางแผนการเดินทางด้วย Live GPS + บริหารจัดการข้อมูลโรงงาน 1,000+ แห่ง + แดชบอร์ดติดตามงานขาย</strong> จบปัญหาเซลส์เสียเวลานั่งงมหาทาง หรือจ้างคนมาทำเอกสาร
+            {t('heroSub')}
           </p>
 
           {/* 4 Pillars of Sales Automation (Replacing Costly Headcount) */}
@@ -374,10 +358,10 @@ export default function HomePage() {
                 <Search className="w-5 h-5" />
               </div>
               <div className="text-white font-black text-sm sm:text-base">
-                1. ค้นหาข้อมูลบริษัท & DBD
+                {t('pillar1Title')}
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                เช็กทุนจดทะเบียน สถานะนิติบุคคล และเบอร์โทรศัพท์ตรงของบริษัทในคลิกเดียว <strong className="text-amber-300">ไม่ต้องจ้างคนนั่งค้นหาข้อมูล</strong>
+                {t('pillar1Desc')}
               </p>
             </div>
 
@@ -387,10 +371,10 @@ export default function HomePage() {
                 <Route className="w-5 h-5" />
               </div>
               <div className="text-white font-black text-sm sm:text-base">
-                2. วางแผนการเดินทางอัจฉริยะ
+                {t('pillar2Title')}
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Live GPS คำนวณระยะทางจากรถ นำทางตรงถึงประตูทางเข้าโรงงาน 100% <strong className="text-emerald-300">ประหยัดเวลาหลงทาง 3 ชม./วัน</strong>
+                {t('pillar2Desc')}
               </p>
             </div>
 
@@ -400,10 +384,10 @@ export default function HomePage() {
                 <Building2 className="w-5 h-5" />
               </div>
               <div className="text-white font-black text-sm sm:text-base">
-                3. บริหารจัดการข้อมูลโรงงาน
+                {t('pillar3Title')}
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                คลังเป้าหมาย 1,000+ แห่ง แบ่งตามโซนนิคมฯ บางพลี, บางปู, สุขสวัสดิ์ ฯลฯ <strong className="text-cyan-300">เปิดจอแล้วเลือกเจาะได้ทันที</strong>
+                {t('pillar3Desc')}
               </p>
             </div>
 
@@ -413,10 +397,10 @@ export default function HomePage() {
                 <LayoutDashboard className="w-5 h-5" />
               </div>
               <div className="text-white font-black text-sm sm:text-base">
-                4. แดชบอร์ดติดตามงานขาย
+                {t('pillar4Title')}
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                บันทึกสถานะและโน้ตการโทรผ่านมือถือ <strong className="text-purple-300">ไม่ต้องจ้างแอดมินคอยกรอก Excel หรือตามงาน</strong>
+                {t('pillar4Desc')}
               </p>
             </div>
 
@@ -429,7 +413,7 @@ export default function HomePage() {
                 onClick={() => router.push('/dashboard')}
                 className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 active:scale-95 text-slate-950 font-black text-sm sm:text-base transition-all shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2 cursor-pointer group"
               >
-                <span>เข้าสู่ศูนย์บัญชาการเป้าหมาย</span>
+                <span>{t('enterCommandBtn')}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             ) : (
@@ -439,7 +423,7 @@ export default function HomePage() {
                   className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 active:scale-95 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2 cursor-pointer group"
                 >
                   <Sparkles className="w-4 h-4 text-slate-950" />
-                  <span>ทดลองใช้งานฟรี (ปลดล็อก 1,000+ โรงงาน)</span>
+                  <span>{t('unlockFreeTrialBtn')}</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
 
@@ -447,7 +431,7 @@ export default function HomePage() {
                   onClick={scrollToMap}
                   className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 active:scale-95 text-slate-200 border border-slate-700/80 font-bold text-xs sm:text-sm transition cursor-pointer"
                 >
-                  <span>ดูเรดาร์แผนที่สด</span>
+                  <span>{t('viewLiveRadarBtn')}</span>
                 </button>
               </>
             )}
@@ -463,13 +447,13 @@ export default function HomePage() {
           <div className="text-center space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 text-xs font-bold">
               <DollarSign className="w-3.5 h-3.5 text-amber-400" />
-              <span>ผลตอบแทนจากการลงทุน (Business ROI)</span>
+              <span>{t('roiTag')}</span>
             </div>
             <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight">
-              ประหยัดต้นทุนองค์กรหลักแสน • เพิ่มยอดขายให้ทีมงานแบบก้าวกระโดด
+              {t('roiTitle')}
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-              เมื่อเปลี่ยนกระบวนการขายแบบเดิม ๆ ให้กลายเป็นระบบอัตโนมัติ องค์กรของคุณจะได้ผลลัพธ์ที่จับต้องได้ทันที
+              {t('roiSub')}
             </p>
           </div>
 
@@ -481,11 +465,11 @@ export default function HomePage() {
                 💰
               </div>
               <div className="text-2xl sm:text-3xl font-black text-white">
-                ฿360,000+ <span className="text-xs text-emerald-400 font-bold">/ ปี</span>
+                {t('roi1Val')} <span className="text-xs text-emerald-400 font-bold">{t('roi1Unit')}</span>
               </div>
-              <div className="text-sm font-bold text-slate-200">ประหยัดค่าจ้างพนักงาน Data & Admin</div>
+              <div className="text-sm font-bold text-slate-200">{t('roi1Title')}</div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                ไม่ต้องจ้างพนักงานคอยหาข้อมูลรายชื่อโรงงาน หรือจ้างแอดมินคอยทำรายงานสรุปสถานะการเข้าพบ
+                {t('roi1Desc')}
               </p>
             </div>
 
@@ -494,11 +478,11 @@ export default function HomePage() {
                 ⏱️
               </div>
               <div className="text-2xl sm:text-3xl font-black text-white">
-                66 ชั่วโมง <span className="text-xs text-amber-400 font-bold">/ คน / เดือน</span>
+                {t('roi2Val')} <span className="text-xs text-amber-400 font-bold">{t('roi2Unit')}</span>
               </div>
-              <div className="text-sm font-bold text-slate-200">คืนเวลาที่มีค่าให้เซลส์โฟกัสการขาย</div>
+              <div className="text-sm font-bold text-slate-200">{t('roi2Title')}</div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                ประหยัดเวลาการนั่งวางแผนเส้นทางวันละ 3 ชั่วโมง ให้เซลส์เอาเวลาไปโทรคุยและเข้าพบบริษัทเป้าหมายได้มากขึ้น 3 เท่า
+                {t('roi2Desc')}
               </p>
             </div>
 
@@ -507,11 +491,11 @@ export default function HomePage() {
                 🎯
               </div>
               <div className="text-2xl sm:text-3xl font-black text-white">
-                100% แม่นยำ <span className="text-xs text-cyan-400 font-bold">ตรงประตูทางเข้า</span>
+                {t('roi3Val')} <span className="text-xs text-cyan-400 font-bold">{t('roi3Unit')}</span>
               </div>
-              <div className="text-sm font-bold text-slate-200">ลดค่าน้ำมันขับหลงทาง & ไม่ติด รปภ.</div>
+              <div className="text-sm font-bold text-slate-200">{t('roi3Title')}</div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                พิกัดประตูทางเข้าถูกต้อง พร้อมลิงก์เช็กขนาดธุรกิจ DBD ทราบขนาดโรงงานล่วงหน้าก่อนก้าวลงจากรถ
+                {t('roi3Desc')}
               </p>
             </div>
 
@@ -524,20 +508,20 @@ export default function HomePage() {
             <div className="p-6 rounded-3xl bg-rose-950/20 border border-rose-900/40 space-y-4">
               <div className="flex items-center gap-2 text-rose-400 font-black text-base">
                 <div className="h-8 w-8 rounded-xl bg-rose-500/20 flex items-center justify-center">✕</div>
-                <span>กระบวนการขายแบบดั้งเดิม (สิ้นเปลืองต้นทุน)</span>
+                <span>{t('compOldTitle')}</span>
               </div>
               <ul className="space-y-3 text-xs sm:text-sm text-slate-300">
                 <li className="flex items-start gap-2.5">
                   <span className="text-rose-400 font-bold">✕</span>
-                  <span><strong>ต้องจ้างพนักงานหลายตำแหน่ง:</strong> ทั้งคนหาข้อมูล, คนโทรเช็กเบอร์, และแอดมินตามงาน</span>
+                  <span>{t('compOld1')}</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-rose-400 font-bold">✕</span>
-                  <span><strong>เซลส์เสียเวลาวางแผนครึ่งวัน:</strong> นั่งเปิด Google Maps หาซอย เสียค่าน้ำมันขับวนหาโรงงาน</span>
+                  <span>{t('compOld2')}</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-rose-400 font-bold">✕</span>
-                  <span><strong>ข้อมูลกระจัดกระจาย:</strong> บันทึกงานบนกระดาษหรือไลน์ ไม่รู้ว่าโรงงานไหนโทรแล้วหรือเสนอราคาไปแล้ว</span>
+                  <span>{t('compOld3')}</span>
                 </li>
               </ul>
             </div>
@@ -547,20 +531,20 @@ export default function HomePage() {
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
               <div className="flex items-center gap-2 text-amber-300 font-black text-base">
                 <div className="h-8 w-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">✓</div>
-                <span>ใช้ B2B Factory Radar (เซลส์มีหน้าที่ขายอย่างเดียว)</span>
+                <span>{t('compRadarTitle')}</span>
               </div>
               <ul className="space-y-3 text-xs sm:text-sm text-slate-200">
                 <li className="flex items-start gap-2.5">
                   <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>ระบบค้นหาและเตรียมข้อมูลให้เสร็จสรรพ:</strong> เบอร์โทรศัพท์ตรงของโรงงาน/บริษัท + ทุนจดทะเบียน DBD พร้อมใช้งาน</span>
+                  <span>{t('compRadar1')}</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>Live GPS คำนวณเส้นทางและนำทางอัตโนมัติ:</strong> บอกโรงงานที่ใกล้ตัวที่สุด ขับตรงถึงประตูผู้ติดต่อ</span>
+                  <span>{t('compRadar2')}</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>แดชบอร์ดอัปเดตสถานะทันทีบนมือถือ:</strong> ปรับสถานะ `โทรแล้ว`, `นัดเข้าพบ`, `เสนอราคา` ใน 1 วินาที</span>
+                  <span>{t('compRadar3')}</span>
                 </li>
               </ul>
             </div>
@@ -581,15 +565,15 @@ export default function HomePage() {
                 <span>Live GPS Factory Radar</span>
               </div>
               <span className="text-xs sm:text-sm font-bold text-slate-300">
-                ศูนย์บัญชาการพิกัดโรงงาน 1,000+ แห่ง (เปิดจอแล้ววิ่งได้ทันที)
+                {t('radarTitle')}
               </span>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">ระบบคัดกรอง:</span>
+              <span className="text-xs text-slate-400">{t('screeningLabel')}</span>
               <span className="px-3 py-1 rounded-xl bg-amber-500/20 text-amber-300 font-black text-xs border border-amber-500/30 flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span>พิกัดประตูทางเข้า 100%</span>
+                <span>{t('gateVerifiedBadge')}</span>
               </span>
             </div>
           </div>
@@ -622,12 +606,12 @@ export default function HomePage() {
       <footer className="border-t border-slate-800/80 bg-[#04060c] py-6 sm:py-8 text-slate-500 text-xs text-center">
         <div className="max-w-7xl mx-auto px-4 space-y-2">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-slate-300 font-bold">
-            <span>B2B FACTORY RADAR</span>
+            <span>{t('appName')}</span>
             <span className="hidden sm:inline text-slate-600">•</span>
-            <span className="text-slate-400 font-normal">ระบบบริหารจัดการการขาย & เรดาร์เป้าหมายโรงงานอุตสาหกรรม</span>
+            <span className="text-slate-400 font-normal">{t('footerCopy')}</span>
           </div>
           <div className="text-[11px] text-slate-600">
-            สืบค้นข้อมูลบริษัท • วางแผนการเดินทาง • บริหารจัดการข้อมูลโรงงาน 1,000+ แห่ง • แดชบอร์ดติดตามงานขาย
+            {t('appSubtitle')}
           </div>
         </div>
       </footer>
