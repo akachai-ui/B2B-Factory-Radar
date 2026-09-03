@@ -60,7 +60,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({
   }
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || t('proMember');
-  const companyName = profile?.company_name && profile?.company_name !== 'บริษัทของฉัน' ? profile.company_name : 'ตั้งค่าบริษัท';
+  const companyName = profile?.company_name || `บริษัทของคุณ ${displayName}`;
   const tier = (profile?.subscription_tier || 'PRO').toUpperCase();
 
   return (

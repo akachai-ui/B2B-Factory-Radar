@@ -52,11 +52,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data && !error) {
         setProfile(data as UserProfile);
       } else {
+        const userName = userMetadata?.full_name || userMetadata?.name || userEmail.split('@')[0] || 'สมาชิกทีมขาย';
+        const defaultCompanyName = userMetadata?.company_name || `บริษัทของคุณ ${userName}`;
+
         const defaultProf: UserProfile = {
           id: userId,
           email: userEmail,
-          full_name: userMetadata?.full_name || userMetadata?.name || userEmail.split('@')[0] || 'สมาชิกทีมขาย',
-          company_name: userMetadata?.company_name || 'บริษัทของฉัน',
+          full_name: userName,
+          company_name: defaultCompanyName,
           phone: '',
           role: 'owner',
           subscription_tier: 'pro',

@@ -128,16 +128,8 @@ export default function DashboardPage() {
   const [isLiveTracking, setIsLiveTracking] = useState<boolean>(true);
   const watchIdRef = useRef<number | null>(null);
 
-  // Auto-prompt Company Onboarding for new users or unconfigured profiles
-  useEffect(() => {
-    if (user && profile && (!profile.company_name || profile.company_name === 'บริษัทของฉัน')) {
-      const hasDismissed = sessionStorage.getItem('onboarding_prompted');
-      if (!hasDismissed) {
-        setIsCompanyModalOpen(true);
-        sessionStorage.setItem('onboarding_prompted', 'true');
-      }
-    }
-  }, [user, profile]);
+  // Note: Onboarding is non-blocking (Option 2) - users enter dashboard immediately!
+
 
   // Load Lead Statuses & listen to updates
   useEffect(() => {
