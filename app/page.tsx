@@ -9,7 +9,6 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AuthModal } from '@/components/AuthModal';
-import { UserMenu } from '@/components/UserMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { MobileBottomSheet } from '@/components/MobileBottomSheet';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
@@ -18,7 +17,6 @@ import {
   Layers,
   Radio,
   ArrowRight,
-  AlertTriangle,
   ShieldCheck,
   Building2,
   Phone,
@@ -33,6 +31,15 @@ import {
   BarChart3,
   Check,
   ChevronRight,
+  Users,
+  Clock,
+  Briefcase,
+  DollarSign,
+  Zap,
+  Route,
+  Target,
+  LayoutDashboard,
+  Search,
 } from 'lucide-react';
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -64,7 +71,7 @@ const FactoryMap = dynamic(
 );
 
 export default function HomePage() {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
   const mapSectionRef = useRef<HTMLDivElement>(null);
@@ -91,7 +98,7 @@ export default function HomePage() {
       // Check PKCE Code
       const code = urlObj.searchParams.get('code');
       if (code) {
-        supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+        supabase.auth.exchangeCodeForSession(code).then(({ data }) => {
           if (data.session?.user) {
             window.location.href = '/dashboard';
           }
@@ -111,7 +118,7 @@ export default function HomePage() {
     }
   }, [user]);
 
-  const [leads, setLeads] = useState<FactoryLead[]>(INITIAL_LEADS);
+  const [leads] = useState<FactoryLead[]>(INITIAL_LEADS);
   const [selectedMobileLead, setSelectedMobileLead] = useState<FactoryLead | null>(null);
   
   const [userLocation, setUserLocation] = useState<{
@@ -286,11 +293,11 @@ export default function HomePage() {
                   B2B FACTORY RADAR
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-gradient-to-r from-amber-400/20 to-amber-500/20 text-amber-300 border border-amber-400/30 uppercase tracking-wider">
-                  Enterprise Vault
+                  Sales Automation
                 </span>
               </div>
               <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">
-                คลังข่าวกรองโรงงานอุตสาหกรรมมูลค่าสูง (Verified Intelligence)
+                ระบบจัดการข้อมูลและเรดาร์เป้าหมายโรงงาน (ประหยัดเวลา & ลดต้นทุนองค์กร)
               </span>
             </div>
           </div>
@@ -320,7 +327,7 @@ export default function HomePage() {
                   className="px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 text-xs font-black transition shadow-lg shadow-amber-500/25 cursor-pointer active:scale-95 flex items-center gap-1"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-slate-950" />
-                  <span>ปลดล็อกคลังข้อมูล</span>
+                  <span>ทดลองใช้งานฟรี</span>
                 </button>
               </div>
             )}
@@ -329,7 +336,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* 2. HIGH-VALUE ASSET HERO SECTION (ENTERPRISE VALUE PROPOSITION) */}
+      {/* 2. HIGH-IMPACT HERO SECTION: COST SAVINGS & SALES EMPOWERMENT */}
       <section className="relative overflow-hidden pt-10 pb-12 sm:pt-20 sm:pb-24 border-b border-slate-800/80 bg-gradient-to-b from-[#0b0f19] via-[#070b14] to-[#040711]">
         
         {/* Glowing Background Ambiance */}
@@ -337,64 +344,86 @@ export default function HomePage() {
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-5 sm:space-y-7">
           
-          {/* High-Value Asset Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-slate-900/90 border border-amber-500/40 text-amber-300 text-xs sm:text-sm font-black shadow-2xl backdrop-blur-md">
-            <Coins className="w-4 h-4 text-amber-400 animate-pulse" />
-            <span>คลังข้อมูลข่าวกรองอุตสาหกรรมมูลค่าสูง (High-Value Asset Vault)</span>
+          {/* Executive Tag */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-slate-900/90 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-black shadow-2xl backdrop-blur-md">
+            <Zap className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <span>ลดต้นทุนการจ้างงานพนักงานได้หลายตำแหน่ง • ยกระดับทีมขายสู่ระบบอัตโนมัติ</span>
           </div>
 
-          {/* Main Explosive Headline */}
+          {/* Main Strategic Headline */}
           <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight sm:leading-tight max-w-4xl mx-auto">
-            ครอบครองคลังเป้าหมายโรงงาน{' '}
+            ประหยัดค่าจ้างพนักงานได้หลายส่วน <br />
             <span className="bg-gradient-to-r from-amber-400 via-emerald-300 to-cyan-400 bg-clip-text text-transparent">
-              1,089 แห่ง
+              ฝ่ายขายไม่ต้องเสียเวลากับการวางแผน
             </span>{' '}
             <br className="hidden sm:inline" />
-            พร้อมเจาะฝ่ายจัดซื้อทันที ไม่ต้องงมหาเอง
+            มีหน้าที่ออกไปขายและปิดดีลอย่างเดียว
           </h1>
 
           {/* Subtitle & Value Proposition */}
-          <p className="text-xs sm:text-base md:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-light">
-            ประหยัดต้นทุนสำรวจภาคสนามและการวิจัยข้อมูลมูลค่ากว่า <strong className="text-amber-300 font-bold">฿500,000+</strong> ด้วยพิกัดประตูทางเข้าแม่นยำ 100% เบอร์ต่อสายตรงจัดซื้อ และสแกนทุนจดทะเบียน DBD ในคลิกเดียว
+          <p className="text-xs sm:text-base md:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed font-light">
+            รวบรวม 4 ระบบอัจฉริยะไว้ในที่เดียว: <strong className="text-white font-bold">สืบค้นข้อมูลบริษัท + วางแผนการเดินทางด้วย Live GPS + บริหารจัดการข้อมูลโรงงาน 1,089 แห่ง + แดชบอร์ดติดตามงานขาย</strong> จบปัญหาเซลส์เสียเวลานั่งงมหาทาง หรือจ้างคนมาทำเอกสาร
           </p>
 
-          {/* 4 Pillars of Intelligence Assets */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 max-w-4xl mx-auto pt-2 text-left">
-            <div className="p-3 sm:p-4 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-md space-y-1 shadow-lg">
-              <div className="text-amber-400 font-black text-sm sm:text-base flex items-center gap-1.5">
-                <Building2 className="w-4 h-4 text-amber-400" />
-                <span>1,089 โรงงาน</span>
+          {/* 4 Pillars of Sales Automation (Replacing Costly Headcount) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-w-5xl mx-auto pt-2 text-left">
+            
+            {/* Pillar 1: Automated Company Research */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-md space-y-2 shadow-lg hover:border-amber-500/50 transition-colors">
+              <div className="h-9 w-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                <Search className="w-5 h-5" />
               </div>
-              <p className="text-[11px] text-slate-400 leading-tight">ฉีดพลาสติกที่เปิดดำเนินกิจการจริง 100%</p>
+              <div className="text-white font-black text-sm sm:text-base">
+                1. ค้นหาข้อมูลบริษัท & DBD
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                เช็กทุนจดทะเบียน สถานะนิติบุคคล และเบอร์ต่อตรงจัดซื้อในคลิกเดียว <strong className="text-amber-300">ไม่ต้องจ้างคนนั่งค้นหาข้อมูล</strong>
+              </p>
             </div>
 
-            <div className="p-3 sm:p-4 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-md space-y-1 shadow-lg">
-              <div className="text-emerald-400 font-black text-sm sm:text-base flex items-center gap-1.5">
-                <Compass className="w-4 h-4 text-emerald-400" />
-                <span>ประตูทางเข้า</span>
+            {/* Pillar 2: AI Route & Travel Planning */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-md space-y-2 shadow-lg hover:border-emerald-500/50 transition-colors">
+              <div className="h-9 w-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                <Route className="w-5 h-5" />
               </div>
-              <p className="text-[11px] text-slate-400 leading-tight">พิกัดปักหมุดหน้าประตู ไม่หลงทาง ไม่ติด รปภ.</p>
+              <div className="text-white font-black text-sm sm:text-base">
+                2. วางแผนการเดินทางอัจฉริยะ
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Live GPS คำนวณระยะทางจากรถ นำทางตรงถึงประตูทางเข้าโรงงาน 100% <strong className="text-emerald-300">ประหยัดเวลาหลงทาง 3 ชม./วัน</strong>
+              </p>
             </div>
 
-            <div className="p-3 sm:p-4 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-md space-y-1 shadow-lg">
-              <div className="text-cyan-400 font-black text-sm sm:text-base flex items-center gap-1.5">
-                <Phone className="w-4 h-4 text-cyan-400" />
-                <span>เบอร์ตรงจัดซื้อ</span>
+            {/* Pillar 3: Centralized Lead Management */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-md space-y-2 shadow-lg hover:border-cyan-500/50 transition-colors">
+              <div className="h-9 w-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold">
+                <Building2 className="w-5 h-5" />
               </div>
-              <p className="text-[11px] text-slate-400 leading-tight">ต่อสายตรงฝ่ายจัดซื้อและวิศวกรรมได้ทันที</p>
+              <div className="text-white font-black text-sm sm:text-base">
+                3. บริหารจัดการข้อมูลโรงงาน
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                คลังเป้าหมาย 1,089 แห่ง แบ่งตามโซนนิคมฯ บางพลี, บางปู, สุขสวัสดิ์ ฯลฯ <strong className="text-cyan-300">เปิดจอแล้วเลือกเจาะได้ทันที</strong>
+              </p>
             </div>
 
-            <div className="p-3 sm:p-4 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-md space-y-1 shadow-lg">
-              <div className="text-purple-400 font-black text-sm sm:text-base flex items-center gap-1.5">
-                <Award className="w-4 h-4 text-purple-400" />
-                <span>ทุน DBD</span>
+            {/* Pillar 4: Sales Pipeline Dashboard */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-md space-y-2 shadow-lg hover:border-purple-500/50 transition-colors">
+              <div className="h-9 w-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
+                <LayoutDashboard className="w-5 h-5" />
               </div>
-              <p className="text-[11px] text-slate-400 leading-tight">สแกนทุนจดทะเบียน/งบการเงิน ประเมินไซส์ก่อนเข้าพบ</p>
+              <div className="text-white font-black text-sm sm:text-base">
+                4. แดชบอร์ดติดตามงานขาย
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                บันทึกสถานะและโน้ตการโทรผ่านมือถือ <strong className="text-purple-300">ไม่ต้องจ้างแอดมินคอยกรอก Excel หรือตามงาน</strong>
+              </p>
             </div>
+
           </div>
 
           {/* CTA Buttons */}
-          <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
             {isLoggedIn ? (
               <button
                 onClick={() => router.push('/dashboard')}
@@ -410,7 +439,7 @@ export default function HomePage() {
                   className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 active:scale-95 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2 cursor-pointer group"
                 >
                   <Sparkles className="w-4 h-4 text-slate-950" />
-                  <span>ปลดล็อกคลังข้อมูล (ทดลองฟรี 30 วัน)</span>
+                  <span>ทดลองใช้งานฟรี (ปลดล็อก 1,089 โรงงาน)</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
 
@@ -418,7 +447,7 @@ export default function HomePage() {
                   onClick={scrollToMap}
                   className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 active:scale-95 text-slate-200 border border-slate-700/80 font-bold text-xs sm:text-sm transition cursor-pointer"
                 >
-                  <span>สำรวจเรดาร์แผนที่สด</span>
+                  <span>ดูเรดาร์แผนที่สด</span>
                 </button>
               </>
             )}
@@ -427,62 +456,111 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. ASSET VALUE COMPARISON MATRIX (BLIND SALES VS RADAR ADVANTAGE) */}
+      {/* 3. COST SAVINGS & BUSINESS ROI (HOW MUCH YOU SAVE ANNUALLY) */}
       <section className="py-12 sm:py-16 bg-[#090d18] border-b border-slate-800/80">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           
           <div className="text-center space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 text-xs font-bold">
+              <DollarSign className="w-3.5 h-3.5 text-amber-400" />
+              <span>ผลตอบแทนจากการลงทุน (Business ROI)</span>
+            </div>
             <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight">
-              ทำไมทีมขายชั้นนำถึงต้องถือครอง <span className="text-amber-400">B2B Radar</span>
+              ประหยัดต้นทุนองค์กรหลักแสน • เพิ่มยอดขายให้ทีมงานแบบก้าวกระโดด
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-              เปรียบเทียบความแตกต่างระหว่างการงมหาลูกค้าเองแบบดั้งเดิม กับการถือครองคลังข่าวกรองเป้าหมาย
+            <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
+              เมื่อเปลี่ยนกระบวนการขายแบบเดิม ๆ ให้กลายเป็นระบบอัตโนมัติ องค์กรของคุณจะได้ผลลัพธ์ที่จับต้องได้ทันที
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          {/* 3 ROI Highlights */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             
-            {/* Card 1: The Old Way (Loss & Frustration) */}
+            <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-3 shadow-xl">
+              <div className="h-10 w-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-lg">
+                💰
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-white">
+                ฿360,000+ <span className="text-xs text-emerald-400 font-bold">/ ปี</span>
+              </div>
+              <div className="text-sm font-bold text-slate-200">ประหยัดค่าจ้างพนักงาน Data & Admin</div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                ไม่ต้องจ้างพนักงานคอยหาข้อมูลรายชื่อโรงงาน หรือจ้างแอดมินคอยทำรายงานสรุปสถานะการเข้าพบ
+              </p>
+            </div>
+
+            <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-3 shadow-xl">
+              <div className="h-10 w-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-black text-lg">
+                ⏱️
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-white">
+                66 ชั่วโมง <span className="text-xs text-amber-400 font-bold">/ คน / เดือน</span>
+              </div>
+              <div className="text-sm font-bold text-slate-200">คืนเวลาที่มีค่าให้เซลส์โฟกัสการขาย</div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                ประหยัดเวลาการนั่งวางแผนเส้นทางวันละ 3 ชั่วโมง ให้เซลส์เอาเวลาไปโทรคุยและเข้าพบบริษัทเป้าหมายได้มากขึ้น 3 เท่า
+              </p>
+            </div>
+
+            <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-3 shadow-xl">
+              <div className="h-10 w-10 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-black text-lg">
+                🎯
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-white">
+                100% แม่นยำ <span className="text-xs text-cyan-400 font-bold">ตรงประตูทางเข้า</span>
+              </div>
+              <div className="text-sm font-bold text-slate-200">ลดค่าน้ำมันขับหลงทาง & ไม่ติด รปภ.</div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                พิกัดประตูทางเข้าถูกต้อง พร้อมลิงก์เช็กขนาดธุรกิจ DBD ทราบขนาดโรงงานล่วงหน้าก่อนก้าวลงจากรถ
+              </p>
+            </div>
+
+          </div>
+
+          {/* Side by Side Comparison */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 pt-4">
+            
+            {/* Old Way */}
             <div className="p-6 rounded-3xl bg-rose-950/20 border border-rose-900/40 space-y-4">
               <div className="flex items-center gap-2 text-rose-400 font-black text-base">
                 <div className="h-8 w-8 rounded-xl bg-rose-500/20 flex items-center justify-center">✕</div>
-                <span>วิธีเดิมของเซลส์ทั่วไป (เสียเวลา & เสียต้นทุน)</span>
+                <span>กระบวนการขายแบบดั้งเดิม (สิ้นเปลืองต้นทุน)</span>
               </div>
               <ul className="space-y-3 text-xs sm:text-sm text-slate-300">
                 <li className="flex items-start gap-2.5">
                   <span className="text-rose-400 font-bold">✕</span>
-                  <span><strong>ขับรถวนหาสุ่มสี่สุ่มห้า:</strong> เสียค่าน้ำมัน ฿15,000+/คน/เดือน โดยไม่รู้ว่าในซอยมีโรงงานอะไรบ้าง</span>
+                  <span><strong>ต้องจ้างพนักงานหลายตำแหน่ง:</strong> ทั้งคนหาข้อมูล, คนโทรเช็กเบอร์, และแอดมินตามงาน</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-rose-400 font-bold">✕</span>
-                  <span><strong>ติดปัญหากับ รปภ. / เข้าผิดประตู:</strong> ไปถึงทางเข้าขนถ่ายสินค้า ถูกปฏิเสธไม่ให้เข้าพบ</span>
+                  <span><strong>เซลส์เสียเวลาวางแผนครึ่งวัน:</strong> นั่งเปิด Google Maps หาซอย เสียค่าน้ำมันขับวนหาโรงงาน</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-rose-400 font-bold">✕</span>
-                  <span><strong>ไม่รู้ขนาดโรงงาน:</strong> เข้าไปเสนอราคาผิดสเกล คุยกับบริษัทที่ใกล้ปิดกิจการโดยไม่รู้ตัว</span>
+                  <span><strong>ข้อมูลกระจัดกระจาย:</strong> บันทึกงานบนกระดาษหรือไลน์ ไม่รู้ว่าโรงงานไหนโทรแล้วหรือเสนอราคาไปแล้ว</span>
                 </li>
               </ul>
             </div>
 
-            {/* Card 2: The Radar Advantage (High ROI & Pure Power) */}
+            {/* Radar Way */}
             <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900 to-indigo-950/40 border border-amber-500/40 space-y-4 shadow-2xl relative overflow-hidden">
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
               <div className="flex items-center gap-2 text-amber-300 font-black text-base">
                 <div className="h-8 w-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">✓</div>
-                <span>ผู้ถือครอง B2B Factory Radar (พร้อมเจาะทันที)</span>
+                <span>ใช้ B2B Factory Radar (เซลส์มีหน้าที่ขายอย่างเดียว)</span>
               </div>
               <ul className="space-y-3 text-xs sm:text-sm text-slate-200">
                 <li className="flex items-start gap-2.5">
                   <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>เปิดจอแล้ววิ่งได้ทันที:</strong> คำนวณระยะทางจากรถคุณไปยังโรงงานที่ใกล้ที่สุดใน 1 วินาที</span>
+                  <span><strong>ระบบค้นหาและเตรียมข้อมูลให้เสร็จสรรพ:</strong> เบอร์โทรตรงจัดซื้อ + ทุนจดทะเบียน DBD พร้อมใช้งาน</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>นำทางตรงถึงประตูทางเข้า:</strong> พิกัด GPS แม่นยำตรงประตูผู้ติดต่อ ไม่หลงทาง</span>
+                  <span><strong>Live GPS คำนวณเส้นทางและนำทางอัตโนมัติ:</strong> บอกโรงงานที่ใกล้ตัวที่สุด ขับตรงถึงประตูผู้ติดต่อ</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>เช็กทุนจดทะเบียน DBD ได้ทันที:</strong> ทราบขนาดธุรกิจและกรรมการบริษัท เพื่อวางกลยุทธ์ปิดการขายก่อนก้าวลงจากรถ</span>
+                  <span><strong>แดชบอร์ดอัปเดตสถานะทันทีบนมือถือ:</strong> ปรับสถานะ `โทรแล้ว`, `นัดเข้าพบ`, `เสนอราคา` ใน 1 วินาที</span>
                 </li>
               </ul>
             </div>
@@ -503,15 +581,15 @@ export default function HomePage() {
                 <span>Live GPS Factory Radar</span>
               </div>
               <span className="text-xs sm:text-sm font-bold text-slate-300">
-                ศูนย์บัญชาการพิกัดโรงงาน 1,089 แห่ง
+                ศูนย์บัญชาการพิกัดโรงงาน 1,089 แห่ง (เปิดจอแล้ววิ่งได้ทันที)
               </span>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">สถานะคลังข้อมูล:</span>
+              <span className="text-xs text-slate-400">ระบบคัดกรอง:</span>
               <span className="px-3 py-1 rounded-xl bg-amber-500/20 text-amber-300 font-black text-xs border border-amber-500/30 flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span>ตรวจสอบพิกัดแล้ว 100%</span>
+                <span>พิกัดประตูทางเข้า 100%</span>
               </span>
             </div>
           </div>
@@ -546,10 +624,10 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-slate-300 font-bold">
             <span>B2B FACTORY RADAR</span>
             <span className="hidden sm:inline text-slate-600">•</span>
-            <span className="text-slate-400 font-normal">ระบบคลังข่าวกรองโรงงานอุตสาหกรรมส่วนตัวสำหรับทีมขาย B2B</span>
+            <span className="text-slate-400 font-normal">ระบบบริหารจัดการการขาย & เรดาร์เป้าหมายโรงงานอุตสาหกรรม</span>
           </div>
           <div className="text-[11px] text-slate-600">
-            ฐานข้อมูลโรงงานฉีดพลาสติก 1,089 แห่ง • พิกัดประตูทางเข้าแม่นยำ • ข้อมูลนิติบุคคล DBD Dataforthai
+            สืบค้นข้อมูลบริษัท • วางแผนการเดินทาง • บริหารจัดการข้อมูลโรงงาน 1,089 แห่ง • แดชบอร์ดติดตามงานขาย
           </div>
         </div>
       </footer>
