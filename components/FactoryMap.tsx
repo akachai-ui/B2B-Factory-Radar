@@ -17,6 +17,15 @@ import {
   Navigation,
 } from 'lucide-react';
 
+declare global {
+  interface Window {
+    updateLeadStatusFromMap: (placeId: string, status: LeadStatus) => void;
+    copyEmailToClipboard: (email: string) => void;
+    requireAuthFromMap?: () => void;
+    L: any;
+  }
+}
+
 interface FactoryMapProps {
   leads: FactoryLead[];
   userLocation: {
@@ -40,15 +49,6 @@ interface FactoryMapProps {
   onStatusChange?: (status: string) => void;
   selectedRadius?: string;
   onRadiusChange?: (radius: string) => void;
-}
-
-// Global declaration for Leaflet on window
-declare global {
-  interface Window {
-    L: any;
-    updateLeadStatusFromMap: (placeId: string, status: LeadStatus) => void;
-    copyEmailToClipboard: (email: string) => void;
-  }
 }
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {

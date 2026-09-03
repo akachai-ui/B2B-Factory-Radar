@@ -158,7 +158,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({
               type="text"
               required
               placeholder="เช่น บริษัท สยาม อินดัสเทรียล จำกัด"
-              value={formData.name}
+              value={formData.name || ''}
               onChange={(e) => setFormData({ ...formData, name: e.target.value, id: 'custom' })}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
             />
@@ -169,7 +169,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({
             <input
               type="text"
               placeholder="ที่ตั้งบริษัท หรือจุดเริ่มต้นเดินทาง"
-              value={formData.address}
+              value={formData.address || ''}
               onChange={(e) => setFormData({ ...formData, address: e.target.value, id: 'custom' })}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
             />
@@ -181,7 +181,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({
               <input
                 type="text"
                 placeholder="02-xxx-xxxx หรือ 08x-xxx-xxxx"
-                value={formData.phone}
+                value={formData.phone || ''}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               />
@@ -191,7 +191,7 @@ export const CompanyModal: React.FC<CompanyModalProps> = ({
               <input
                 type="text"
                 placeholder="ชื่อผู้ดูแล หรือทีมฝ่ายขาย"
-                value={formData.contact_person}
+                value={formData.contact_person || ''}
                 onChange={(e) => setFormData({ ...formData, contact_person: e.target.value })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
               />

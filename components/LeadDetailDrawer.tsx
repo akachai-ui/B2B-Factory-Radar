@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Building2, Phone, Mail, Globe, MapPin, Calendar, Save, CheckCircle2 } from 'lucide-react';
-import { FactoryLead, SalesStatus } from '@/lib/types';
+import { FactoryLead } from '@/lib/types';
 
 interface LeadDetailDrawerProps {
   lead: FactoryLead | null;
@@ -43,7 +43,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
     setTimeout(() => setSavedSuccess(false), 2000);
   };
 
-  const statusOptions: SalesStatus[] = [
+  const statusOptions: string[] = [
     'ยังไม่ได้ติดต่อ',
     'โทรติดต่อแล้ว',
     'นัดหมาย On-site Demo',

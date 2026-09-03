@@ -3,19 +3,23 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
-import { CompanyProfile } from '@/lib/types';
+import { CompanyProfile, Company } from '@/lib/types';
 
 export interface UserProfile {
   id: string;
   email: string;
   full_name: string;
-  company_name: string;
-  company_address: string;
-  company_phone: string;
-  company_lat: number;
-  company_lng: number;
-  company_radius_km: number;
-  subscription_tier: string;
+  phone?: string | null;
+  role?: string | null;
+  company_id?: string | null;
+  company?: Company | null;
+  company_name?: string | null;
+  company_address?: string | null;
+  company_phone?: string | null;
+  company_lat?: number | null;
+  company_lng?: number | null;
+  company_radius_km?: number | null;
+  subscription_tier?: string | null;
 }
 
 interface AuthContextType {

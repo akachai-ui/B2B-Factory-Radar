@@ -22,6 +22,7 @@ export interface FactoryLead {
 }
 
 export type LeadStatus = 'NEW' | 'CONTACTED' | 'MEETING' | 'QUOTED' | 'WON' | 'LOST';
+export type SalesStatus = LeadStatus;
 export type UserRole = 'owner' | 'manager' | 'sales';
 
 export interface LeadStatusRecord {
@@ -34,18 +35,22 @@ export interface LeadStatusRecord {
 export interface Company {
   id: string;
   name: string;
+  branch?: string;
   tax_id?: string | null;
   phone?: string | null;
   address?: string | null;
+  contact_person?: string;
   lat?: number;
   lng?: number;
   radius_km?: number;
-  subscription_tier: 'starter' | 'pro' | 'enterprise';
-  max_seats: number;
+  subscription_tier?: 'starter' | 'pro' | 'enterprise' | string;
+  max_seats?: number;
   invite_code?: string | null;
   created_at?: string;
   updated_at?: string;
 }
+
+export type CompanyProfile = Company;
 
 export interface UserProfile {
   id: string;

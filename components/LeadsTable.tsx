@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Phone, Mail, Globe, MapPin, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Edit3 } from 'lucide-react';
-import { FactoryLead, SalesStatus } from '@/lib/types';
+import { FactoryLead } from '@/lib/types';
 
 interface LeadsTableProps {
   leads: FactoryLead[];
@@ -25,7 +25,7 @@ export const LeadsTable: React.FC<LeadsTableProps> = ({
   const endIdx = Math.min(startIdx + pageSize, leads.length);
   const pageData = leads.slice(startIdx, endIdx);
 
-  const statusOptions: SalesStatus[] = [
+  const statusOptions: string[] = [
     'ยังไม่ได้ติดต่อ',
     'โทรติดต่อแล้ว',
     'นัดหมาย On-site Demo',
