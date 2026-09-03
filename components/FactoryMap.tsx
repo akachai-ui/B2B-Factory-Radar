@@ -396,8 +396,8 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
 
           // Corporate Intelligence Search URLs for Company Quick Fact
           const cleanCompanyName = lead.name.replace(/บริษัท|จำกัด|\(มหาชน\)|สาขา.*/gi, '').trim() || lead.name;
-          const dbdSearchUrl = `https://www.dataforthai.com/company/search?q=${encodeURIComponent(cleanCompanyName)}`;
-          const credenSearchUrl = `https://data.creden.co/search?q=${encodeURIComponent(cleanCompanyName)}`;
+          const dbdSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(lead.name + ' ทุนจดทะเบียน DBD')}`;
+          const credenSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(lead.name + ' ข้อมูลงบการเงิน creden dataforthai')}`;
           const mapsNavUrl = lead.maps_url || `https://www.google.com/maps/search/?api=1&query=${lead.lat},${lead.lng}`;
 
           const popupHtml = `
