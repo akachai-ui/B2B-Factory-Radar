@@ -362,7 +362,7 @@ export default function HomePage() {
 
           {/* Subtitle & Value Proposition */}
           <p className="text-xs sm:text-base md:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed font-light">
-            รวบรวม 4 ระบบอัจฉริยะไว้ในที่เดียว: <strong className="text-white font-bold">สืบค้นข้อมูลบริษัท + วางแผนการเดินทางด้วย Live GPS + บริหารจัดการข้อมูลโรงงาน 1,089 แห่ง + แดชบอร์ดติดตามงานขาย</strong> จบปัญหาเซลส์เสียเวลานั่งงมหาทาง หรือจ้างคนมาทำเอกสาร
+            รวบรวม 4 ระบบอัจฉริยะไว้ในที่เดียว: <strong className="text-white font-bold">สืบค้นข้อมูลบริษัท + วางแผนการเดินทางด้วย Live GPS + บริหารจัดการข้อมูลโรงงาน 1,000+ แห่ง + แดชบอร์ดติดตามงานขาย</strong> จบปัญหาเซลส์เสียเวลานั่งงมหาทาง หรือจ้างคนมาทำเอกสาร
           </p>
 
           {/* 4 Pillars of Sales Automation (Replacing Costly Headcount) */}
@@ -403,7 +403,7 @@ export default function HomePage() {
                 3. บริหารจัดการข้อมูลโรงงาน
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                คลังเป้าหมาย 1,089 แห่ง แบ่งตามโซนนิคมฯ บางพลี, บางปู, สุขสวัสดิ์ ฯลฯ <strong className="text-cyan-300">เปิดจอแล้วเลือกเจาะได้ทันที</strong>
+                คลังเป้าหมาย 1,000+ แห่ง แบ่งตามโซนนิคมฯ บางพลี, บางปู, สุขสวัสดิ์ ฯลฯ <strong className="text-cyan-300">เปิดจอแล้วเลือกเจาะได้ทันที</strong>
               </p>
             </div>
 
@@ -439,7 +439,7 @@ export default function HomePage() {
                   className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 active:scale-95 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2 cursor-pointer group"
                 >
                   <Sparkles className="w-4 h-4 text-slate-950" />
-                  <span>ทดลองใช้งานฟรี (ปลดล็อก 1,089 โรงงาน)</span>
+                  <span>ทดลองใช้งานฟรี (ปลดล็อก 1,000+ โรงงาน)</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
 
@@ -581,7 +581,7 @@ export default function HomePage() {
                 <span>Live GPS Factory Radar</span>
               </div>
               <span className="text-xs sm:text-sm font-bold text-slate-300">
-                ศูนย์บัญชาการพิกัดโรงงาน 1,089 แห่ง (เปิดจอแล้ววิ่งได้ทันที)
+                ศูนย์บัญชาการพิกัดโรงงาน 1,000+ แห่ง (เปิดจอแล้ววิ่งได้ทันที)
               </span>
             </div>
 
@@ -627,7 +627,7 @@ export default function HomePage() {
             <span className="text-slate-400 font-normal">ระบบบริหารจัดการการขาย & เรดาร์เป้าหมายโรงงานอุตสาหกรรม</span>
           </div>
           <div className="text-[11px] text-slate-600">
-            สืบค้นข้อมูลบริษัท • วางแผนการเดินทาง • บริหารจัดการข้อมูลโรงงาน 1,089 แห่ง • แดชบอร์ดติดตามงานขาย
+            สืบค้นข้อมูลบริษัท • วางแผนการเดินทาง • บริหารจัดการข้อมูลโรงงาน 1,000+ แห่ง • แดชบอร์ดติดตามงานขาย
           </div>
         </div>
       </footer>
