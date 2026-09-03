@@ -66,11 +66,11 @@ export const translations: Record<Language, Record<string, string>> = {
     quickFactTitle: '🏢 Company Quick Fact (ข้อมูลเสริมช่วยเปิดบทสนทนา)',
     checkDbdBtn: '🔍 ตรวจสอบทุนจดทะเบียน & นิติบุคคล (DBD Dataforthai)',
     checkCredenBtn: '📊 วิเคราะห์งบการเงิน & ไซส์บริษัท (Creden Data)',
-    directLine: 'ต่อสายตรงฝ่ายจัดซื้อ / วิศวกรรม',
+    directLine: 'เบอร์โทรศัพท์ตรงของบริษัท',
 
     // Map Section
     mapCommandCenter: 'ศูนย์บัญชาการพิกัดโรงงานพร้อมเจาะ',
-    mapSubheading: 'พิกัด GPS แม่นยำตรงประตูทางเข้า แตะที่หมุดเพื่อดูเบอร์จัดซื้อและ Quick Fact',
+    mapSubheading: 'พิกัด GPS แม่นยำตรงประตูทางเข้า แตะที่หมุดเพื่อดูเบอร์ตรงโรงงานและ Quick Fact',
     displaying: 'แสดงผลเป้าหมาย:',
     factoriesUnit: 'โรงงาน',
     pinsUnit: 'หมุด',
@@ -88,11 +88,11 @@ export const translations: Record<Language, Record<string, string>> = {
     distanceAway: 'ห่างจากคุณ ~',
     drivingTime: 'ขับรถ ~',
     minutesUnit: 'นาที',
-    callNow: 'โทรต่อสายฝ่ายจัดซื้อ',
+    callNow: 'โทรตรงโรงงาน / บริษัท',
     navigateGoogle: 'นำทาง Google Maps',
     visitWebsite: 'เปิดดูเว็บไซต์บริษัท',
     noPhone: 'ไม่มีเบอร์โทร',
-    phoneLabel: 'เบอร์โทรศัพท์ (เบอร์ต่อจัดซื้อ/วิศวกรรม)',
+    phoneLabel: 'เบอร์โทรศัพท์ตรงของบริษัท',
     emailLabel: 'อีเมล',
     addressLabel: 'ที่อยู่ละเอียด',
     actionsLabel: 'แอ็กชัน',
@@ -103,7 +103,7 @@ export const translations: Record<Language, Record<string, string>> = {
     mapView: 'แผนที่สด',
     tableView: 'ตารางรายชื่อ',
     tableTitle: 'คลังเป้าหมายโรงงานพร้อมเจาะ (Verified Leads Directory)',
-    tableSub: 'รายชื่อโรงงาน 1,089 แห่ง พร้อมสถานะติดตามงาน เบอร์ต่อสายจัดซื้อ และปุ่มเช็กข้อมูลนิติบุคคล',
+    tableSub: 'รายชื่อโรงงาน 1,000+ แห่ง พร้อมสถานะติดตามงาน เบอร์โทรศัพท์ตรงของบริษัท และปุ่มเช็กข้อมูลนิติบุคคล',
     allUnlockedBadge: 'Verified 100%',
     accessDatabaseText: 'ฐานข้อมูลโรงงานฉีดพลาสติก & แม่พิมพ์ สมุทรปราการ',
 
@@ -191,11 +191,11 @@ export const translations: Record<Language, Record<string, string>> = {
     quickFactTitle: '🏢 Company Quick Fact & Intelligence',
     checkDbdBtn: '🔍 Check Registered Capital & DBD Info (Dataforthai)',
     checkCredenBtn: '📊 Company Size & Financials (Creden Data)',
-    directLine: 'Direct line to Procurement / Engineering',
+    directLine: 'Direct Company Phone Line',
 
     // Map Section
     mapCommandCenter: 'Target Factory Radar Command Center',
-    mapSubheading: 'Accurate entrance GPS pins. Tap any pin for direct phone numbers and Company Quick Facts.',
+    mapSubheading: 'Accurate entrance GPS pins. Tap any pin for direct company phone numbers and Company Quick Facts.',
     displaying: 'Showing Targets:',
     factoriesUnit: 'Factories',
     pinsUnit: 'Pins',
@@ -208,16 +208,16 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // Popup & Bottom Sheet
     guestLockedTitle: 'Plastic Injection Factory',
-    guestLockedDesc: 'Accurate entrance GPS coords with direct phone numbers and company facts.',
+    guestLockedDesc: 'Accurate entrance GPS coords with direct company phone numbers and company facts.',
     unlockThisFactoryBtn: '🔓 View Target Details',
     distanceAway: 'Distance from you ~',
     drivingTime: 'Drive ~',
     minutesUnit: 'min',
-    callNow: 'Call Procurement Line',
+    callNow: 'Call Factory / Company Direct',
     navigateGoogle: 'Navigate Google Maps',
     visitWebsite: 'Visit Website',
     noPhone: 'No Phone',
-    phoneLabel: 'Phone Number (Procurement / Engineering)',
+    phoneLabel: 'Direct Company Phone',
     emailLabel: 'Email',
     addressLabel: 'Detailed Address',
     actionsLabel: 'Actions',
@@ -228,7 +228,7 @@ export const translations: Record<Language, Record<string, string>> = {
     mapView: 'Live Radar',
     tableView: 'CRM Table',
     tableTitle: 'Verified Target Factory Directory (Pillar 1)',
-    tableSub: '1,089 target factories with live contact stages, direct phone lines, and DBD corporate size check buttons.',
+    tableSub: '1,000+ target factories with live contact stages, direct company phone lines, and DBD corporate size check buttons.',
     allUnlockedBadge: 'Verified 100%',
     accessDatabaseText: 'Plastic injection molding & tooling factories in Samut Prakan',
 
@@ -266,16 +266,16 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // Hero Section
     heroBadge: '第一支柱：Verified Lead Intelligence (精准目标工厂库)',
-    heroTitlePrefix: '北榄府 1,089+ 家注塑与制造目标工厂',
+    heroTitlePrefix: '北榄府 1,000+ 家注塑与制造目标工厂',
     heroTitleSuffix: '一键触达',
     heroTitleTime: '开屏即跑',
-    heroSubtitle: '精准大门GPS定位、直通采购/工程部电话、智能园区筛选及企业工商注册资本一键核验。',
+    heroSubtitle: '精准大门GPS定位、企业直通电话、智能园区筛选及企业工商注册资本一键核验。',
     heroExploreBtn: '🚀 立即探索实时雷达',
     heroUnlockBtn: '🔓 开启全量数据',
     heroGoDashboardBtn: '🚀 进入雷达控制台 (Dashboard)',
 
     // Zones & Territories
-    zoneAll: '🌐 全部工业区域 (1,089 家)',
+    zoneAll: '🌐 全部工业区域 (1,000+ 家)',
     zoneBangPhli: '📍 邦披区 Bang Phli (384)',
     zoneKingKaew: '📍 金乔路-拉差贴瓦工业带 King Kaew',
     zoneBangpoo: '📍 邦普工业区-帕萨 Bangpoo (328)',
@@ -286,7 +286,7 @@ export const translations: Record<Language, Record<string, string>> = {
     zonePhraSamut: '📍 帕沙木则滴区 Phra Samut (115)',
     zoneBangBo: '📍 邦波区 Bang Bo (87)',
     zoneMueang: '📍 府治区 Mueang',
-    allDistricts: '🏛️ 所有行政区 (1,089 家)',
+    allDistricts: '🏛️ 所有行政区 (1,000+ 家)',
     allSubdistricts: '🏘️ 所有乡镇/街道',
 
     // Near Me & Radius Filter
@@ -308,7 +308,7 @@ export const translations: Record<Language, Record<string, string>> = {
     statusWon: '🏆 正式客户 / 成交 (Customer / Won)',
     statusLost: '🔴 暂无意向 / 拒绝',
     statusLabel: '状态标签 (Status Tag):',
-    notePlaceholder: '记录破冰跟进情报 (如：采购负责人张经理，工厂配有12台注塑机)...',
+    notePlaceholder: '记录破冰跟进情报 (如：负责人张经理，工厂配有12台注塑机)...',
     savedNoteLabel: '最新情报:',
     saveStatusBtn: '保存状态',
 
@@ -316,11 +316,11 @@ export const translations: Record<Language, Record<string, string>> = {
     quickFactTitle: '🏢 Company Quick Fact (企业工商速览)',
     checkDbdBtn: '🔍 查询注册资本与法定代表人 (DBD Dataforthai)',
     checkCredenBtn: '📊 评估企业规模与财务 (Creden Data)',
-    directLine: '直通采购部 / 工程技术部',
+    directLine: '企业直通电话',
 
     // Map Section
     mapCommandCenter: '工业目标工厂精准雷达控制中心',
-    mapSubheading: '大门级别GPS精准定位，点击图钉即可拨打采购电话与核验工商。',
+    mapSubheading: '大门级别GPS精准定位，点击图钉即可拨打企业直通电话与核验工商。',
     displaying: '显示目标:',
     factoriesUnit: '家工厂',
     pinsUnit: '个图钉',
@@ -333,16 +333,16 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // Popup & Bottom Sheet
     guestLockedTitle: '注塑与模具制造工厂',
-    guestLockedDesc: '大门精准GPS定位、采购直通电话与工商企业数据。',
+    guestLockedDesc: '大门精准GPS定位、企业直通电话与工商企业数据。',
     unlockThisFactoryBtn: '🔓 查看该工厂详情',
     distanceAway: '距您约 ~',
     drivingTime: '车程约 ~',
     minutesUnit: '分钟',
-    callNow: '拨打采购部电话',
+    callNow: '拨打企业直通电话',
     navigateGoogle: '谷歌大门导航',
     visitWebsite: '访问官网',
     noPhone: '暂无电话',
-    phoneLabel: '电话号码 (采购部 / 工程部)',
+    phoneLabel: '企业直通电话',
     emailLabel: '电子邮箱',
     addressLabel: '详细地址',
     actionsLabel: '快捷操作',
@@ -353,7 +353,7 @@ export const translations: Record<Language, Record<string, string>> = {
     mapView: '实时雷达',
     tableView: '客户线索表',
     tableTitle: '第一支柱：精准目标工厂库 (Verified Target Catalog)',
-    tableSub: '1,089 家注塑工厂库，集成跟进状态、直通采购电话与工商注册资本核查。',
+    tableSub: '1,000+ 家注塑工厂库，集成跟进状态、企业直通电话与工商注册资本核查。',
     allUnlockedBadge: '100% 完整权限',
     accessDatabaseText: '已授权访问北榄府注塑与机械制造工厂全量数据',
 

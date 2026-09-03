@@ -816,7 +816,7 @@ export default function DashboardPage() {
                           className="py-2.5 px-3 rounded-xl bg-emerald-600 active:bg-emerald-500 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-sm transition"
                         >
                           <Phone className="w-3.5 h-3.5" />
-                          <span>โทรจัดซื้อ {lead.phone}</span>
+                          <span>โทรตรงโรงงาน {lead.phone}</span>
                         </a>
                       ) : (
                         <div className="py-2.5 px-3 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs text-center flex items-center justify-center">
@@ -831,7 +831,7 @@ export default function DashboardPage() {
                         className="py-2.5 px-3 rounded-xl bg-amber-500 active:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-sm transition"
                       >
                         <Navigation className="w-3.5 h-3.5" />
-                        <span>นำทางประตู</span>
+                        <span>นำทาง GPS</span>
                       </a>
                     </div>
 
@@ -901,7 +901,7 @@ export default function DashboardPage() {
                       <th className="p-3">ระยะทาง</th>
                       <th className="p-3">{t('statusLabel')}</th>
                       <th className="p-3">พื้นที่ / โซน</th>
-                      <th className="p-3">เบอร์ต่อฝ่ายจัดซื้อ</th>
+                      <th className="p-3">เบอร์โทรศัพท์ตรงของบริษัท</th>
                       <th className="p-3">Company Quick Fact</th>
                       <th className="p-3 text-center">{t('actionsLabel')}</th>
                     </tr>

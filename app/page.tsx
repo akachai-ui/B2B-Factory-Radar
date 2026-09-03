@@ -377,7 +377,7 @@ export default function HomePage() {
                 1. ค้นหาข้อมูลบริษัท & DBD
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                เช็กทุนจดทะเบียน สถานะนิติบุคคล และเบอร์ต่อตรงจัดซื้อในคลิกเดียว <strong className="text-amber-300">ไม่ต้องจ้างคนนั่งค้นหาข้อมูล</strong>
+                เช็กทุนจดทะเบียน สถานะนิติบุคคล และเบอร์โทรศัพท์ตรงของบริษัทในคลิกเดียว <strong className="text-amber-300">ไม่ต้องจ้างคนนั่งค้นหาข้อมูล</strong>
               </p>
             </div>
 
@@ -552,7 +552,7 @@ export default function HomePage() {
               <ul className="space-y-3 text-xs sm:text-sm text-slate-200">
                 <li className="flex items-start gap-2.5">
                   <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>ระบบค้นหาและเตรียมข้อมูลให้เสร็จสรรพ:</strong> เบอร์โทรตรงจัดซื้อ + ทุนจดทะเบียน DBD พร้อมใช้งาน</span>
+                  <span><strong>ระบบค้นหาและเตรียมข้อมูลให้เสร็จสรรพ:</strong> เบอร์โทรศัพท์ตรงของโรงงาน/บริษัท + ทุนจดทะเบียน DBD พร้อมใช้งาน</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <span className="text-emerald-400 font-bold">✓</span>
