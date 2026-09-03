@@ -663,3 +663,5 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
     </div>
   );
 };
+
+export default FactoryMap;

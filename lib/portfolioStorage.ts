@@ -15,7 +15,9 @@ export function getPortfolioRecords(userId: string = 'default'): Record<string, 
   if (typeof window === 'undefined') return {};
   try {
     const raw = localStorage.getItem(`${STORAGE_KEY_PREFIX}${userId}`);
-    if (raw) return JSON.parse(raw);
+    if (raw && raw !== 'undefined' && raw !== 'null' && raw.trim() !== '') {
+      return JSON.parse(raw);
+    }
   } catch (e) {
     console.warn('Error reading portfolio records:', e);
   }
