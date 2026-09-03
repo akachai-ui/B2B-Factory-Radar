@@ -1,5 +1,5 @@
 export interface FactoryLead {
-  id?: string;
+  id?: string | number;
   place_id: string;
   name: string;
   address: string;
@@ -15,10 +15,14 @@ export interface FactoryLead {
   maps_url?: string;
   rating?: number;
   user_ratings_total?: number;
+  status?: any;
+  contact_person?: string;
+  notes?: string;
   created_at?: string;
 }
 
 export type LeadStatus = 'NEW' | 'CONTACTED' | 'MEETING' | 'WON' | 'LOST';
+export type SalesStatus = any;
 
 export interface LeadStatusRecord {
   status: LeadStatus;
@@ -27,11 +31,25 @@ export interface LeadStatusRecord {
 }
 
 export interface CompanyProfile {
+  id?: string | number;
   name: string;
+  branch?: string;
   address: string;
   phone: string;
   contact_person: string;
   lat: number;
   lng: number;
   radius_km: number;
+}
+
+export interface FilterState {
+  search: string;
+  district: string;
+  subdistrict: string;
+  hasPhone: boolean;
+  hasEmail: boolean;
+  hasWeb: boolean;
+  minRating: number;
+  status?: string;
+  category?: string;
 }
