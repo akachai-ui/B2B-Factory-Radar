@@ -12,7 +12,6 @@ import { getLeadStatuses, saveLeadStatus } from '@/lib/leadStatusStorage';
 import { UserMenu } from '@/components/UserMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { CompanyOnboardingModal } from '@/components/CompanyOnboardingModal';
-import { TeamManagementModal } from '@/components/TeamManagementModal';
 import {
   Layers,
   MapPin,
@@ -39,6 +38,7 @@ import {
   SlidersHorizontal,
   ChevronRight,
   X,
+  Settings,
 } from 'lucide-react';
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -141,7 +141,6 @@ export default function DashboardPage() {
   // Today's Route State (List of selected factories in order)
   const [todayRoute, setTodayRoute] = useState<FactoryLead[]>([]);
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState<boolean>(false);
-  const [isTeamModalOpen, setIsTeamModalOpen] = useState<boolean>(false);
   const [isRouteDrawerOpen, setIsRouteDrawerOpen] = useState<boolean>(true);
   const [copyToast, setCopyToast] = useState<string | null>(null);
   const [leadStatuses, setLeadStatuses] = useState<Record<string, { status: LeadStatus; note?: string }>>({});
@@ -435,19 +434,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={() => setIsCompanyModalOpen(true)}
-              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-bold transition cursor-pointer group"
-              title="คลิกเพื่อตั้งชื่อหรือแก้ไขข้อมูลบริษัทของคุณ"
-            >
-              <Building2 className="w-3.5 h-3.5 text-amber-400" />
-              <span className="truncate max-w-[130px] font-bold text-white">
-                {profile?.company_name || '🏢 ตั้งชื่อบริษัทของคุณ'}
-              </span>
-              <span className="text-[10px] text-amber-400 font-bold group-hover:underline">✎ แก้ไข</span>
-            </button>
-
+          <div className="flex items-center gap-2 sm:gap-2.5">
             <button
               onClick={() => setIsRouteDrawerOpen(!isRouteDrawerOpen)}
               className={`px-3 py-1.5 rounded-xl border text-xs font-black transition flex items-center gap-1.5 cursor-pointer ${
@@ -463,12 +450,26 @@ export default function DashboardPage() {
               </span>
             </button>
 
+            {/* Settings Button */}
+            <button
+              onClick={() => setIsCompanyModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-bold transition cursor-pointer group shadow-xs"
+              title="ตั้งค่าข้อมูลบริษัท / โปรไฟล์"
+            >
+              <Settings className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-45 transition-transform" />
+              <span>ตั้งค่า</span>
+              {profile?.company_name && (
+                <span className="hidden md:inline text-slate-400 font-normal border-l border-slate-700 pl-1.5 max-w-[120px] truncate">
+                  {profile.company_name}
+                </span>
+              )}
+            </button>
+
             <LanguageSwitcher />
 
             <UserMenu
               onOpenAuth={() => {}}
               onOpenCompanyProfile={() => setIsCompanyModalOpen(true)}
-              onOpenTeamManagement={() => setIsTeamModalOpen(true)}
             />
           </div>
 
@@ -874,12 +875,6 @@ export default function DashboardPage() {
       <CompanyOnboardingModal
         isOpen={isCompanyModalOpen}
         onClose={() => setIsCompanyModalOpen(false)}
-      />
-
-      {/* Team Management Modal */}
-      <TeamManagementModal
-        isOpen={isTeamModalOpen}
-        onClose={() => setIsTeamModalOpen(false)}
       />
 
     </div>
