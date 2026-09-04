@@ -122,7 +122,7 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
         <div className="bg-slate-900 border border-slate-700/90 rounded-3xl p-5 sm:p-8 max-w-md w-full shadow-2xl text-white space-y-4 relative animate-in zoom-in-95 duration-200">
           
           {/* Close Button (if not forced initial onboarding) */}

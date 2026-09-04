@@ -53,7 +53,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/40 backdrop-blur-xs flex justify-end">
+    <div className="fixed inset-0 z-[1000] overflow-hidden bg-slate-950/40 backdrop-blur-xs flex justify-end">
       <div className="w-full max-w-lg bg-white h-full shadow-2xl flex flex-col border-l border-slate-200 animate-in slide-in-from-right duration-300">
         
         {/* Drawer Header */}

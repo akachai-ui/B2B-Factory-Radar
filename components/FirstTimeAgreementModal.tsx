@@ -64,7 +64,7 @@ export const FirstTimeAgreementModal: React.FC<FirstTimeAgreementModalProps> = (
   const email = user?.email || '-';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-5 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-200">
       <div className="bg-slate-900 border border-slate-700/90 rounded-3xl max-w-2xl w-full shadow-2xl text-slate-200 relative animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] overflow-hidden">
         
         {/* 1. MODAL HEADER */}
