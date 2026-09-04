@@ -256,11 +256,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const acceptPdpaConsent = async () => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('routehunter_pdpa_consent_v1', 'accepted');
-      localStorage.setItem('routehunter_pdpa_consent', 'accepted');
-    }
     if (user) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`routehunter_signed_legal_v2026_09_${user.id}`, 'accepted');
+        localStorage.setItem('routehunter_pdpa_consent_v1', 'accepted');
+        localStorage.setItem('routehunter_pdpa_consent', 'accepted');
+      }
       const now = new Date().toISOString();
       await supabase
         .from('profiles')

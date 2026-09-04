@@ -10,10 +10,15 @@ export const GlobalAgreementGatekeeper: React.FC = () => {
 
   useEffect(() => {
     if (!loading && user) {
-      // Check if user has already accepted the official agreement
-      const consent = typeof window !== 'undefined' ? localStorage.getItem('routehunter_pdpa_consent_v1') : null;
-      if (consent !== 'accepted') {
+      const consentKey = `routehunter_signed_legal_v2026_09_${user.id}`;
+      const isSignedLocally = typeof window !== 'undefined' && localStorage.getItem(consentKey) === 'accepted';
+      const isSignedDb = profile?.pdpa_consent === true;
+
+      // If user has not signed this agreement version, force open the modal
+      if (!isSignedLocally || !isSignedDb) {
         setIsOpen(true);
+      } else {
+        setIsOpen(false);
       }
     } else {
       setIsOpen(false);
