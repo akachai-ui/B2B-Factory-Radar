@@ -104,9 +104,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // 2. Fallback check for existing session from localStorage/cookies
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
       if (!isMounted) return;
-      if (session?.user) {
+      if (error) {
+        // If stored session is expired or invalid, sign out cleanly so subsequent anon requests succeed
+        await supabase.auth.signOut().catch(() => {});
+        setUser(null);
+        setProfile(null);
+      } else if (session?.user) {
         setUser(session.user);
         await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
       }
