@@ -240,6 +240,53 @@ export default function DashboardPage() {
     setTimeout(() => setCopyToast(null), 3000);
   };
 
+  // 3. Compute Route Summary Stats (Total Distance, Travel Time, Legs)
+  const routeStats = useMemo(() => {
+    if (todayRoute.length === 0) {
+      return {
+        totalKm: 0,
+        totalMins: 0,
+        formattedTime: '0 นาที',
+        legs: [] as { distKm: number; mins: number; fromLabel: string; toName: string }[],
+      };
+    }
+
+    let totalKm = 0;
+    const legs: { distKm: number; mins: number; fromLabel: string; toName: string }[] = [];
+
+    let currentLat = userLocation.lat;
+    let currentLng = userLocation.lng;
+
+    todayRoute.forEach((stop, idx) => {
+      const legDist = calculateDistanceKm(currentLat, currentLng, stop.lat, stop.lng);
+      const legMins = Math.max(1, Math.round(legDist * 2.2));
+      totalKm += legDist;
+      legs.push({
+        distKm: legDist,
+        mins: legMins,
+        fromLabel: idx === 0 ? 'จุดเริ่มต้น' : `จุดที่ ${idx}`,
+        toName: stop.name,
+      });
+      currentLat = stop.lat;
+      currentLng = stop.lng;
+    });
+
+    const totalMins = Math.round(totalKm * 2.2);
+    let formattedTime = `${totalMins} นาที`;
+    if (totalMins >= 60) {
+      const hrs = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      formattedTime = mins > 0 ? `${hrs} ชม. ${mins} นาที` : `${hrs} ชม.`;
+    }
+
+    return {
+      totalKm,
+      totalMins,
+      formattedTime,
+      legs,
+    };
+  }, [todayRoute, userLocation]);
+
   // Generate Google Maps Multi-Stop Navigation URL
   const googleMapsRouteUrl = useMemo(() => {
     if (todayRoute.length === 0) return '#';
@@ -264,12 +311,17 @@ export default function DashboardPage() {
     summary += `👤 ผู้รับผิดชอบ: ${profile?.full_name || user?.email?.split('@')[0]}\n`;
     summary += `🏢 องค์กร: ${companyName}\n`;
     summary += `📍 จุดเริ่มต้น: ${userLocation.label}\n`;
+    summary += `🛣️ ระยะทางรวมทั้งหมด: ~${routeStats.totalKm.toFixed(1)} กม.\n`;
+    summary += `⏱️ เวลาเดินทางโดยประมาณ: ~${routeStats.formattedTime}\n`;
     summary += `🎯 เป้าหมายทั้งหมด: ${todayRoute.length} โรงงาน\n`;
     summary += `------------------------------------\n`;
 
     todayRoute.forEach((l, idx) => {
+      const leg = routeStats.legs[idx];
+      const fromText = idx === 0 ? 'จากจุดเริ่มต้น' : `จากจุดที่ ${idx}`;
       summary += `${idx + 1}. ${l.name}\n`;
       summary += `   • อ.${l.district || '-'} | ถนน: ${l.road || '-'}\n`;
+      if (leg) summary += `   • ระยะทาง: ${fromText} ~${leg.distKm.toFixed(1)} กม. (~${leg.mins} นาที)\n`;
       if (l.phone) summary += `   • โทร: ${l.phone}\n`;
     });
 
@@ -277,7 +329,7 @@ export default function DashboardPage() {
     summary += `🗺️ นำทาง Google Maps: ${googleMapsRouteUrl}\n`;
 
     navigator.clipboard.writeText(summary);
-    setCopyToast('📋 คัดลอกสรุปรูทแล้ว พร้อมส่งเข้ากลุ่มไลน์!');
+    setCopyToast('📋 คัดลอกสรุปรูทพร้อมระยะทางแล้ว!');
     setTimeout(() => setCopyToast(null), 3500);
   };
 
@@ -402,8 +454,40 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Route Distance & Time Summary Cards */}
+      {todayRoute.length > 0 && (
+        <div className="grid grid-cols-3 gap-1.5 my-2.5 p-2 rounded-2xl bg-slate-950/90 border border-slate-800/90 shrink-0">
+          <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-900/80 border border-slate-800/60 text-center">
+            <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
+              🛣️ ระยะทางรวม
+            </span>
+            <span className="text-xs sm:text-sm font-black text-amber-400 mt-0.5">
+              ~{routeStats.totalKm.toFixed(1)} <span className="text-[10px] font-normal text-slate-400">กม.</span>
+            </span>
+          </div>
+
+          <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-900/80 border border-slate-800/60 text-center">
+            <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
+              ⏱️ ขับรถประมาณ
+            </span>
+            <span className="text-xs sm:text-sm font-black text-cyan-400 mt-0.5 truncate max-w-full">
+              ~{routeStats.formattedTime}
+            </span>
+          </div>
+
+          <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-900/80 border border-slate-800/60 text-center">
+            <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
+              🎯 จุดแวะ
+            </span>
+            <span className="text-xs sm:text-sm font-black text-emerald-400 mt-0.5">
+              {todayRoute.length} <span className="text-[10px] font-normal text-slate-400">แห่ง</span>
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Route Stops List */}
-      <div className="flex-1 overflow-y-auto py-3 space-y-2 pr-1 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto py-2 space-y-2 pr-1 scrollbar-thin">
         {todayRoute.length === 0 ? (
           <div className="py-10 px-4 text-center text-slate-500 space-y-2">
             <Car className="w-8 h-8 mx-auto text-slate-600 stroke-1" />
@@ -414,7 +498,8 @@ export default function DashboardPage() {
           </div>
         ) : (
           todayRoute.map((stop, idx) => {
-            const distFromUser = calculateDistanceKm(userLocation.lat, userLocation.lng, stop.lat, stop.lng);
+            const leg = routeStats.legs[idx];
+            const fromText = idx === 0 ? 'จุดเริ่มต้น' : `จุดที่ ${idx}`;
 
             return (
               <div
@@ -431,7 +516,7 @@ export default function DashboardPage() {
                       {stop.name}
                     </h4>
                     <p className="text-[10px] text-slate-400 truncate mt-0.5">
-                      📍 อ.{stop.district || '-'} • ห่าง {distFromUser.toFixed(1)} กม.
+                      📍 อ.{stop.district || '-'} • จาก{fromText} <strong className="text-amber-300 font-bold">~{leg ? leg.distKm.toFixed(1) : '0'} กม.</strong> (~{leg ? leg.mins : '1'} นาที)
                     </p>
                   </div>
                   <button
@@ -496,7 +581,7 @@ export default function DashboardPage() {
             className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 active:scale-95 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-amber-500/20"
           >
             <Navigation className="w-3.5 h-3.5 fill-slate-950" />
-            <span>เปิดนำทางครบทุกจุด ({todayRoute.length} จุด) บน Google Maps</span>
+            <span>เปิดนำทาง {todayRoute.length} จุด (~{routeStats.totalKm.toFixed(1)} กม.) บน Google Maps</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </a>
 
@@ -506,7 +591,7 @@ export default function DashboardPage() {
             className="w-full py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
           >
             <Share2 className="w-3.5 h-3.5 text-slate-400" />
-            <span>คัดลอกสรุปรูท (ส่งไลน์/รายงานหัวหน้า)</span>
+            <span>คัดลอกสรุปรูทพร้อมระยะทาง (ส่งไลน์)</span>
           </button>
 
         </div>
@@ -560,6 +645,11 @@ export default function DashboardPage() {
               <span className="px-1.5 py-0.2 rounded-full bg-slate-950 text-white text-[10px] font-bold">
                 {todayRoute.length}
               </span>
+              {todayRoute.length > 0 && (
+                <span className="hidden sm:inline-block text-[10px] bg-amber-600 text-white px-1.5 py-0.2 rounded-md font-bold">
+                  ~{routeStats.totalKm.toFixed(1)} กม.
+                </span>
+              )}
             </button>
 
             <UserMenu
@@ -669,7 +759,7 @@ export default function DashboardPage() {
                 >
                   <div className="flex items-center gap-2">
                     <Car className="w-4 h-4 text-slate-950" />
-                    <span>รูทวันนี้ ({todayRoute.length} โรงงาน)</span>
+                    <span>รูท {todayRoute.length} โรงงาน (~{routeStats.totalKm.toFixed(1)} กม.)</span>
                   </div>
                   <div className="flex items-center gap-1 text-[11px] bg-slate-950 text-white px-2 py-0.5 rounded-lg">
                     <span>เปิดดูรูท</span>
