@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { GlobalAgreementGatekeeper } from '@/components/GlobalAgreementGatekeeper';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -35,7 +34,6 @@ export default function RootLayout({
         <LanguageProvider>
           <AuthProvider>
             {children}
-            <GlobalAgreementGatekeeper />
           </AuthProvider>
         </LanguageProvider>
 

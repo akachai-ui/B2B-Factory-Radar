@@ -11,8 +11,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { AuthModal } from '@/components/AuthModal';
 import { PdpaTermsModal } from '@/components/PdpaTermsModal';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { MobileBottomSheet } from '@/components/MobileBottomSheet';
-import { MobileBottomNav } from '@/components/MobileBottomNav';
 import {
   Sparkles,
   Layers,
@@ -639,26 +637,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-
-      {/* Mobile Bottom Navigation Bar */}
-      <MobileBottomNav
-        isLiveTracking={isLiveTracking}
-        onToggleLiveTracking={toggleLiveTracking}
-        onOpenAuth={() => handleOpenAuth(user ? 'signin' : 'signup')}
-        onScrollToMap={scrollToMap}
-      />
-
-      {/* Mobile Swipeable Bottom Sheet Drawer */}
-      <MobileBottomSheet
-        lead={selectedMobileLead}
-        onClose={() => setSelectedMobileLead(null)}
-        isLoggedIn={isLoggedIn}
-        onRequireAuth={() => {
-          setSelectedMobileLead(null);
-          handleOpenAuth('signup');
-        }}
-        userLocation={userLocation}
-      />
 
       {/* Auth Modal (Sign In / Sign Up) */}
       <AuthModal
