@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { UserMenu } from '@/components/UserMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { PdpaTermsModal } from '@/components/PdpaTermsModal';
+import { FirstTimeAgreementModal } from '@/components/FirstTimeAgreementModal';
 import {
   Layers,
   ArrowRight,
@@ -37,12 +37,12 @@ export default function DashboardPage() {
   // Check PDPA Consent for Google Login & First-time Users
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
-      const consent = localStorage.getItem('routehunter_pdpa_consent');
-      if (consent !== 'accepted') {
+      const consent = localStorage.getItem('routehunter_pdpa_consent_v1');
+      if (consent !== 'accepted' && (!profile || !profile.pdpa_consent)) {
         setIsPdpaModalOpen(true);
       }
     }
-  }, [user]);
+  }, [user, profile]);
 
   if (loading) {
     return (
@@ -203,11 +203,14 @@ export default function DashboardPage() {
         </div>
       </footer>
 
-      {/* 4. MANDATORY PDPA MODAL FOR FIRST-TIME USERS */}
-      <PdpaTermsModal
+      {/* 4. MANDATORY FIRST-TIME TERMS & PDPA AGREEMENT MODAL */}
+      <FirstTimeAgreementModal
         isOpen={isPdpaModalOpen}
-        onClose={handleAcceptPdpa}
-        defaultTab="pdpa"
+        onAccepted={() => setIsPdpaModalOpen(false)}
+        onDeclined={async () => {
+          await signOut();
+          router.push('/');
+        }}
       />
 
     </div>

@@ -20,6 +20,9 @@ export interface UserProfile {
   company_lng?: number | null;
   company_radius_km?: number | null;
   subscription_tier?: string | null;
+  pdpa_consent?: boolean | null;
+  pdpa_consent_at?: string | null;
+  pdpa_version?: string | null;
 }
 
 interface AuthContextType {
@@ -32,6 +35,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   updateCompanyProfile: (data: Partial<CompanyProfile>) => Promise<{ error: any }>;
   refreshProfile: () => Promise<void>;
+  acceptPdpaConsent: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -251,6 +255,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const acceptPdpaConsent = async () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('routehunter_pdpa_consent_v1', 'accepted');
+      localStorage.setItem('routehunter_pdpa_consent', 'accepted');
+    }
+    if (user) {
+      const now = new Date().toISOString();
+      await supabase
+        .from('profiles')
+        .update({
+          pdpa_consent: true,
+          pdpa_consent_at: now,
+          pdpa_version: '1.0-2026',
+          updated_at: now,
+        })
+        .eq('id', user.id);
+
+      if (profile) {
+        setProfile({
+          ...profile,
+          pdpa_consent: true,
+          pdpa_consent_at: now,
+          pdpa_version: '1.0-2026',
+        });
+      }
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -263,6 +295,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signOut,
         updateCompanyProfile,
         refreshProfile,
+        acceptPdpaConsent,
       }}
     >
       {children}
