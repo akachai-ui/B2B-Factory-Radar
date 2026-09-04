@@ -67,7 +67,6 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
           .update({
             name: companyName.trim(),
             phone: phone.trim(),
-            updated_at: new Date().toISOString(),
           })
           .eq('id', currentCompanyId);
 
