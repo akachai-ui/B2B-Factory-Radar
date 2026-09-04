@@ -15,7 +15,9 @@ import {
   ShieldCheck,
   Phone,
   Navigation,
+  Layers,
 } from 'lucide-react';
+import samutprakanDistricts from '@/lib/geojson/samutprakan_districts.json';
 
 declare global {
   interface Window {
@@ -100,6 +102,9 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
   const userAccuracyCircleRef = useRef<any>(null);
   const searchRadiusCircleRef = useRef<any>(null);
   const routeLayerGroupRef = useRef<any>(null);
+  const boundaryLayerGroupRef = useRef<any>(null);
+
+  const [showBoundaries, setShowBoundaries] = useState<boolean>(true);
 
   const onToggleRouteLeadRef = useRef(onToggleRouteLead);
   onToggleRouteLeadRef.current = onToggleRouteLead;
@@ -257,6 +262,10 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
       const routeLayerGroup = L.layerGroup().addTo(map);
       routeLayerGroupRef.current = routeLayerGroup;
 
+      // Dedicated layer group for District GeoJSON Boundaries
+      const boundaryLayerGroup = L.layerGroup().addTo(map);
+      boundaryLayerGroupRef.current = boundaryLayerGroup;
+
       mapInstanceRef.current = map;
 
       // Invalidate size to ensure zero grey/blank tiles
@@ -282,6 +291,110 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
       resizeObserver.disconnect();
     };
   }, [isLeafletReady]);
+
+  // 1.5 RENDER GEOJSON DISTRICT BOUNDARY LINES
+  useEffect(() => {
+    if (!mapInstanceRef.current || !isLeafletReady || !window.L || !boundaryLayerGroupRef.current) return;
+    const L = window.L;
+    const boundaryLayerGroup = boundaryLayerGroupRef.current;
+    boundaryLayerGroup.clearLayers();
+
+    if (!showBoundaries) return;
+
+    const districtColors: Record<string, string> = {
+      'เมืองสมุทรปราการ': '#3b82f6', // Blue
+      'บางพลี': '#10b981', // Emerald
+      'พระประแดง': '#8b5cf6', // Purple
+      'พระสมุทรเจดีย์': '#ec4899', // Pink
+      'บางบ่อ': '#f59e0b', // Amber
+      'บางเสาธง': '#06b6d4', // Cyan
+    };
+
+    try {
+      const geoJsonLayer = L.geoJSON(samutprakanDistricts as any, {
+        style: (feature: any) => {
+          const districtName = feature?.properties?.amp_th || '';
+          const isSelected =
+            selectedDistrict &&
+            selectedDistrict !== 'ALL' &&
+            (selectedDistrict.includes(districtName) || districtName.includes(selectedDistrict));
+          const hasSpecificFilter = selectedDistrict && selectedDistrict !== 'ALL';
+          const baseColor = districtColors[districtName] || '#64748b';
+
+          if (isSelected) {
+            return {
+              color: '#f59e0b',
+              weight: 3.5,
+              opacity: 1,
+              fillColor: '#f59e0b',
+              fillOpacity: 0.18,
+            };
+          }
+
+          if (hasSpecificFilter) {
+            return {
+              color: baseColor,
+              weight: 1.5,
+              opacity: 0.4,
+              fillColor: baseColor,
+              fillOpacity: 0.02,
+              dashArray: '4, 4',
+            };
+          }
+
+          return {
+            color: baseColor,
+            weight: 2,
+            opacity: 0.8,
+            fillColor: baseColor,
+            fillOpacity: 0.08,
+            dashArray: '6, 6',
+          };
+        },
+        onEachFeature: (feature: any, layer: any) => {
+          const districtName = feature?.properties?.amp_th || '';
+          const areaSqkm = feature?.properties?.area_sqkm ? Math.round(feature.properties.area_sqkm) : null;
+
+          // Tooltip on hover
+          layer.bindTooltip(
+            `<div class="font-bold text-xs text-slate-900">📍 อ.${districtName}${areaSqkm ? ` <span class="text-slate-500 font-normal">(${areaSqkm} ตร.กม.)</span>` : ''}</div>`,
+            {
+              sticky: true,
+              direction: 'top',
+              className: 'custom-district-tooltip',
+            }
+          );
+
+          layer.on({
+            mouseover: (e: any) => {
+              const l = e.target;
+              l.setStyle({
+                weight: 3,
+                opacity: 1,
+                fillOpacity: 0.22,
+              });
+              if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                l.bringToBack();
+              }
+            },
+            mouseout: (e: any) => {
+              geoJsonLayer.resetStyle(e.target);
+            },
+            click: () => {
+              if (onDistrictChange) {
+                onDistrictChange(districtName);
+              }
+            },
+          });
+        },
+      });
+
+      boundaryLayerGroup.addLayer(geoJsonLayer);
+      geoJsonLayer.bringToBack();
+    } catch (err) {
+      console.warn('GeoJSON boundary rendering error:', err);
+    }
+  }, [showBoundaries, selectedDistrict, isLeafletReady]);
 
   // 2. FIX ISSUE 3: DRAW CONNECTED ROUTE POLYLINE & NUMBERED SEQUENCE BADGES
   useEffect(() => {
@@ -719,6 +832,21 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         >
           <Radio className={`w-4 h-4 ${isLiveTracking ? 'text-white animate-pulse' : 'text-emerald-400'}`} />
           <span className="hidden sm:inline">{isLiveTracking ? 'GPS รถเปิดอยู่' : 'เปิด GPS'}</span>
+        </button>
+
+        {/* Toggle Boundary Lines */}
+        <button
+          type="button"
+          onClick={() => setShowBoundaries(!showBoundaries)}
+          className={`h-9 sm:h-10 px-3 rounded-2xl shadow-2xl border backdrop-blur-md text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer ${
+            showBoundaries
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
+              : 'bg-slate-900/95 hover:bg-slate-800 text-slate-400 border-slate-700/90'
+          }`}
+          title="เปิด/ปิด เส้นแบ่งขอบเขต 6 อำเภอสมุทรปราการ"
+        >
+          <Layers className="w-4 h-4 text-amber-400" />
+          <span className="hidden sm:inline">เส้นเขต {showBoundaries ? 'เปิด' : 'ปิด'}</span>
         </button>
 
         {/* Reset View */}

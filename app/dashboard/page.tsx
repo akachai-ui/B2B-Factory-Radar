@@ -518,7 +518,7 @@ export default function DashboardPage() {
     <div className="min-h-screen flex flex-col bg-[#070b14] text-slate-100 selection:bg-amber-500 selection:text-slate-950">
       
       {/* 1. TOP NAVBAR (Prominent Company Branding) */}
-      <header className="bg-[#0b0f19]/95 backdrop-blur-xl sticky top-0 z-40 border-b border-slate-800/80 shadow-md">
+      <header className="bg-[#0b0f19]/95 backdrop-blur-xl sticky top-0 z-[800] border-b border-slate-800/80 shadow-md">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2">
           
           {/* Prominent Company Workspace Title (Clickable to Edit Profile) */}
