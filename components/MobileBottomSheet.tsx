@@ -7,6 +7,8 @@ import { getLeadStatuses, saveLeadStatus } from '@/lib/leadStatusStorage';
 import { Phone, Navigation, Globe, Mail, Lock, Sparkles, Car, Check, Copy, ExternalLink, ShieldCheck, Building2 } from 'lucide-react';
 
 interface MobileBottomSheetProps {
+  routeLeadIds?: string[];
+  onToggleRouteLead?: (lead: FactoryLead) => void;
   lead: FactoryLead | null;
   onClose: () => void;
   isLoggedIn: boolean;
@@ -34,6 +36,8 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
   isLoggedIn,
   onRequireAuth,
   userLocation,
+  routeLeadIds = [],
+  onToggleRouteLead,
 }) => {
   const { t } = useLanguage();
   const [currentStatus, setCurrentStatus] = useState<LeadStatus>('NEW');
@@ -165,6 +169,25 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
         ) : (
           /* 2. LOGGED IN MEMBER VIEW: FULL CRM & ACTIONS */
           <div className="space-y-3 pt-1">
+            
+            {/* 🚗 Today Route Planner Button */}
+            {onToggleRouteLead && (
+              <button
+                onClick={() => onToggleRouteLead(lead)}
+                className={`w-full py-3 px-4 rounded-2xl font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                  routeLeadIds.includes(lead.place_id)
+                    ? 'bg-amber-500 text-slate-950 border border-amber-400 ring-2 ring-amber-400/40 shadow-lg'
+                    : 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 text-slate-950 shadow-lg shadow-amber-500/25'
+                }`}
+              >
+                <Car className="w-4 h-4 text-slate-950" />
+                <span>
+                  {routeLeadIds.includes(lead.place_id)
+                    ? '✓ อยู่ในรูทวันนี้แล้ว (คลิกเพื่อยกเลิก)'
+                    : '🚗 + เพิ่มเข้ารูทวันนี้'}
+                </span>
+              </button>
+            )}
             
             {/* Status & Notes Tracking Box */}
             <div className="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 space-y-2.5">

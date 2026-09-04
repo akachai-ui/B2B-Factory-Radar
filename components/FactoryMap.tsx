@@ -431,6 +431,18 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
           const dbdSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(lead.name + ' ทุนจดทะเบียน DBD')}`;
           const mapsNavUrl = lead.maps_url || `https://www.google.com/maps/search/?api=1&query=${lead.lat},${lead.lng}`;
 
+          const isInRoute = routeLeadIds && routeLeadIds.includes(lead.place_id);
+          const routeBtnText = isInRoute ? '✓ อยู่ในรูทวันนี้แล้ว' : '🚗 + เพิ่มเข้ารูทวันนี้';
+          const routeBtnClass = isInRoute
+            ? 'bg-amber-500 text-slate-950 border border-amber-400 font-black shadow-md ring-2 ring-amber-400/40'
+            : 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black shadow-md shadow-amber-500/20';
+
+          const routeButtonHtml = `
+            <button onclick="window.toggleRouteFromMap('${lead.place_id}')" class="w-full py-2 px-3 rounded-xl ${routeBtnClass} text-xs transition cursor-pointer flex items-center justify-center gap-1.5 my-1 active:scale-95">
+              <span>${routeBtnText}</span>
+            </button>
+          `;
+
           let popupHtml = '';
 
           if (!isLoggedIn) {
@@ -485,6 +497,9 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
                 <p class="text-[11px] text-slate-600 leading-tight">${lead.address}</p>
                 
                 ${distanceBadge}
+
+                <!-- 🚗 Today Route Planner Button -->
+                ${routeButtonHtml}
 
                 <!-- Status Tag Selector (Pillar 1) -->
                 <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
