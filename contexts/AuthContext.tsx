@@ -87,56 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
-    // 1. Process explicit OAuth Hash Fragment (#access_token=...) or PKCE code (?code=...)
-    if (typeof window !== 'undefined') {
-      if (window.location.hash && window.location.hash.includes('access_token=')) {
-        const hash = window.location.hash.substring(1);
-        const params = new URLSearchParams(hash);
-        const access_token = params.get('access_token');
-        const refresh_token = params.get('refresh_token');
-
-        if (access_token) {
-          setLoading(true);
-          supabase.auth
-            .setSession({
-              access_token,
-              refresh_token: refresh_token || '',
-            })
-            .then(async ({ data: { session } }) => {
-              if (session?.user && isMounted) {
-                setUser(session.user);
-                await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
-                setLoading(false);
-                if (window.history.replaceState) {
-                  window.history.replaceState(null, '', window.location.pathname);
-                }
-              }
-            })
-            .catch(() => {});
-        }
-      } else if (window.location.search && window.location.search.includes('code=')) {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
-        if (code) {
-          setLoading(true);
-          supabase.auth
-            .exchangeCodeForSession(code)
-            .then(async ({ data: { session } }) => {
-              if (session?.user && isMounted) {
-                setUser(session.user);
-                await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
-                setLoading(false);
-                if (window.history.replaceState) {
-                  window.history.replaceState(null, '', window.location.pathname);
-                }
-              }
-            })
-            .catch(() => {});
-        }
-      }
-    }
-
-    // 2. Listen to auth state changes as the single source of truth
+    // 1. Listen to Supabase Auth State Changes (Handles OAuth hashes, PKCE codes, token refreshes automatically)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -144,6 +95,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (session?.user) {
         setUser(session.user);
+        if (typeof window !== 'undefined' && window.location.hash.includes('access_token=')) {
+          if (window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        }
         await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
@@ -152,23 +108,80 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    // 3. Fallback check for existing session from localStorage/cookies
-    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
-      if (!isMounted) return;
-      if (error) {
-        // If stored session is expired or invalid, sign out cleanly so subsequent anon requests succeed
-        await supabase.auth.signOut().catch(() => {});
-        setUser(null);
-        setProfile(null);
-      } else if (session?.user) {
-        setUser(session.user);
-        await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
+    // 2. Safe async Auth Initializer
+    const initAuth = async () => {
+      try {
+        if (typeof window !== 'undefined' && window.location.hash.includes('access_token=')) {
+          const hash = window.location.hash.substring(1);
+          const params = new URLSearchParams(hash);
+          const access_token = params.get('access_token');
+          const refresh_token = params.get('refresh_token');
+
+          if (access_token) {
+            const { data, error } = await supabase.auth.setSession({
+              access_token,
+              refresh_token: refresh_token || '',
+            });
+
+            if (data?.session?.user && isMounted) {
+              setUser(data.session.user);
+              if (window.history.replaceState) {
+                window.history.replaceState(null, '', window.location.pathname);
+              }
+              await fetchProfile(data.session.user.id, data.session.user.email || '', data.session.user.user_metadata);
+              setLoading(false);
+              return;
+            }
+          }
+        } else if (typeof window !== 'undefined' && window.location.search.includes('code=')) {
+          const params = new URLSearchParams(window.location.search);
+          const code = params.get('code');
+          if (code) {
+            const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+            if (data?.session?.user && isMounted) {
+              setUser(data.session.user);
+              if (window.history.replaceState) {
+                window.history.replaceState(null, '', window.location.pathname);
+              }
+              await fetchProfile(data.session.user.id, data.session.user.email || '', data.session.user.user_metadata);
+              setLoading(false);
+              return;
+            }
+          }
+        }
+
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (!isMounted) return;
+
+        if (error) {
+          await supabase.auth.signOut().catch(() => {});
+          setUser(null);
+          setProfile(null);
+        } else if (session?.user) {
+          setUser(session.user);
+          await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
+        }
+      } catch (err) {
+        console.warn('Auth init error:', err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-      setLoading(false);
-    });
+    };
+
+    initAuth();
+
+    // 3. Safety fallback timer: guarantee loading never hangs permanently
+    const safetyTimer = setTimeout(() => {
+      if (isMounted) {
+        setLoading(false);
+      }
+    }, 3500);
 
     return () => {
       isMounted = false;
+      clearTimeout(safetyTimer);
       subscription.unsubscribe();
     };
   }, []);
