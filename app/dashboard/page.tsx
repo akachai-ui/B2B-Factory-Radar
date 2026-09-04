@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { UserMenu } from '@/components/UserMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { PdpaTermsModal } from '@/components/PdpaTermsModal';
 import {
   Layers,
   ArrowRight,
@@ -16,6 +17,7 @@ import {
   LogOut,
   Clock,
   Compass,
+  Check,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -23,12 +25,24 @@ export default function DashboardPage() {
   const { t } = useLanguage();
   const router = useRouter();
 
+  const [isPdpaModalOpen, setIsPdpaModalOpen] = useState<boolean>(false);
+
   // Protect Dashboard: if not authenticated, redirect to landing page
   useEffect(() => {
     if (!loading && !user) {
       router.push('/');
     }
   }, [loading, user, router]);
+
+  // Check PDPA Consent for Google Login & First-time Users
+  useEffect(() => {
+    if (typeof window !== 'undefined' && user) {
+      const consent = localStorage.getItem('routehunter_pdpa_consent');
+      if (consent !== 'accepted') {
+        setIsPdpaModalOpen(true);
+      }
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -45,6 +59,13 @@ export default function DashboardPage() {
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'สมาชิกทีมขาย';
   const companyName = profile?.company_name || `บริษัทของคุณ ${displayName}`;
+
+  const handleAcceptPdpa = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('routehunter_pdpa_consent', 'accepted');
+    }
+    setIsPdpaModalOpen(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#070b14] text-slate-100 selection:bg-amber-500 selection:text-slate-950">
@@ -181,6 +202,13 @@ export default function DashboardPage() {
           <p className="text-[11px] text-slate-500">© 2026 RouteHunter • ระบบบริหารจัดการการขาย & เรดาร์เป้าหมายโรงงานอุตสาหกรรม</p>
         </div>
       </footer>
+
+      {/* 4. MANDATORY PDPA MODAL FOR FIRST-TIME USERS */}
+      <PdpaTermsModal
+        isOpen={isPdpaModalOpen}
+        onClose={handleAcceptPdpa}
+        defaultTab="pdpa"
+      />
 
     </div>
   );
