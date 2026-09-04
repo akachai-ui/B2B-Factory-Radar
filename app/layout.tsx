@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { GlobalAgreementGatekeeper } from '@/components/GlobalAgreementGatekeeper';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -32,7 +33,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-slate-900 text-slate-100 antialiased selection:bg-blue-600 selection:text-white">
         <LanguageProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            {children}
+            <GlobalAgreementGatekeeper />
+          </AuthProvider>
         </LanguageProvider>
 
         {/* Essential Leaflet and MarkerCluster Scripts */}
