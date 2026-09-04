@@ -22,6 +22,7 @@ import {
   ArrowUpRight,
   X,
   ChevronUp,
+  Building2,
 } from 'lucide-react';
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -121,8 +122,11 @@ export default function DashboardPage() {
   // Today's Route State (List of selected factories in order)
   const [todayRoute, setTodayRoute] = useState<FactoryLead[]>([]);
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState<boolean>(false);
-  const [isRouteDrawerOpen, setIsRouteDrawerOpen] = useState<boolean>(false); // default closed on small screens for max map view
+  const [isRouteDrawerOpen, setIsRouteDrawerOpen] = useState<boolean>(false);
   const [copyToast, setCopyToast] = useState<string | null>(null);
+
+  // Company Name
+  const companyName = profile?.company_name || profile?.company?.name || 'บริษัทของคุณ (คลิกตั้งชื่อ)';
 
   // Open route drawer by default only on larger screens
   useEffect(() => {
@@ -256,9 +260,9 @@ export default function DashboardPage() {
   const handleCopyRouteSummary = () => {
     if (todayRoute.length === 0) return;
     const dateStr = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
-    let summary = `🚗 [แผนการออกวิ่งเซลส์ RouteHunter] - ${dateStr}\n`;
+    let summary = `🚗 [แผนการออกวิ่งเซลส์: ${companyName}] - ${dateStr}\n`;
     summary += `👤 ผู้รับผิดชอบ: ${profile?.full_name || user?.email?.split('@')[0]}\n`;
-    summary += `🏢 บริษัท: ${profile?.company_name || 'RouteHunter Sales Team'}\n`;
+    summary += `🏢 องค์กร: ${companyName}\n`;
     summary += `📍 จุดเริ่มต้น: ${userLocation.label}\n`;
     summary += `🎯 เป้าหมายทั้งหมด: ${todayRoute.length} โรงงาน\n`;
     summary += `------------------------------------\n`;
@@ -356,22 +360,22 @@ export default function DashboardPage() {
     <div className="flex flex-col h-full">
       {/* Drawer Header */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <div className="h-8 w-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
             <Car className="w-4 h-4" />
           </div>
-          <div>
-            <h3 className="text-sm font-black text-white flex items-center gap-1.5">
+          <div className="min-w-0">
+            <h3 className="text-sm font-black text-white flex items-center gap-1.5 truncate">
               <span>แผนจัดรูทวิ่งวันนี้</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black">
+              <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black shrink-0">
                 {todayRoute.length}
               </span>
             </h3>
-            <p className="text-[10px] text-slate-400">เรียงตามลำดับโรงงานที่จะเข้าพบ</p>
+            <p className="text-[10px] text-amber-400/90 truncate">🏢 {companyName}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           {todayRoute.length > 0 && (
             <button
               onClick={handleClearRoute}
@@ -513,30 +517,36 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#070b14] text-slate-100 selection:bg-amber-500 selection:text-slate-950">
       
-      {/* 1. MOBILE-FIRST TOP NAVBAR */}
+      {/* 1. TOP NAVBAR (Prominent Company Branding) */}
       <header className="bg-[#0b0f19]/95 backdrop-blur-xl sticky top-0 z-40 border-b border-slate-800/80 shadow-md">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2">
           
-          {/* Logo & Workspace Title */}
-          <div className="flex items-center gap-2 select-none cursor-pointer shrink-0" onClick={() => router.push('/')}>
-            <div className="relative flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-amber-500 via-emerald-500 to-cyan-500 text-slate-950 font-black shadow-md shadow-amber-500/20 shrink-0">
-              <Car className="w-4 h-4 text-slate-950" />
+          {/* Prominent Company Workspace Title (Clickable to Edit Profile) */}
+          <div
+            onClick={() => setIsCompanyModalOpen(true)}
+            className="flex items-center gap-2 select-none cursor-pointer shrink-0 group min-w-0"
+            title="คลิกเพื่อแก้ไขข้อมูลบริษัทของคุณ"
+          >
+            <div className="relative flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-400 text-slate-950 font-black shadow-md shadow-amber-500/20 shrink-0 group-hover:scale-105 transition-transform">
+              <Building2 className="w-4 h-4 text-slate-950" />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-sm sm:text-lg font-black tracking-tight text-white">RouteHunter</span>
-                <span className="hidden md:inline-block px-2 py-0.5 rounded-full text-[9px] font-black bg-gradient-to-r from-amber-400/20 to-amber-500/20 text-amber-300 border border-amber-400/30 uppercase tracking-wider">
-                  Sales Route Planner
+                <span className="text-xs sm:text-base font-black tracking-tight text-white truncate max-w-[150px] sm:max-w-[340px] group-hover:text-amber-300 transition">
+                  {companyName}
+                </span>
+                <span className="hidden sm:inline-block px-1.5 py-0.2 rounded-md text-[9px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 uppercase tracking-wider shrink-0">
+                  COMPANY
                 </span>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium hidden lg:inline">
-                📍 สมุทรปราการ • 989 โรงงานเป้าหมาย (พิกัดประตูทางเข้า 100%)
+              <span className="text-[9px] sm:text-[10px] text-amber-400/90 font-medium truncate max-w-[170px] sm:max-w-none">
+                ระบบวางแผนรูททีมขาย • RouteHunter
               </span>
             </div>
           </div>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <button
               onClick={() => setIsRouteDrawerOpen(!isRouteDrawerOpen)}
               className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl border text-xs font-black transition flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95 ${
@@ -567,7 +577,7 @@ export default function DashboardPage() {
         {/* MAP & FILTER SECTION */}
         <div className={`flex flex-col gap-2.5 transition-all duration-300 h-[calc(100dvh-64px)] sm:h-auto ${isRouteDrawerOpen ? 'lg:col-span-8' : 'lg:col-span-12'}`}>
           
-          {/* Filter Toolbar (Mobile App Optimized Bar) */}
+          {/* Filter Toolbar */}
           <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-2 sm:p-3 shadow-lg flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0">
             
             {/* Search Input */}
