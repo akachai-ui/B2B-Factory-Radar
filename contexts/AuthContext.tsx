@@ -101,17 +101,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (session?.user) {
         setUser(session.user);
+        setLoading(false);
         if (typeof window !== 'undefined' && window.location.hash.includes('access_token=')) {
           if (window.history.replaceState) {
             window.history.replaceState(null, '', window.location.pathname);
           }
         }
-        await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
+        fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setProfile(null);
+        setLoading(false);
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     // 2. Initial check for existing session (only if NOT waiting for OAuth URL callback to process)
@@ -120,18 +123,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!isMounted) return;
         if (session?.user) {
           setUser(session.user);
-          await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
+          setLoading(false);
+          fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
+        } else {
+          setLoading(false);
         }
-        setLoading(false);
       });
     }
 
-    // 3. Fallback safety timer (4 seconds max)
+    // 3. Fallback safety timer (2.5 seconds max)
     const timer = setTimeout(() => {
       if (isMounted) {
         setLoading(false);
       }
-    }, 4000);
+    }, 2500);
 
     return () => {
       isMounted = false;
@@ -149,7 +154,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       },
     });
 
-    // Explicitly navigate to Google OAuth URL
     if (data?.url && typeof window !== 'undefined') {
       window.location.href = data.url;
     }
@@ -164,7 +168,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (data.user) {
       setUser(data.user);
-      await fetchProfile(data.user.id, data.user.email || '', data.user.user_metadata);
+      setLoading(false);
+      fetchProfile(data.user.id, data.user.email || '', data.user.user_metadata);
     }
     return { error };
   };
