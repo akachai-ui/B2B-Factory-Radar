@@ -66,9 +66,9 @@ export const UserMenu: React.FC<UserMenuProps> = ({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-2 px-2.5 py-1.5 rounded-2xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 transition cursor-pointer text-left shadow-xs"
+        className="flex items-center gap-1.5 sm:gap-2 p-1 sm:px-2.5 sm:py-1.5 rounded-xl sm:rounded-2xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 transition cursor-pointer text-left shadow-xs shrink-0"
       >
-        <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl bg-gradient-to-br from-amber-500 to-indigo-600 text-slate-950 font-black text-xs flex items-center justify-center shadow-xs">
+        <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg sm:rounded-xl bg-gradient-to-br from-amber-500 to-indigo-600 text-slate-950 font-black text-xs flex items-center justify-center shadow-xs shrink-0">
           {displayName.slice(0, 1).toUpperCase()}
         </div>
         
@@ -85,7 +85,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({
           </div>
         </div>
 
-        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className="hidden sm:block w-3.5 h-3.5 text-slate-400 transition-transform" />
       </button>
 
       {/* Dropdown Menu */}
