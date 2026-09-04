@@ -87,62 +87,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
-    // 1. Handle OAuth PKCE exchange code in URL (?code=...) & hash fragment (#access_token=...)
-    if (typeof window !== 'undefined') {
-      const searchParams = new URLSearchParams(window.location.search);
-      const code = searchParams.get('code');
-
-      if (code) {
-        supabase.auth.exchangeCodeForSession(code).then(({ data: { session }, error }) => {
-          if (session?.user && isMounted) {
-            setUser(session.user);
-            fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
-            setLoading(false);
-            window.location.href = '/dashboard';
-          }
-        });
-      }
-
-      if (window.location.hash.includes('access_token=')) {
-        setTimeout(() => {
-          if (window.history.replaceState) {
-            window.history.replaceState(null, '', window.location.pathname);
-          }
-        }, 300);
-      }
-    }
-
-    // 2. Get initial Supabase session & verify user is still active in database
-    supabase.auth.getUser().then(({ data: { user: activeUser }, error }) => {
-      if (!isMounted) return;
-      if (error || !activeUser) {
-        // User was deleted from Supabase backend
-        supabase.auth.signOut().catch(() => {});
-        setUser(null);
-        setProfile(null);
-        setLoading(false);
-      } else {
-        setUser(activeUser);
-        fetchProfile(activeUser.id, activeUser.email || '', activeUser.user_metadata);
-        setLoading(false);
-      }
-    });
-
-    // 3. Listen to auth changes (e.g. SIGNED_IN, SIGNED_OUT from OAuth)
+    // 1. Listen to auth state changes as the single source of truth
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted) return;
-      if (event === 'SIGNED_OUT' || !session) {
+
+      if (session?.user) {
+        setUser(session.user);
+        await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
+      } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setProfile(null);
-      } else {
-        const currentUser = session.user;
-        setUser(currentUser);
-        fetchProfile(currentUser.id, currentUser.email || '', currentUser.user_metadata);
-        if (event === 'SIGNED_IN' && typeof window !== 'undefined' && window.location.pathname === '/') {
-          window.location.href = '/dashboard';
-        }
+      }
+      setLoading(false);
+    });
+
+    // 2. Fallback check for existing session from localStorage/cookies
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!isMounted) return;
+      if (session?.user) {
+        setUser(session.user);
+        await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
       }
       setLoading(false);
     });

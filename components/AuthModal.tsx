@@ -75,8 +75,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           setSuccessMessage('เข้าสู่ระบบสำเร็จ! กำลังไปที่ Dashboard...');
           setTimeout(() => {
             onClose();
-            window.location.href = '/dashboard';
-          }, 600);
+            router.push('/dashboard');
+          }, 300);
         }
       } else {
         const { error } = await signUp(email, password, fullName, companyName);
@@ -86,8 +86,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           setSuccessMessage('สมัครสมาชิกสำเร็จ! กำลังไปที่ Dashboard...');
           setTimeout(() => {
             onClose();
-            window.location.href = '/dashboard';
-          }, 800);
+            router.push('/dashboard');
+          }, 400);
         }
       }
     } catch (err: any) {
