@@ -22,6 +22,7 @@ declare global {
     updateLeadStatusFromMap: (placeId: string, status: LeadStatus) => void;
     copyEmailToClipboard: (email: string) => void;
     requireAuthFromMap?: () => void;
+    toggleRouteFromMap?: (placeId: string) => void;
     L: any;
   }
 }
@@ -49,6 +50,8 @@ interface FactoryMapProps {
   onStatusChange?: (status: string) => void;
   selectedRadius?: string;
   onRadiusChange?: (radius: string) => void;
+  routeLeadIds?: string[];
+  onToggleRouteLead?: (lead: FactoryLead) => void;
 }
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -82,6 +85,8 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
   onStatusChange,
   selectedRadius = 'ALL',
   onRadiusChange,
+  routeLeadIds = [],
+  onToggleRouteLead,
 }) => {
   const { t } = useLanguage();
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -120,6 +125,13 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         navigator.clipboard.writeText(email);
         setCopyToast(`✓ คัดลอกอีเมล ${email} เรียบร้อยแล้ว!`);
         setTimeout(() => setCopyToast(null), 2500);
+      }
+    };
+
+    window.toggleRouteFromMap = (placeId: string) => {
+      const target = leads.find((l) => l.place_id === placeId);
+      if (target && onToggleRouteLead) {
+        onToggleRouteLead(target);
       }
     };
 
