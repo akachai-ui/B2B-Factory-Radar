@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   AlertCircle,
   ArrowRight,
-  ShieldCheck,
 } from 'lucide-react';
 import { PdpaTermsModal } from './PdpaTermsModal';
 
@@ -32,7 +31,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const router = useRouter();
 
   const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
-  const [pdpaCheckbox, setPdpaCheckbox] = useState<boolean>(false);
   const [isPdpaModalOpen, setIsPdpaModalOpen] = useState<boolean>(false);
   const [pdpaTab, setPdpaTab] = useState<'pdpa' | 'terms'>('pdpa');
   
@@ -45,27 +43,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedConsent = localStorage.getItem('routehunter_pdpa_consent');
-      if (savedConsent === 'accepted') {
-        setPdpaCheckbox(true);
-      }
-    }
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   const handleGoogleSignIn = async () => {
-    if (!pdpaCheckbox) {
-      setErrorMessage('กรุณาติ๊กกดยินยอมรับข้อกำหนดการให้บริการและนโยบาย PDPA ก่อนเข้าสู่ระบบด้วย Google');
-      return;
-    }
     setErrorMessage('');
     setLoading(true);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('routehunter_pdpa_consent', 'accepted');
-    }
     try {
       const { error } = await signInWithGoogle();
       if (error) {
@@ -80,16 +62,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pdpaCheckbox) {
-      setErrorMessage('กรุณาติ๊กกดยินยอมรับข้อกำหนดการให้บริการและนโยบาย PDPA ก่อนดำเนินการต่อ');
-      return;
-    }
     setErrorMessage('');
     setSuccessMessage('');
     setLoading(true);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('routehunter_pdpa_consent', 'accepted');
-    }
 
     try {
       if (mode === 'signin') {
@@ -159,65 +134,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           <div className="space-y-4 pt-1 animate-in fade-in duration-200">
             
-            {/* 1. MANDATORY PDPA & TERMS CHECKBOX (ALWAYS VISIBLE) */}
-            <div className={`p-3 rounded-2xl border transition-all ${
-              !pdpaCheckbox ? 'bg-amber-50/90 border-amber-300' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={pdpaCheckbox}
-                  onChange={(e) => {
-                    setPdpaCheckbox(e.target.checked);
-                    if (e.target.checked) setErrorMessage('');
-                  }}
-                  className="mt-0.5 rounded text-amber-600 focus:ring-amber-500 h-4 w-4 shrink-0 cursor-pointer accent-amber-500"
-                />
-                <span className="text-xs text-slate-700 leading-snug font-medium">
-                  ข้าพเจ้ายินยอมรับ{' '}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setPdpaTab('terms');
-                      setIsPdpaModalOpen(true);
-                    }}
-                    className="text-amber-700 font-bold underline hover:text-amber-900 cursor-pointer"
-                  >
-                    ข้อกำหนดการให้บริการ
-                  </button>{' '}
-                  และ{' '}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setPdpaTab('pdpa');
-                      setIsPdpaModalOpen(true);
-                    }}
-                    className="text-amber-700 font-bold underline hover:text-amber-900 cursor-pointer"
-                  >
-                    นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA)
-                  </button>
-                </span>
-              </label>
-            </div>
-
-            {/* Error / Success Notifications */}
-            {errorMessage && (
-              <div className="p-3 rounded-2xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-medium flex items-start gap-2 animate-in shake">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                <span className="break-all">{errorMessage}</span>
-              </div>
-            )}
-
-            {successMessage && (
-              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-pulse">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{successMessage}</span>
-              </div>
-            )}
-
-            {/* 2. OFFICIAL GOOGLE SIGN IN BUTTON */}
+            {/* 1. OFFICIAL GOOGLE SIGN IN BUTTON */}
             <button
               type="button"
               onClick={handleGoogleSignIn}
@@ -244,6 +161,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </svg>
               <span>{loading ? 'กำลังเชื่อมต่อ Google...' : googleBtnText}</span>
             </button>
+
+            {/* Error / Success Notifications */}
+            {errorMessage && (
+              <div className="p-3 rounded-2xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-medium flex items-start gap-2 animate-in shake">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <span className="break-all">{errorMessage}</span>
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-pulse">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{successMessage}</span>
+              </div>
+            )}
 
             <div className="relative flex py-1 items-center">
               <div className="flex-grow border-t border-slate-200"></div>
@@ -367,6 +299,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
 
             </form>
+
+            {/* Subtle Terms & Privacy Footer */}
+            <p className="text-[11px] text-center text-slate-400 pt-1 leading-snug">
+              การเข้าสู่ระบบถือว่าท่านยอมรับ{' '}
+              <button
+                type="button"
+                onClick={() => {
+                  setPdpaTab('terms');
+                  setIsPdpaModalOpen(true);
+                }}
+                className="text-amber-700 font-bold underline hover:text-amber-800 cursor-pointer"
+              >
+                ข้อกำหนดการให้บริการ
+              </button>{' '}
+              และ{' '}
+              <button
+                type="button"
+                onClick={() => {
+                  setPdpaTab('pdpa');
+                  setIsPdpaModalOpen(true);
+                }}
+                className="text-amber-700 font-bold underline hover:text-amber-800 cursor-pointer"
+              >
+                นโยบาย PDPA
+              </button>
+            </p>
 
           </div>
 
