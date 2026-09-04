@@ -60,11 +60,12 @@ export default function DashboardPage() {
   // Protect Dashboard: redirect if not logged in
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (!loading && !user) {
-        if (window.location.hash.includes('access_token=') && window.history.replaceState) {
-          window.history.replaceState(null, '', '/');
-        }
-        router.push('/');
+      const hasAuthParams =
+        window.location.hash.includes('access_token=') ||
+        window.location.search.includes('code=');
+
+      if (!loading && !user && !hasAuthParams) {
+        router.replace('/');
       }
     }
   }, [loading, user, router]);

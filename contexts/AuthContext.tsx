@@ -87,6 +87,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
+    const hasAuthParams =
+      typeof window !== 'undefined' &&
+      (window.location.hash.includes('access_token=') ||
+        window.location.search.includes('code=') ||
+        window.location.hash.includes('error='));
+
     // 1. Listen to Supabase Auth State Changes (Handles OAuth hashes, PKCE codes, token refreshes automatically)
     const {
       data: { subscription },
@@ -108,18 +114,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    // 2. Initial check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!isMounted) return;
-      if (session?.user) {
-        setUser(session.user);
-        await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
+    // 2. Initial check for existing session (only if NOT waiting for OAuth URL callback to process)
+    if (!hasAuthParams) {
+      supabase.auth.getSession().then(async ({ data: { session } }) => {
+        if (!isMounted) return;
+        if (session?.user) {
+          setUser(session.user);
+          await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
+        }
+        setLoading(false);
+      });
+    }
+
+    // 3. Fallback safety timer (4 seconds max)
+    const timer = setTimeout(() => {
+      if (isMounted) {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    }, 4000);
 
     return () => {
       isMounted = false;
+      clearTimeout(timer);
       subscription.unsubscribe();
     };
   }, []);
