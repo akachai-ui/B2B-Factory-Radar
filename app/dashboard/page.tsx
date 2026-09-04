@@ -402,7 +402,7 @@ export default function DashboardPage() {
     });
   }, [leads, searchQuery, selectedDistrict, selectedRadius, userLocation]);
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-[#070b14] flex flex-col items-center justify-center text-slate-400 space-y-3">
         <div className="h-10 w-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
@@ -410,8 +410,6 @@ export default function DashboardPage() {
       </div>
     );
   }
-
-  if (!user) return null;
 
   // Render Route Drawer Content (reused on Desktop sidebar and Mobile bottom sheet)
   const renderRouteContent = () => (
