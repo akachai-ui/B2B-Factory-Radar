@@ -638,6 +638,7 @@ export default function DashboardPage() {
                 selectedRadius={selectedRadius}
                 onRadiusChange={setSelectedRadius}
                 routeLeadIds={routeLeadIds}
+                todayRoute={todayRoute}
                 onToggleRouteLead={handleToggleRouteLead}
               />
             </div>

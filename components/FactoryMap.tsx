@@ -51,6 +51,7 @@ interface FactoryMapProps {
   selectedRadius?: string;
   onRadiusChange?: (radius: string) => void;
   routeLeadIds?: string[];
+  todayRoute?: FactoryLead[];
   onToggleRouteLead?: (lead: FactoryLead) => void;
 }
 
@@ -86,6 +87,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
   selectedRadius = 'ALL',
   onRadiusChange,
   routeLeadIds = [],
+  todayRoute = [],
   onToggleRouteLead,
 }) => {
   const { t } = useLanguage();
@@ -95,6 +97,13 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
   const userMarkerRef = useRef<any>(null);
   const userAccuracyCircleRef = useRef<any>(null);
   const searchRadiusCircleRef = useRef<any>(null);
+  const routeLayerGroupRef = useRef<any>(null);
+
+  const onToggleRouteLeadRef = useRef(onToggleRouteLead);
+  onToggleRouteLeadRef.current = onToggleRouteLead;
+
+  const leadsRef = useRef(leads);
+  leadsRef.current = leads;
 
   const [isLeafletReady, setIsLeafletReady] = useState<boolean>(false);
   const [leadStatuses, setLeadStatuses] = useState<Record<string, { status: LeadStatus; note?: string }>>({});
@@ -129,9 +138,9 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
     };
 
     window.toggleRouteFromMap = (placeId: string) => {
-      const target = leads.find((l) => l.place_id === placeId);
-      if (target && onToggleRouteLead) {
-        onToggleRouteLead(target);
+      const target = leadsRef.current.find((l) => l.place_id === placeId);
+      if (target && onToggleRouteLeadRef.current) {
+        onToggleRouteLeadRef.current(target);
       }
     };
 
@@ -140,15 +149,9 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         onRequireAuth();
       }
     };
+  }, [onRequireAuth]);
 
-    return () => {
-      delete (window as any).updateLeadStatusFromMap;
-      delete (window as any).copyEmailToClipboard;
-      delete (window as any).requireAuthFromMap;
-    };
-  }, []);
-
-  // Ensure Leaflet JS & MarkerCluster scripts are loaded
+  // Handle Leaflet Library Dynamic Loader
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -210,13 +213,11 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         zoomControl: true,
       });
 
-      // Official Clean OpenStreetMap Tiles (No watermark / No API Key required)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
       }).addTo(map);
 
-      // Initialize Marker Cluster Group
       if (L.markerClusterGroup) {
         const markersCluster = L.markerClusterGroup({
           chunkedLoading: true,
@@ -250,6 +251,10 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         clusterGroupRef.current = markersCluster;
       }
 
+      // Dedicated layer group for Route Polyline and sequence badges
+      const routeLayerGroup = L.layerGroup().addTo(map);
+      routeLayerGroupRef.current = routeLayerGroup;
+
       mapInstanceRef.current = map;
 
       // Invalidate size to ensure zero grey/blank tiles
@@ -259,9 +264,83 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
     }
   }, [isLeafletReady]);
 
-  // Update Markers, Live GPS Location, and Radius Circle
+  // 1. FIX ISSUE 1: RESIZE OBSERVER ON MAP CONTAINER TO PREVENT GREY TILES
   useEffect(() => {
-    if (!mapInstanceRef.current || !window.L || !isLeafletReady) return;
+    if (!mapContainerRef.current || !mapInstanceRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    });
+
+    resizeObserver.observe(mapContainerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isLeafletReady]);
+
+  // 2. FIX ISSUE 3: DRAW CONNECTED ROUTE POLYLINE & NUMBERED SEQUENCE BADGES
+  useEffect(() => {
+    if (!mapInstanceRef.current || !isLeafletReady || !window.L || !routeLayerGroupRef.current) return;
+    const L = window.L;
+    const map = mapInstanceRef.current;
+    const routeLayerGroup = routeLayerGroupRef.current;
+
+    // Clear previous route polylines and sequence markers
+    routeLayerGroup.clearLayers();
+
+    if (todayRoute && todayRoute.length > 0) {
+      const latlngs = [
+        [userLocation.lat, userLocation.lng],
+        ...todayRoute.map((stop) => [stop.lat, stop.lng]),
+      ];
+
+      // Draw Glowing Polyline Path
+      const polyline = L.polyline(latlngs, {
+        color: '#f59e0b',
+        weight: 5,
+        opacity: 0.9,
+        dashArray: '10, 8',
+        lineCap: 'round',
+        lineJoin: 'round',
+      });
+      routeLayerGroup.addLayer(polyline);
+
+      // Draw Numbered Stop Badges along the route
+      todayRoute.forEach((stop, index) => {
+        const stopBadgeIcon = L.divIcon({
+          className: 'custom-route-stop-marker',
+          html: `
+            <div class="relative flex items-center justify-center">
+              <div class="h-8 w-8 rounded-full bg-amber-500 border-2 border-slate-950 text-slate-950 font-black text-xs flex items-center justify-center shadow-2xl ring-4 ring-amber-400/50 transform hover:scale-125 transition-transform cursor-pointer">
+                <span>${index + 1}</span>
+              </div>
+            </div>
+          `,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
+        });
+
+        const stopMarker = L.marker([stop.lat, stop.lng], { icon: stopBadgeIcon });
+        stopMarker.bindPopup(`
+          <div class="p-2 text-slate-800 space-y-1 text-xs">
+            <span class="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-black text-[10px]">
+              🚗 จุดแวะที่ ${index + 1}
+            </span>
+            <h4 class="font-black text-slate-900 leading-snug">${stop.name}</h4>
+            <p class="text-slate-500 text-[10px]">${stop.subdistrict} • ${stop.district}</p>
+          </div>
+        `);
+        routeLayerGroup.addLayer(stopMarker);
+      });
+    }
+  }, [todayRoute, userLocation, isLeafletReady]);
+
+  // Update Markers & Clusters when leads or filters change
+  useEffect(() => {
+    if (!mapInstanceRef.current || !isLeafletReady || !window.L) return;
 
     const L = window.L;
     const map = mapInstanceRef.current;
@@ -332,7 +411,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         searchRadiusCircleRef.current = radCircle;
       }
 
-      // Update Factory Markers with Color-Coding for Pillar 1
+      // Update Factory Markers with Color-Coding
       const markersCluster = clusterGroupRef.current;
       if (markersCluster) {
         markersCluster.clearLayers();
@@ -341,22 +420,23 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         leads.forEach((lead) => {
           if (!lead.lat || !lead.lng) return;
 
-          // Calculate distance from user's live position
           const distKm = calculateDistanceKm(userLocation.lat, userLocation.lng, lead.lat, lead.lng);
           const estMinutes = Math.max(1, Math.round(distKm * 2.2));
 
-          // Radius filter check
           if (selectedRadius && selectedRadius !== 'ALL') {
             const maxKm = parseFloat(selectedRadius);
             if (distKm > maxKm) return;
           }
 
-          const statusRecord = leadStatuses[lead.place_id] || { status: 'NEW' as LeadStatus };
-          const status = statusRecord.status;
+          const statusRecord = leadStatuses[lead.place_id];
+          const status: LeadStatus = statusRecord ? statusRecord.status : 'NEW';
 
-          // Status Filter check
-          if (selectedStatus && selectedStatus !== 'ALL' && status !== selectedStatus) {
-            return;
+          if (selectedStatus && selectedStatus !== 'ALL') {
+            if (selectedStatus === 'IN_ROUTE') {
+              if (!routeLeadIds.includes(lead.place_id)) return;
+            } else if (status !== selectedStatus) {
+              return;
+            }
           }
 
           bounds.push([lead.lat, lead.lng]);
@@ -373,7 +453,6 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
             </div>
           `;
 
-          // Color Pin Icon based on Pillar 1 Stages
           let pinColorBg = 'bg-blue-600';
           let pinBorder = 'border-blue-400';
           let pinEmoji = '🏢';
@@ -427,18 +506,17 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
           const maskedPhone = cleanPhone ? cleanPhone.slice(0, 5) + '-XXXX' : '02-740-XXXX';
           const cleanEmail = lead.email ? lead.email.split(',')[0].trim() : '';
 
-          // Corporate Intelligence Search URLs for Company Quick Fact
           const dbdSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(lead.name + ' ทุนจดทะเบียน DBD')}`;
           const mapsNavUrl = lead.maps_url || `https://www.google.com/maps/search/?api=1&query=${lead.lat},${lead.lng}`;
 
           const isInRoute = routeLeadIds && routeLeadIds.includes(lead.place_id);
-          const routeBtnText = isInRoute ? '✓ อยู่ในรูทวันนี้แล้ว' : '🚗 + เพิ่มเข้ารูทวันนี้';
+          const routeBtnText = isInRoute ? '✓ อยู่ในรูทวันนี้แล้ว (คลิกเพื่อยกเลิก)' : '🚗 + เพิ่มเข้ารูทวันนี้';
           const routeBtnClass = isInRoute
             ? 'bg-amber-500 text-slate-950 border border-amber-400 font-black shadow-md ring-2 ring-amber-400/40'
             : 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black shadow-md shadow-amber-500/20';
 
           const routeButtonHtml = `
-            <button onclick="window.toggleRouteFromMap('${lead.place_id}')" class="w-full py-2 px-3 rounded-xl ${routeBtnClass} text-xs transition cursor-pointer flex items-center justify-center gap-1.5 my-1 active:scale-95">
+            <button onclick="window.toggleRouteFromMap('${lead.place_id}')" class="w-full py-2.5 px-3 rounded-xl ${routeBtnClass} text-xs transition cursor-pointer flex items-center justify-center gap-1.5 my-1 active:scale-95">
               <span>${routeBtnText}</span>
             </button>
           `;
@@ -446,7 +524,6 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
           let popupHtml = '';
 
           if (!isLoggedIn) {
-            // STRATEGY 1: HIGH-VALUE MASKED TEASER FOR ALL FACTORIES
             popupHtml = `
               <div class="p-2 space-y-2 text-slate-800 min-w-[260px] max-w-[310px]">
                 <div class="flex items-center justify-between gap-1">
@@ -463,7 +540,6 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
                 
                 ${distanceBadge}
 
-                <!-- Masked Company Intel Box -->
                 <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
                   <div class="flex items-center justify-between">
                     <span class="text-slate-500 font-bold text-[11px]">📞 เบอร์โทรตรงโรงงาน:</span>
@@ -481,7 +557,6 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
               </div>
             `;
           } else {
-            // FULL LOGGED IN DASHBOARD POPUP
             popupHtml = `
               <div class="p-1 space-y-2 text-slate-800 min-w-[260px] max-w-[320px]">
                 <div class="flex items-center justify-between gap-1">
@@ -501,7 +576,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
                 <!-- 🚗 Today Route Planner Button -->
                 ${routeButtonHtml}
 
-                <!-- Status Tag Selector (Pillar 1) -->
+                <!-- Status Tag Selector -->
                 <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                   <div class="text-[10px] font-bold text-slate-500 flex items-center justify-between">
                     <span>📋 ${t('statusLabel')}</span>
@@ -517,7 +592,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
                   </select>
                 </div>
 
-                <!-- Company Quick Fact Button (Pillar 1) -->
+                <!-- Company Quick Fact Button -->
                 <a href="${dbdSearchUrl}" target="_blank" rel="noopener noreferrer" class="block w-full p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-xs font-bold text-center transition shadow-xs" title="เช็กทุนจดทะเบียนและนิติบุคคล">
                   <span>🔍 ตรวจสอบทุนจดทะเบียน DBD</span>
                 </a>
@@ -565,7 +640,6 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
 
           const marker = L.marker([lead.lat, lead.lng], { icon: customIcon });
 
-          // Mobile bottom sheet trigger or desktop popup
           marker.on('click', () => {
             if (window.innerWidth < 640 && onSelectLead) {
               onSelectLead(lead);
@@ -576,130 +650,27 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
           markersCluster.addLayer(marker);
         });
 
-        // Fit map bounds if filter is applied
-        if ((selectedDistrict !== 'ALL' || selectedRadius !== 'ALL') && bounds.length > 1) {
+        // Auto zoom/fit bounds on district filter change
+        if (selectedDistrict && selectedDistrict !== 'ALL' && bounds.length > 1) {
           map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
         }
       }
-    } catch (err) {
-      console.warn('Map update error:', err);
+    } catch (e) {
+      console.warn('Map marker rendering error:', e);
     }
-  }, [leads, userLocation, isLiveTracking, selectedDistrict, selectedSubdistrict, selectedStatus, selectedRadius, leadStatuses, isLeafletReady, t]);
-
-  // Zoom to user's live position
-  const zoomToUser = () => {
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 14, {
-        animate: true,
-      });
-      mapInstanceRef.current.invalidateSize();
-    }
-  };
-
-  // Reset to full map overview
-  const resetMapView = () => {
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 11);
-      mapInstanceRef.current.invalidateSize();
-      if (onRadiusChange) onRadiusChange('ALL');
-    }
-  };
+  }, [leads, selectedDistrict, selectedStatus, selectedRadius, userLocation, isLiveTracking, leadStatuses, routeLeadIds, todayRoute, isLeafletReady]);
 
   return (
-    <div className="relative bg-white rounded-3xl p-3 sm:p-5 border border-slate-200/80 shadow-xl space-y-3">
-      
-      {/* Toast Notification when Email is Copied */}
+    <div className="relative w-full h-full min-h-[500px]">
+      <div ref={mapContainerRef} className="w-full h-full min-h-[500px] z-0" />
+
+      {/* Copy Toast */}
       {copyToast && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-2xl bg-slate-900/95 backdrop-blur-md text-emerald-400 border border-emerald-500/50 shadow-2xl text-xs font-black flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200 pointer-events-none">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white px-4 py-2 rounded-2xl shadow-2xl border border-slate-700 text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
           <Check className="w-4 h-4 text-emerald-400" />
           <span>{copyToast}</span>
         </div>
       )}
-
-      {/* SLEEK MAP TOP BAR (OPTIMIZED FOR IPHONE & MOBILE) */}
-      <div className="flex items-center justify-between gap-1.5 px-0.5 sm:px-1">
-        
-        {/* Left: Live GPS Status & Target Count */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
-          <div className={`h-7 w-7 sm:h-9 sm:w-9 rounded-xl sm:rounded-2xl ${isLiveTracking ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-blue-600 to-indigo-700'} text-white flex items-center justify-center text-xs sm:text-base shadow-xs shrink-0 transition-colors`}>
-            {isLiveTracking ? '🚗' : '🗺️'}
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <h3 className="text-xs sm:text-base font-black text-slate-900 tracking-tight truncate">
-                {t('mapCommandCenter')}
-              </h3>
-              <span className="px-1.5 py-0.2 sm:px-2 sm:py-0.5 rounded-full bg-blue-50 text-blue-800 text-[9px] sm:text-[10px] font-extrabold border border-blue-200 shrink-0">
-                {leads.length.toLocaleString()} เป้าหมาย
-              </span>
-            </div>
-            <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium flex items-center gap-1 truncate">
-              {isLiveTracking ? (
-                <span className="text-emerald-700 font-bold flex items-center gap-1">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  {t('liveGpsCar')}
-                </span>
-              ) : (
-                <span>{t('yourGpsLocation')}</span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Right: Quick Controls */}
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          
-          {/* Live GPS Toggle */}
-          <button
-            onClick={onToggleLiveTracking}
-            className={`p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-xs active:scale-95 shrink-0 ${
-              isLiveTracking
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-            }`}
-            title="เปิด/ปิด Live GPS ติดตามรถ"
-          >
-            <Radio className={`w-3.5 h-3.5 ${isLiveTracking ? 'animate-pulse text-emerald-200' : 'text-slate-400'}`} />
-            <span className="hidden md:inline">{isLiveTracking ? t('liveGpsActive') : t('liveGpsInactive')}</span>
-          </button>
-
-          {/* Zoom to GPS */}
-          <button
-            onClick={zoomToUser}
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] sm:text-xs font-bold border border-slate-200 transition-all flex items-center gap-1 cursor-pointer active:scale-95 shrink-0"
-            title="ซูมไปยังพิกัดของคุณ"
-          >
-            <Compass className="w-3.5 h-3.5 text-blue-600" />
-            <span className="hidden sm:inline">{t('zoomLocation')}</span>
-          </button>
-
-          {/* Reset Map */}
-          <button
-            onClick={resetMapView}
-            className="p-1.5 sm:px-2 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-all flex items-center gap-1 cursor-pointer active:scale-95 shrink-0"
-            title={t('centerMap')}
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
-
-        </div>
-
-      </div>
-
-      {/* Map Canvas with Responsive Height */}
-      <div
-        ref={mapContainerRef}
-        id="map"
-        className="shadow-inner border border-slate-200/80 h-[380px] sm:h-[620px] rounded-2xl overflow-hidden relative bg-slate-100"
-      >
-        {!isLeafletReady && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 text-slate-500 space-y-2 z-10">
-            <div className="h-8 w-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-xs font-bold">กำลังเชื่อมต่อดาวเทียมแผนที่...</p>
-          </div>
-        )}
-      </div>
-
     </div>
   );
 };
