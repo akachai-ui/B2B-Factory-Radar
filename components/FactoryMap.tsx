@@ -664,6 +664,54 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
     <div className="relative w-full h-full min-h-[500px]">
       <div ref={mapContainerRef} className="w-full h-full min-h-[500px] z-0" />
 
+      {/* Floating Map Action Controls */}
+      <div className="absolute top-4 right-4 z-[400] flex flex-col gap-2">
+        {/* Recenter on User Location (หาจุดตัวเอง) */}
+        <button
+          type="button"
+          onClick={() => {
+            if (mapInstanceRef.current) {
+              mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 15, { animate: true });
+            }
+          }}
+          className="h-9 sm:h-10 px-3 bg-slate-900/95 hover:bg-slate-800 text-white rounded-2xl shadow-2xl border border-slate-700/90 backdrop-blur-md text-xs font-black flex items-center gap-1.5 transition active:scale-95 cursor-pointer group"
+          title="เลื่อนแผนที่ไปที่ตำแหน่งของคุณ (หาจุดตัวเอง)"
+        >
+          <Compass className="w-4 h-4 text-amber-400 group-hover:rotate-45 transition-transform" />
+          <span>หาจุดตัวเอง</span>
+        </button>
+
+        {/* Live GPS Toggle */}
+        <button
+          type="button"
+          onClick={onToggleLiveTracking}
+          className={`h-9 sm:h-10 px-3 rounded-2xl shadow-2xl border backdrop-blur-md text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer ${
+            isLiveTracking
+              ? 'bg-emerald-600 text-white border-emerald-400 shadow-emerald-500/25'
+              : 'bg-slate-900/95 hover:bg-slate-800 text-slate-200 border-slate-700/90'
+          }`}
+          title="เปิด/ปิด การติดตามพิกัด GPS สดจากรถ"
+        >
+          <Radio className={`w-4 h-4 ${isLiveTracking ? 'text-white animate-pulse' : 'text-emerald-400'}`} />
+          <span className="hidden sm:inline">{isLiveTracking ? 'GPS รถเปิดอยู่' : 'เปิด GPS'}</span>
+        </button>
+
+        {/* Reset View */}
+        <button
+          type="button"
+          onClick={() => {
+            if (mapInstanceRef.current) {
+              mapInstanceRef.current.setView([13.6062, 100.6974], 11, { animate: true });
+            }
+          }}
+          className="h-9 sm:h-10 px-3 bg-slate-900/95 hover:bg-slate-800 text-slate-300 hover:text-white rounded-2xl shadow-2xl border border-slate-700/90 backdrop-blur-md text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+          title="รีเซ็ตมุมมองแผนที่ครอบคลุม 6 อำเภอ"
+        >
+          <RotateCcw className="w-4 h-4 text-slate-400" />
+          <span className="hidden sm:inline">รีเซ็ต</span>
+        </button>
+      </div>
+
       {/* Copy Toast */}
       {copyToast && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white px-4 py-2 rounded-2xl shadow-2xl border border-slate-700 text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
