@@ -108,80 +108,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    // 2. Safe async Auth Initializer
-    const initAuth = async () => {
-      try {
-        if (typeof window !== 'undefined' && window.location.hash.includes('access_token=')) {
-          const hash = window.location.hash.substring(1);
-          const params = new URLSearchParams(hash);
-          const access_token = params.get('access_token');
-          const refresh_token = params.get('refresh_token');
-
-          if (access_token) {
-            const { data, error } = await supabase.auth.setSession({
-              access_token,
-              refresh_token: refresh_token || '',
-            });
-
-            if (data?.session?.user && isMounted) {
-              setUser(data.session.user);
-              if (window.history.replaceState) {
-                window.history.replaceState(null, '', window.location.pathname);
-              }
-              await fetchProfile(data.session.user.id, data.session.user.email || '', data.session.user.user_metadata);
-              setLoading(false);
-              return;
-            }
-          }
-        } else if (typeof window !== 'undefined' && window.location.search.includes('code=')) {
-          const params = new URLSearchParams(window.location.search);
-          const code = params.get('code');
-          if (code) {
-            const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-            if (data?.session?.user && isMounted) {
-              setUser(data.session.user);
-              if (window.history.replaceState) {
-                window.history.replaceState(null, '', window.location.pathname);
-              }
-              await fetchProfile(data.session.user.id, data.session.user.email || '', data.session.user.user_metadata);
-              setLoading(false);
-              return;
-            }
-          }
-        }
-
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (!isMounted) return;
-
-        if (error) {
-          await supabase.auth.signOut().catch(() => {});
-          setUser(null);
-          setProfile(null);
-        } else if (session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
-        }
-      } catch (err) {
-        console.warn('Auth init error:', err);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+    // 2. Initial check for existing session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!isMounted) return;
+      if (session?.user) {
+        setUser(session.user);
+        await fetchProfile(session.user.id, session.user.email || '', session.user.user_metadata);
       }
-    };
-
-    initAuth();
-
-    // 3. Safety fallback timer: guarantee loading never hangs permanently
-    const safetyTimer = setTimeout(() => {
-      if (isMounted) {
-        setLoading(false);
-      }
-    }, 3500);
+      setLoading(false);
+    });
 
     return () => {
       isMounted = false;
-      clearTimeout(safetyTimer);
       subscription.unsubscribe();
     };
   }, []);

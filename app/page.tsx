@@ -79,29 +79,12 @@ export default function HomePage() {
       } else if (urlError) {
         setAuthError(decodeURIComponent(urlError));
       }
-
-      // Check PKCE Code
-      const code = urlObj.searchParams.get('code');
-      if (code) {
-        supabase.auth.exchangeCodeForSession(code).then(({ data }) => {
-          if (data.session?.user) {
-            window.location.href = '/dashboard';
-          }
-        });
-      }
-
-      // Check session
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) {
-          window.location.href = '/dashboard';
-        }
-      });
     }
 
     if (user) {
-      window.location.href = '/dashboard';
+      router.replace('/dashboard');
     }
-  }, [user]);
+  }, [user, router]);
 
   const [leads, setLeads] = useState<FactoryLead[]>(INITIAL_LEADS);
 
