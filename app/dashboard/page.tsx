@@ -450,21 +450,6 @@ export default function DashboardPage() {
               </span>
             </button>
 
-            {/* Settings Button */}
-            <button
-              onClick={() => setIsCompanyModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-bold transition cursor-pointer group shadow-xs"
-              title="ตั้งค่าข้อมูลบริษัท / โปรไฟล์"
-            >
-              <Settings className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-45 transition-transform" />
-              <span>ตั้งค่า</span>
-              {profile?.company_name && (
-                <span className="hidden md:inline text-slate-400 font-normal border-l border-slate-700 pl-1.5 max-w-[120px] truncate">
-                  {profile.company_name}
-                </span>
-              )}
-            </button>
-
             <LanguageSwitcher />
 
             <UserMenu

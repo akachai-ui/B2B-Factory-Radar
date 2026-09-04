@@ -97,9 +97,19 @@ export const UserMenu: React.FC<UserMenuProps> = ({
             <p className="font-bold text-xs text-white truncate">{displayName}</p>
             <p className="text-[11px] text-slate-400 truncate mt-0.5">{user.email}</p>
             
-            <div className="mt-2.5 p-2 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-1">
-              <div className="text-[10px] text-amber-300 font-bold truncate">
-                🏢 {companyName}
+            <div
+              onClick={() => {
+                if (onOpenCompanyProfile) {
+                  setDropdownOpen(false);
+                  onOpenCompanyProfile();
+                }
+              }}
+              className="mt-2.5 p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-400/30 flex items-center justify-between gap-1.5 transition cursor-pointer group"
+              title="คลิกเพื่อตั้งค่าข้อมูลบริษัท"
+            >
+              <div className="text-[11px] text-amber-300 font-bold truncate group-hover:text-amber-200 flex items-center gap-1.5">
+                <span>🏢</span>
+                <span className="truncate">{companyName}</span>
               </div>
               <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[9px] font-black shrink-0">
                 PRO
@@ -114,7 +124,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({
                   setDropdownOpen(false);
                   onOpenCompanyProfile();
                 }}
-                className="w-full px-3 py-2 rounded-xl text-slate-200 hover:bg-slate-800 hover:text-white flex items-center gap-2 transition cursor-pointer text-left font-bold"
+                className="w-full px-3 py-2.5 rounded-xl text-slate-200 hover:bg-slate-800 hover:text-white flex items-center gap-2.5 transition cursor-pointer text-left font-bold"
               >
                 <Building2 className="w-4 h-4 text-amber-400" />
                 <span>ข้อมูลบริษัท & โปรไฟล์</span>
