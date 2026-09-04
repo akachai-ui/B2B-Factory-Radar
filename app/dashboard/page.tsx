@@ -83,7 +83,7 @@ export default function DashboardPage() {
   const [leads, setLeads] = useState<FactoryLead[]>(INITIAL_LEADS);
   const [isLoadingLeads, setIsLoadingLeads] = useState<boolean>(true);
 
-  // User Location (Default to Bang Phli, Samut Prakan)
+  // User Location with Live GPS auto-detection
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
@@ -95,6 +95,39 @@ export default function DashboardPage() {
     lng: 100.6974,
     label: 'ตำแหน่งเริ่มต้น: อ.บางพลี จ.สมุทรปราการ',
   });
+
+  // Auto-detect Live GPS immediately on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+      const savedGps = localStorage.getItem('routehunter_last_gps');
+      if (savedGps) {
+        try {
+          const parsed = JSON.parse(savedGps);
+          if (parsed.lat && parsed.lng) {
+            setUserLocation(parsed);
+          }
+        } catch (e) {}
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const liveLoc = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            label: '📍 พิกัดสดจาก GPS ของคุณ',
+            speed: pos.coords.speed,
+            accuracy: pos.coords.accuracy,
+          };
+          setUserLocation(liveLoc);
+          localStorage.setItem('routehunter_last_gps', JSON.stringify(liveLoc));
+        },
+        (err) => {
+          console.warn('Auto GPS detection error:', err);
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      );
+    }
+  }, []);
 
   const [isLiveTracking, setIsLiveTracking] = useState<boolean>(false);
   const [selectedDistrict, setSelectedDistrict] = useState<string>('ALL');
@@ -319,9 +352,13 @@ export default function DashboardPage() {
         if (!matchName && !matchRoad && !matchPhone && !matchDist) return false;
       }
 
-      // 2. District filter
-      if (selectedDistrict !== 'ALL' && lead.district !== selectedDistrict) {
-        return false;
+      // 2. District filter (Matches both "บางพลี" and "อำเภอบางพลี")
+      if (selectedDistrict !== 'ALL') {
+        const leadDist = (lead.district || '').replace('อำเภอ', '').replace('อ.', '').trim();
+        const targetDist = selectedDistrict.replace('อำเภอ', '').replace('อ.', '').trim();
+        if (leadDist !== targetDist && !lead.district?.includes(targetDist)) {
+          return false;
+        }
       }
 
       // 3. Status filter
@@ -640,6 +677,7 @@ export default function DashboardPage() {
                 routeLeadIds={routeLeadIds}
                 todayRoute={todayRoute}
                 onToggleRouteLead={handleToggleRouteLead}
+                onUpdateUserLocation={setUserLocation}
               />
             </div>
 

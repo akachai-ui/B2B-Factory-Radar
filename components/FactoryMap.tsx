@@ -53,6 +53,7 @@ interface FactoryMapProps {
   routeLeadIds?: string[];
   todayRoute?: FactoryLead[];
   onToggleRouteLead?: (lead: FactoryLead) => void;
+  onUpdateUserLocation?: (loc: any) => void;
 }
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -89,6 +90,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
   routeLeadIds = [],
   todayRoute = [],
   onToggleRouteLead,
+  onUpdateUserLocation,
 }) => {
   const { t } = useLanguage();
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -652,7 +654,7 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
 
         // Auto zoom/fit bounds on district filter change
         if (selectedDistrict && selectedDistrict !== 'ALL' && bounds.length > 1) {
-          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+          map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
         }
       }
     } catch (e) {
@@ -670,7 +672,30 @@ export const FactoryMap: React.FC<FactoryMapProps> = ({
         <button
           type="button"
           onClick={() => {
-            if (mapInstanceRef.current) {
+            if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+              navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                  const liveLoc = {
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude,
+                    label: '📍 พิกัดสดจาก GPS ของคุณ',
+                    accuracy: pos.coords.accuracy,
+                  };
+                  if (onUpdateUserLocation) {
+                    onUpdateUserLocation(liveLoc);
+                  }
+                  if (mapInstanceRef.current) {
+                    mapInstanceRef.current.setView([liveLoc.lat, liveLoc.lng], 16, { animate: true });
+                  }
+                },
+                () => {
+                  if (mapInstanceRef.current) {
+                    mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 15, { animate: true });
+                  }
+                },
+                { enableHighAccuracy: true }
+              );
+            } else if (mapInstanceRef.current) {
               mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 15, { animate: true });
             }
           }}
