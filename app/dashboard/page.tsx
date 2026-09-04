@@ -11,6 +11,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getLeadStatuses, saveLeadStatus } from '@/lib/leadStatusStorage';
 import { UserMenu } from '@/components/UserMenu';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { CompanyOnboardingModal } from '@/components/CompanyOnboardingModal';
+import { TeamManagementModal } from '@/components/TeamManagementModal';
 import {
   Layers,
   MapPin,
@@ -138,6 +140,8 @@ export default function DashboardPage() {
 
   // Today's Route State (List of selected factories in order)
   const [todayRoute, setTodayRoute] = useState<FactoryLead[]>([]);
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState<boolean>(false);
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState<boolean>(false);
   const [isRouteDrawerOpen, setIsRouteDrawerOpen] = useState<boolean>(true);
   const [copyToast, setCopyToast] = useState<string | null>(null);
   const [leadStatuses, setLeadStatuses] = useState<Record<string, { status: LeadStatus; note?: string }>>({});
@@ -433,6 +437,18 @@ export default function DashboardPage() {
           {/* Right Controls */}
           <div className="flex items-center gap-2.5">
             <button
+              onClick={() => setIsCompanyModalOpen(true)}
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-bold transition cursor-pointer group"
+              title="คลิกเพื่อตั้งชื่อหรือแก้ไขข้อมูลบริษัทของคุณ"
+            >
+              <Building2 className="w-3.5 h-3.5 text-amber-400" />
+              <span className="truncate max-w-[130px] font-bold text-white">
+                {profile?.company_name || '🏢 ตั้งชื่อบริษัทของคุณ'}
+              </span>
+              <span className="text-[10px] text-amber-400 font-bold group-hover:underline">✎ แก้ไข</span>
+            </button>
+
+            <button
               onClick={() => setIsRouteDrawerOpen(!isRouteDrawerOpen)}
               className={`px-3 py-1.5 rounded-xl border text-xs font-black transition flex items-center gap-1.5 cursor-pointer ${
                 todayRoute.length > 0
@@ -446,8 +462,14 @@ export default function DashboardPage() {
                 {todayRoute.length}
               </span>
             </button>
+
             <LanguageSwitcher />
-            <UserMenu onOpenAuth={() => {}} />
+
+            <UserMenu
+              onOpenAuth={() => {}}
+              onOpenCompanyProfile={() => setIsCompanyModalOpen(true)}
+              onOpenTeamManagement={() => setIsTeamModalOpen(true)}
+            />
           </div>
 
         </div>
@@ -847,6 +869,18 @@ export default function DashboardPage() {
         )}
 
       </div>
+
+      {/* Company Profile Modal */}
+      <CompanyOnboardingModal
+        isOpen={isCompanyModalOpen}
+        onClose={() => setIsCompanyModalOpen(false)}
+      />
+
+      {/* Team Management Modal */}
+      <TeamManagementModal
+        isOpen={isTeamModalOpen}
+        onClose={() => setIsTeamModalOpen(false)}
+      />
 
     </div>
   );
