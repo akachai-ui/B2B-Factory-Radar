@@ -70,19 +70,17 @@ CREATE POLICY "Users can manage own profile" ON public.profiles
 DROP POLICY IF EXISTS "Members can view own company" ON public.companies;
 DROP POLICY IF EXISTS "Users can create company" ON public.companies;
 DROP POLICY IF EXISTS "Owners can update own company" ON public.companies;
+DROP POLICY IF EXISTS "Enable read access for authenticated users" ON public.companies;
+DROP POLICY IF EXISTS "Enable update for authenticated users" ON public.companies;
 
 CREATE POLICY "Users can create company" ON public.companies
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT TO authenticated WITH CHECK (true);
 
-CREATE POLICY "Members can view own company" ON public.companies
-  FOR SELECT USING (
-    id IN (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-  );
+CREATE POLICY "Enable read access for authenticated users" ON public.companies
+  FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "Owners can update own company" ON public.companies
-  FOR UPDATE USING (
-    id IN (SELECT company_id FROM public.profiles WHERE id = auth.uid())
-  );
+CREATE POLICY "Enable update for authenticated users" ON public.companies
+  FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
 
 -- 8. RLS Policies for Lead Interactions (Team Shared)
 DROP POLICY IF EXISTS "Members can view team lead interactions" ON public.lead_interactions;

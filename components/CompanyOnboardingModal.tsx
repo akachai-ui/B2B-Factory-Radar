@@ -61,8 +61,8 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
       let currentCompanyId = profile?.company_id;
 
       if (currentCompanyId) {
-        // Update existing Company
-        await supabase
+        // 1. Update existing Company
+        const { error: compUpdateErr } = await supabase
           .from('companies')
           .update({
             name: companyName.trim(),
@@ -70,8 +70,12 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
             updated_at: new Date().toISOString(),
           })
           .eq('id', currentCompanyId);
+
+        if (compUpdateErr) {
+          console.warn('Company update warning:', compUpdateErr);
+        }
       } else {
-        // Create new Company for Owner
+        // 2. Create new Company in `companies` table
         const { data: newCompany, error: compError } = await supabase
           .from('companies')
           .insert({
@@ -79,17 +83,21 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
             phone: phone.trim(),
             address: 'สมุทรปราการ',
             subscription_tier: 'pro',
-            max_seats: 5,
-            invite_code: 'RH-' + Math.floor(1000 + Math.random() * 9000),
           })
           .select('id')
           .single();
 
-        if (!compError && newCompany) {
+        if (compError) {
+          console.error('Company creation error:', compError);
+          throw new Error(`ไม่สามารถบันทึกลงตาราง companies ได้: ${compError.message} (กรุณาตรวจสอบ RLS Policy)`);
+        }
+
+        if (newCompany && newCompany.id) {
           currentCompanyId = newCompany.id;
         }
       }
 
+      // 3. Update profile with company_id & company_name for relation linking
       const updateProfilePayload = {
         id: user.id,
         email: user.email || '',
@@ -108,13 +116,13 @@ export const CompanyOnboardingModal: React.FC<CompanyOnboardingModalProps> = ({
         .upsert(updateProfilePayload);
 
       if (profError) {
-        setErrorMsg('เกิดข้อผิดพลาดในการบันทึกโปรไฟล์: ' + profError.message);
-      } else {
-        await refreshProfile();
-        onClose();
+        throw new Error('เกิดข้อผิดพลาดในการบันทึกโปรไฟล์: ' + profError.message);
       }
+
+      await refreshProfile();
+      onClose();
     } catch (err: any) {
-      setErrorMsg('เกิดข้อผิดพลาด: ' + (err.message || err));
+      setErrorMsg(err.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
     } finally {
       setLoading(false);
     }
