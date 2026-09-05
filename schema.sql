@@ -37,14 +37,17 @@ CREATE POLICY "Allow public read access on leads"
   TO anon, authenticated 
   USING (true);
 
--- 3. Table: profiles (ตารางเก็บข้อมูลโปรไฟล์ผู้ใช้และชื่อบริษัท White-label)
+-- 3. Table: profiles (ตารางเก็บข้อมูลโปรไฟล์ผู้ใช้ แยกบุคคลธรรมดา หรือ บริษัท)
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL,
   full_name TEXT,
+  account_type TEXT DEFAULT 'individual', -- 'individual' (บุคคลธรรมดา) หรือ 'company' (นิติบุคคล/บริษัท)
   company_name TEXT DEFAULT 'บริษัทของฉัน',
+  tax_id TEXT,                            -- เลขผู้เสียภาษี 13 หลัก
+  branch TEXT DEFAULT 'สำนักงานใหญ่',      -- สำนักงานใหญ่ หรือ สาขา
   phone TEXT,
-  role TEXT DEFAULT 'owner', -- 'owner', 'manager', 'sales'
+  role TEXT DEFAULT 'owner',             -- 'owner', 'manager', 'sales'
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );

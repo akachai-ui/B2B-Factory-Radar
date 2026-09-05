@@ -18,6 +18,8 @@ import {
   AlertCircle,
   Sparkles,
   Zap,
+  User,
+  ShieldCheck,
 } from 'lucide-react';
 
 export default function LeadsDatabasePage() {
@@ -104,7 +106,8 @@ export default function LeadsDatabasePage() {
     });
   }, [leads, selectedDistrict, searchQuery]);
 
-  const companyName = profile?.company_name || 'บริษัทของฉัน';
+  const isCompany = profile?.account_type === 'company';
+  const displayCompanyName = profile?.company_name || 'บริษัทของฉัน';
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'ผู้ใช้งาน';
 
   return (
@@ -118,29 +121,60 @@ export default function LeadsDatabasePage() {
         
         {/* User Status Welcome Banner (When Logged In) */}
         {user ? (
-          <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-slate-900 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+          <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
             <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-black text-xl shrink-0 border border-amber-500/40">
-                ✓
+              <div className={`h-12 w-12 rounded-2xl flex items-center justify-center font-black text-xl shrink-0 border ${
+                isCompany
+                  ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+                  : 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40'
+              }`}>
+                {isCompany ? '🏢' : '👤'}
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-base sm:text-lg font-black text-white">
                     ยินดีต้อนรับ, {displayName}
                   </h2>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/30">
-                    ONLINE
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
+                    isCompany
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                      : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+                  }`}>
+                    {isCompany ? '🏢 บัญชีนิติบุคคล / บริษัท' : '👤 บัญชีบุคคลธรรมดา'}
                   </span>
                 </div>
-                <p className="text-xs text-amber-300/90 mt-0.5 flex items-center gap-1.5 font-medium">
-                  <Building2 className="w-3.5 h-3.5 text-amber-400" />
-                  <span>สังกัดองค์กร: <strong>{companyName}</strong></span>
-                </p>
+                <div className="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-3">
+                  {isCompany ? (
+                    <>
+                      <span className="text-amber-300 font-bold flex items-center gap-1">
+                        <Building2 className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{displayCompanyName}</span>
+                      </span>
+                      {profile?.branch && (
+                        <span className="text-slate-500 text-[11px]">• สาขา: {profile.branch}</span>
+                      )}
+                      {profile?.tax_id && (
+                        <span className="text-slate-500 text-[11px] font-mono">• เลขผู้เสียภาษี: {profile.tax_id}</span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-cyan-300/90 font-medium flex items-center gap-1">
+                      <User className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>โหมดผู้ใช้งานเดี่ยว (Solo / Freelance)</span>
+                    </span>
+                  )}
+                  {profile?.phone && (
+                    <span className="text-slate-400 text-[11px] font-mono flex items-center gap-1">
+                      <Phone className="w-3 h-3 text-slate-500" />
+                      <span>{profile.phone}</span>
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 self-end sm:self-center">
-              <span className="text-xs text-slate-400">บัญชี: {user.email}</span>
+            <div className="flex items-center gap-2 self-end sm:self-center text-[11px] text-slate-500 font-mono">
+              <span>{user.email}</span>
             </div>
           </div>
         ) : (
@@ -151,10 +185,10 @@ export default function LeadsDatabasePage() {
                 <span>B2B Factory Radar • Phase 1</span>
               </div>
               <h2 className="text-base sm:text-xl font-black text-white">
-                เข้าสู่ระบบเพื่อปลดล็อกฟังก์ชันวางแผนรูทและข้อมูลเชิงลึก
+                เข้าสู่ระบบเพื่อปลดล็อกฟังก์ชันวางแผนรูทและโปรไฟล์ธุรกิจ
               </h2>
               <p className="text-xs text-slate-400">
-                รองรับการ Login 1-Click ด้วย Google หรือ Email/Password
+                รองรับทั้งบุคคลธรรมดา และนิติบุคคล/บริษัท พร้อมหัวรายงาน White-label
               </p>
             </div>
 

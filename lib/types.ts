@@ -61,17 +61,16 @@ export interface UserProfile {
   id: string;
   email: string;
   full_name: string;
+  account_type?: 'individual' | 'company';
+  company_name?: string | null;
+  tax_id?: string | null;
+  branch?: string | null;
   phone?: string | null;
   role: UserRole;
   company_id?: string | null;
-  company_name?: string | null;
   company?: Company | null;
   company_address?: string | null;
   company_phone?: string | null;
-  company_lat?: number;
-  company_lng?: number;
-  company_radius_km?: number;
-  subscription_tier?: string;
   created_at?: string;
   updated_at?: string;
 }
