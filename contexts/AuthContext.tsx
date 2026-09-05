@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { UserProfile } from '@/lib/types';
@@ -26,63 +26,101 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch or ensure profile row exists in public.profiles
-  const fetchProfile = async (currentUser: User) => {
+  // Fetch live profile from public.profiles in Supabase
+  const fetchLiveProfile = useCallback(async (currentUser: User) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', currentUser.id)
-        .single();
+        .maybeSingle();
 
       if (data && !error) {
         setProfile(data as UserProfile);
-      } else {
-        const fallbackProfile = {
+      } else if (!data) {
+        // If profile row doesn't exist yet, insert a clean default
+        const newProfile: Partial<UserProfile> = {
           id: currentUser.id,
           email: currentUser.email || '',
           full_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'ผู้ใช้งาน',
-          company_name: 'บริษัทของฉัน',
+          account_type: 'individual',
+          company_name: null,
           role: 'owner',
         };
         const { data: inserted } = await supabase
           .from('profiles')
-          .insert([fallbackProfile])
+          .insert([newProfile])
           .select()
-          .single();
+          .maybeSingle();
         if (inserted) {
           setProfile(inserted as UserProfile);
         }
       }
     } catch (e) {
-      console.warn('Profile fetch warning:', e);
+      console.warn('Profile sync warning:', e);
     }
-  };
+  }, []);
 
+  // Stale-While-Revalidate: Server Validation on App Load
   useEffect(() => {
     let mounted = true;
 
-    // 1. Initial Session Check
-    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      if (!mounted) return;
-      setSession(initialSession);
-      setUser(initialSession?.user ?? null);
-      if (initialSession?.user) {
-        fetchProfile(initialSession.user);
-      }
-      setLoading(false);
-    });
+    async function initAuth() {
+      try {
+        // 1. Instant Cache Render (0s)
+        const { data: { session: cachedSession } } = await supabase.auth.getSession();
+        if (mounted && cachedSession?.user) {
+          setSession(cachedSession);
+          setUser(cachedSession.user);
+        }
 
-    // 2. Auth State Change Listener
+        // 2. Background Revalidate against Server
+        const { data: { user: serverUser }, error: serverError } = await supabase.auth.getUser();
+
+        if (!mounted) return;
+
+        if (serverError || !serverUser) {
+          // If User was deleted on the server or token is invalid -> Force Logout
+          if (cachedSession) {
+            console.warn('User invalidated on server -> Logging out');
+            await supabase.auth.signOut();
+          }
+          setUser(null);
+          setSession(null);
+          setProfile(null);
+        } else {
+          // User is valid on server -> sync profile live from DB
+          setUser(serverUser);
+          await fetchLiveProfile(serverUser);
+        }
+      } catch (err) {
+        console.error('Auth initialization error:', err);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    initAuth();
+
+    // 3. Auth State Change Listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       if (!mounted) return;
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
 
-      if (currentSession?.user) {
-        await fetchProfile(currentSession.user);
-      } else {
+      if (event === 'SIGNED_OUT' || !currentSession?.user) {
+        setUser(null);
+        setSession(null);
         setProfile(null);
+        setLoading(false);
+        return;
+      }
+
+      setSession(currentSession);
+      setUser(currentSession.user);
+
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        await fetchLiveProfile(currentSession.user);
       }
       setLoading(false);
     });
@@ -91,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchLiveProfile]);
 
   // 1-Click Google Login with Dynamic Origin
   const signInWithGoogle = async () => {
@@ -120,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     if (data?.user) {
       setUser(data.user);
-      await fetchProfile(data.user);
+      await fetchLiveProfile(data.user);
     }
     return { error };
   };
@@ -138,7 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     if (data?.user) {
       setUser(data.user);
-      await fetchProfile(data.user);
+      await fetchLiveProfile(data.user);
     }
     return { error };
   };
@@ -153,7 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   };
 
-  // Update Profile (company name, full name, phone)
+  // Update Profile
   const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!user) return { error: 'No authenticated user' };
     try {
@@ -178,7 +216,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshProfile = async () => {
     if (user) {
-      await fetchProfile(user);
+      await fetchLiveProfile(user);
     }
   };
 
