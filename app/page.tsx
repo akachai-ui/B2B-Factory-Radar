@@ -67,7 +67,7 @@ export default function LeadsRadarPage() {
 
   // Trigger Onboarding for First-Time Users
   useEffect(() => {
-    if (user && profile && profile.onboarded !== true && !profile.account_type) {
+    if (user && profile && profile.onboarded !== true) {
       setIsOnboardingOpen(true);
     } else {
       setIsOnboardingOpen(false);

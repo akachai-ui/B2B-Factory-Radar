@@ -45,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           full_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'ผู้ใช้งาน',
           account_type: 'individual',
           company_name: null,
+          onboarded: false,
           role: 'owner',
         };
         const { data: inserted } = await supabase
