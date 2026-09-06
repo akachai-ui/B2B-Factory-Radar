@@ -66,6 +66,7 @@ export interface UserProfile {
   tax_id?: string | null;
   branch?: string | null;
   phone?: string | null;
+  onboarded?: boolean;
   role: UserRole;
   company_id?: string | null;
   company?: Company | null;

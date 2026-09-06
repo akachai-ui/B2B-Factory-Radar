@@ -7,13 +7,13 @@ import { FactoryLead } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navbar } from '@/components/Navbar';
 import { AuthModal } from '@/components/AuthModal';
+import { IdentityOnboardingModal } from '@/components/IdentityOnboardingModal';
 import {
   Search,
   MapPin,
   Phone,
   Building2,
   ExternalLink,
-  RefreshCw,
   Sparkles,
   Zap,
   User,
@@ -21,7 +21,6 @@ import {
   Layers,
   ListFilter,
   Navigation,
-  CheckCircle2,
 } from 'lucide-react';
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -64,6 +63,16 @@ export default function LeadsRadarPage() {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+
+  // Trigger Onboarding for First-Time Users
+  useEffect(() => {
+    if (user && profile && profile.onboarded !== true && !profile.account_type) {
+      setIsOnboardingOpen(true);
+    } else {
+      setIsOnboardingOpen(false);
+    }
+  }, [user, profile]);
 
   // Live GPS User Location State
   const [userLocation, setUserLocation] = useState<{
@@ -240,6 +249,9 @@ export default function LeadsRadarPage() {
                 <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
                   <MapPin className="w-3 h-3 text-cyan-400" />
                   <span>{userLocation.label}</span>
+                  {profile?.phone && (
+                    <span className="text-slate-500 font-mono ml-2">• โทร: {profile.phone}</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -504,6 +516,12 @@ export default function LeadsRadarPage() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         initialMode={authModalMode}
+      />
+
+      {/* 7. Identity Onboarding Modal (First-time Identity Choice) */}
+      <IdentityOnboardingModal
+        isOpen={isOnboardingOpen}
+        onComplete={() => setIsOnboardingOpen(false)}
       />
 
     </div>

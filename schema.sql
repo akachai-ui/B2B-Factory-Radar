@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   tax_id TEXT,                            -- เลขผู้เสียภาษี 13 หลัก
   branch TEXT DEFAULT 'สำนักงานใหญ่',      -- สำนักงานใหญ่ หรือ สาขา
   phone TEXT,
+  onboarded BOOLEAN DEFAULT FALSE,       -- สถานะการยืนยันตัวตนครั้งแรก
   role TEXT DEFAULT 'owner',             -- 'owner', 'manager', 'sales'
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL

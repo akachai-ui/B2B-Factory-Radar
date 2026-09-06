@@ -61,9 +61,9 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
     await updateProfile({
       account_type: accountType,
       full_name: fullName.trim() || displayName,
-      company_name: accountType === 'company' ? (companyName.trim() || 'บริษัทของฉัน') : null,
-      tax_id: accountType === 'company' ? taxId.trim() : null,
-      branch: accountType === 'company' ? branch.trim() : null,
+      company_name: accountType === 'company' ? (companyName.trim() || 'บริษัทของฉัน') : (profile?.company_name || null),
+      tax_id: accountType === 'company' ? taxId.trim() : (profile?.tax_id || null),
+      branch: accountType === 'company' ? branch.trim() : (profile?.branch || 'สำนักงานใหญ่'),
       phone: phone.trim(),
     });
 
