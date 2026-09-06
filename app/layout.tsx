@@ -26,6 +26,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
       </head>
       <body className="min-h-full flex flex-col bg-[#070b14] text-slate-100 antialiased font-sans">
         <AuthProvider>
@@ -33,7 +35,11 @@ export default function RootLayout({
         </AuthProvider>
         <Script
           src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-          strategy="lazyOnload"
+          strategy="beforeInteractive"
+        />
+        <Script
+          src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"
+          strategy="beforeInteractive"
         />
       </body>
     </html>
