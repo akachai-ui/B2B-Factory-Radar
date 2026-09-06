@@ -56,12 +56,14 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- RLS for profiles
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
+-- Allow reading profiles (for Team / Multi-tenant Directory / Dev Overview)
 DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
-CREATE POLICY "Users can view own profile"
+DROP POLICY IF EXISTS "Allow read access to profiles" ON public.profiles;
+CREATE POLICY "Allow read access to profiles"
   ON public.profiles
   FOR SELECT
-  TO authenticated
-  USING (auth.uid() = id);
+  TO authenticated, anon
+  USING (true);
 
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile"

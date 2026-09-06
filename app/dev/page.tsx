@@ -47,21 +47,27 @@ export default function DevOverviewPage() {
   const [districtBreakdown, setDistrictBreakdown] = useState<Record<string, number>>({});
   const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
   const [searchProfileQuery, setSearchProfileQuery] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'profiles' | 'database' | 'raw'>('overview');
+  const [activeTab, setActiveTab] = useState<'profiles' | 'overview' | 'database' | 'raw'>('profiles');
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
 
   // Fetch Database Overview
   const fetchOverviewData = async () => {
     setIsLoadingData(true);
     try {
-      // 1. Fetch All Profiles
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (profilesData && !profilesError) {
-        setAllProfiles(profilesData as UserProfile[]);
+      // 1. Fetch All Profiles from API (Bypassing client RLS)
+      try {
+        const res = await fetch('/api/dev/profiles', { cache: 'no-store' });
+        const json = await res.json();
+        if (json.success && json.profiles) {
+          setAllProfiles(json.profiles as UserProfile[]);
+        } else {
+          // Fallback direct supabase query
+          const { data: pData } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+          if (pData) setAllProfiles(pData as UserProfile[]);
+        }
+      } catch (e) {
+        const { data: pData } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+        if (pData) setAllProfiles(pData as UserProfile[]);
       }
 
       // 2. Fetch Leads Count & District Breakdown
