@@ -11,7 +11,7 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModalProps) {
-  const { signInWithGoogle, signInWithPassword, signUpWithPassword } = useAuth();
+  const { signInWithGoogle, signInWithFacebook, signInWithPassword, signUpWithPassword } = useAuth();
   
   const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
   const [email, setEmail] = useState('');
@@ -20,6 +20,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
   
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isFacebookLoading, setIsFacebookLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -34,10 +35,24 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
         setErrorMsg(error.message);
         setIsGoogleLoading(false);
       }
-      // If successful, Supabase redirects to Google, so we stay in loading
     } catch (err: any) {
       setErrorMsg(err.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ Google');
       setIsGoogleLoading(false);
+    }
+  };
+
+  const handleFacebookSignIn = async () => {
+    setErrorMsg(null);
+    setIsFacebookLoading(true);
+    try {
+      const { error } = await signInWithFacebook();
+      if (error) {
+        setErrorMsg(error.message);
+        setIsFacebookLoading(false);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ Facebook');
+      setIsFacebookLoading(false);
     }
   };
 
@@ -131,12 +146,13 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
           </div>
         )}
 
-        {/* 1. Google 1-Click Sign In */}
-        <div>
+        {/* 1. OAuth 1-Click Sign In (Google & Facebook) */}
+        <div className="space-y-2.5">
+          {/* Google Button */}
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            disabled={isGoogleLoading || isLoading}
+            disabled={isGoogleLoading || isFacebookLoading || isLoading}
             className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-slate-100 active:scale-[0.98] text-slate-900 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-3 shadow-lg shadow-white/5 cursor-pointer disabled:opacity-60"
           >
             {isGoogleLoading ? (
@@ -162,6 +178,23 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
               </svg>
             )}
             <span>เข้าสู่ระบบด้วย Google</span>
+          </button>
+
+          {/* Facebook Button */}
+          <button
+            type="button"
+            onClick={handleFacebookSignIn}
+            disabled={isGoogleLoading || isFacebookLoading || isLoading}
+            className="w-full py-3 px-4 rounded-2xl bg-[#1877F2] hover:bg-[#166fe5] active:scale-[0.98] text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-3 shadow-lg shadow-[#1877F2]/20 cursor-pointer disabled:opacity-60"
+          >
+            {isFacebookLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
+            ) : (
+              <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            )}
+            <span>เข้าสู่ระบบด้วย Facebook</span>
           </button>
         </div>
 

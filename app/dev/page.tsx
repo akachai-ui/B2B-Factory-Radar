@@ -166,7 +166,7 @@ export default function DevOverviewPage() {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans">
       
       {/* 1. App Top Navigation */}
-      <Navbar onOpenAuth={(mode) => { setAuthModalMode(mode); setIsAuthModalOpen(true); }} />
+      <Navbar onOpenAuth={(mode = 'signin') => { setAuthModalMode(mode); setIsAuthModalOpen(true); }} />
 
       {/* 2. Dev Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
