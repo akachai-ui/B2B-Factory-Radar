@@ -518,13 +518,14 @@ export default function DevOverviewPage() {
                     <th className="py-3.5 px-4">ข้อมูลบริษัท (Company Data)</th>
                     <th className="py-3.5 px-4">เบอร์โทร</th>
                     <th className="py-3.5 px-4">onboarded</th>
+                    <th className="py-3.5 px-4">company_id</th>
                     <th className="py-3.5 px-4">User ID (UUID)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 font-mono">
                   {filteredProfiles.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="p-8 text-center text-slate-500">
+                      <td colSpan={8} className="p-8 text-center text-slate-500">
                         {isLoadingData ? 'กำลังโหลดข้อมูลโปรไฟล์...' : 'ไม่พบข้อมูลโปรไฟล์'}
                       </td>
                     </tr>
@@ -533,7 +534,12 @@ export default function DevOverviewPage() {
                       <tr key={p.id || idx} className="hover:bg-slate-800/40 transition">
                         <td className="py-3 px-4 text-center text-slate-500">{idx + 1}</td>
                         <td className="py-3 px-4 font-sans font-bold text-white">
-                          <div>{p.full_name || '-'}</div>
+                          <div className="flex items-center gap-1.5">
+                            <span>{p.full_name || '-'}</span>
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                              {p.role || 'owner'}
+                            </span>
+                          </div>
                           <div className="text-[11px] font-mono text-cyan-400 font-normal">{p.email}</div>
                         </td>
                         <td className="py-3 px-4">
@@ -565,7 +571,10 @@ export default function DevOverviewPage() {
                             {p.onboarded ? '✓ TRUE' : '✕ FALSE'}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-[10px] text-slate-500 truncate max-w-[120px]">
+                        <td className="py-3 px-4 text-[10px] font-mono text-amber-400/90 truncate max-w-[100px]">
+                          {p.company_id ? p.company_id : <span className="text-slate-600">NULL (Solo)</span>}
+                        </td>
+                        <td className="py-3 px-4 text-[10px] text-slate-500 truncate max-w-[100px]">
                           {p.id}
                         </td>
                       </tr>

@@ -37,18 +37,41 @@ CREATE POLICY "Allow public read access on leads"
   TO anon, authenticated 
   USING (true);
 
--- 3. Table: profiles (ตารางเก็บข้อมูลโปรไฟล์ผู้ใช้ แยกบุคคลธรรมดา หรือ บริษัท)
+-- 3. Table: companies (ตารางข้อมูลบริษัทแม่)
+CREATE TABLE IF NOT EXISTS public.companies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  tax_id TEXT,
+  branch TEXT DEFAULT 'สำนักงานใหญ่',
+  phone TEXT,
+  address TEXT,
+  owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- RLS for companies
+ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow read access to companies" ON public.companies;
+CREATE POLICY "Allow read access to companies"
+  ON public.companies
+  FOR SELECT
+  TO authenticated, anon
+  USING (true);
+
+-- 4. Table: profiles (ตารางเก็บข้อมูลโปรไฟล์ผู้ใช้ เชื่อมโยง company_id)
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL,
   full_name TEXT,
-  account_type TEXT DEFAULT 'individual', -- 'individual' (บุคคลธรรมดา) หรือ 'company' (นิติบุคคล/บริษัท)
+  account_type TEXT DEFAULT 'individual', -- 'individual' หรือ 'company'
   company_name TEXT DEFAULT 'บริษัทของฉัน',
   tax_id TEXT,                            -- เลขผู้เสียภาษี 13 หลัก
   branch TEXT DEFAULT 'สำนักงานใหญ่',      -- สำนักงานใหญ่ หรือ สาขา
   phone TEXT,
   onboarded BOOLEAN DEFAULT FALSE,       -- สถานะการยืนยันตัวตนครั้งแรก
   role TEXT DEFAULT 'owner',             -- 'owner', 'manager', 'sales'
+  company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL, -- รหัสอ้างอิงสังกัดบริษัท
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
