@@ -1,71 +1,63 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { FactoryLead } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navbar } from '@/components/Navbar';
 import { AuthModal } from '@/components/AuthModal';
 import { IdentityOnboardingModal } from '@/components/IdentityOnboardingModal';
+import { UserProfile } from '@/lib/types';
 import {
-  Search,
-  MapPin,
-  Phone,
+  Users,
+  UserPlus,
+  ShieldCheck,
   Building2,
-  ExternalLink,
+  User,
+  UserCheck,
+  Mail,
+  Phone,
+  Hash,
   Sparkles,
   Zap,
-  User,
-  SlidersHorizontal,
-  Layers,
-  ListFilter,
-  Navigation,
-  Globe,
+  Trash2,
   CheckCircle2,
+  AlertCircle,
+  Copy,
+  Check,
+  RefreshCw,
+  Crown,
+  Briefcase,
+  Layers,
+  ArrowRight,
+  Send,
+  PlusCircle,
+  Clock,
+  Shield,
+  KeyRound,
+  FileSpreadsheet,
 } from 'lucide-react';
 
-function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-// Dynamically import Leaflet Map (SSR Disabled)
-const FactoryMap = dynamic(
-  () => import('@/components/FactoryMap').then((mod) => mod.FactoryMap),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-[540px] sm:h-[640px] rounded-3xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-slate-400 space-y-3">
-        <div className="h-10 w-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-xs font-bold text-slate-300">กำลังโหลดแผนที่เรดาร์โรงงานสมุทรปราการ...</p>
-      </div>
-    ),
-  }
-);
-
-export default function LeadsRadarMainPage() {
-  const { user, profile } = useAuth();
-  
-  const [leads, setLeads] = useState<FactoryLead[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('ALL');
-  const [selectedRadius, setSelectedRadius] = useState<string>('ALL');
-  const [activeTab, setActiveTab] = useState<'map' | 'table'>('map');
+export default function TeamManagementPage() {
+  const { user, profile, loading: authLoading, updateProfile } = useAuth();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+
+  // Team Data States
+  const [teamMembers, setTeamMembers] = useState<UserProfile[]>([]);
+  const [isLoadingTeam, setIsLoadingTeam] = useState<boolean>(true);
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [copiedLink, setCopiedLink] = useState<boolean>(false);
+
+  // Add Member Form
+  const [newEmail, setNewEmail] = useState('');
+  const [newFullName, setNewFullName] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newRole, setNewRole] = useState<'sales' | 'manager'>('sales');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Trigger Onboarding for First-Time Users
   useEffect(() => {
@@ -76,460 +68,474 @@ export default function LeadsRadarMainPage() {
     }
   }, [user, profile]);
 
-  // Live GPS User Location State (Default: Samut Prakan Center)
-  const [userLocation, setUserLocation] = useState<{
-    lat: number;
-    lng: number;
-    label: string;
-    speed?: number | null;
-    accuracy?: number | null;
-  }>({
-    lat: 13.6062,
-    lng: 100.6974,
-    label: 'พิกัดเริ่มต้น: จ.สมุทรปราการ',
-  });
-
-  const [isLiveTracking, setIsLiveTracking] = useState<boolean>(true);
-  const watchIdRef = useRef<number | null>(null);
-
-  // Auto-detect GPS Location
-  useEffect(() => {
-    if (typeof window === 'undefined' || !navigator.geolocation) return;
-
-    if (isLiveTracking) {
-      watchIdRef.current = navigator.geolocation.watchPosition(
-        (pos) => {
-          setUserLocation({
-            lat: Number(pos.coords.latitude.toFixed(6)),
-            lng: Number(pos.coords.longitude.toFixed(6)),
-            label: '📍 พิกัดสดจาก GPS ของคุณ',
-            speed: pos.coords.speed,
-            accuracy: pos.coords.accuracy,
-          });
-        },
-        (err) => {
-          console.warn('Live GPS watch error:', err.message);
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
-      );
-    } else if (watchIdRef.current !== null) {
-      navigator.geolocation.clearWatch(watchIdRef.current);
-      watchIdRef.current = null;
-    }
-
-    return () => {
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-      }
-    };
-  }, [isLiveTracking]);
-
-  const toggleLiveTracking = () => {
-    setIsLiveTracking((prev) => !prev);
-  };
-
-  const handleOpenAuth = (mode: 'signin' | 'signup' = 'signin') => {
-    setAuthModalMode(mode);
-    setIsAuthModalOpen(true);
-  };
-
-  // Fetch Live Leads from Supabase
-  const fetchLeads = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('leads')
-        .select('*')
-        .order('id', { ascending: true });
-
-      if (data && !error) {
-        setLeads(data as FactoryLead[]);
-      }
-    } catch (err) {
-      console.warn('Fetch leads error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLeads();
-  }, []);
-
-  // District breakdown calculation
-  const districtCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    leads.forEach((lead) => {
-      const d = (lead.district || 'ไม่ระบุ').replace('อำเภอ', '').replace('อ.', '').trim();
-      counts[d] = (counts[d] || 0) + 1;
-    });
-    return counts;
-  }, [leads]);
-
-  const districts = ['บางพลี', 'เมืองสมุทรปราการ', 'พระประแดง', 'พระสมุทรเจดีย์', 'บางบ่อ', 'บางเสาธง'];
-
-  // Filtered Leads
-  const filteredLeads = useMemo(() => {
-    const results = leads.filter((lead) => {
-      if (!lead.lat || !lead.lng) return false;
-
-      // 1. District filter
-      if (selectedDistrict !== 'ALL') {
-        const d = (lead.district || '').replace('อำเภอ', '').replace('อ.', '').trim();
-        if (d !== selectedDistrict && !lead.district?.includes(selectedDistrict)) {
-          return false;
-        }
-      }
-
-      // 2. Radius filter (Distance from User GPS)
-      if (selectedRadius !== 'ALL') {
-        const radKm = parseFloat(selectedRadius);
-        const dist = calculateDistanceKm(userLocation.lat, userLocation.lng, lead.lat, lead.lng);
-        if (dist > radKm) return false;
-      }
-
-      // 3. Search query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matchName = lead.name?.toLowerCase().includes(q);
-        const matchCompany = lead.company_name?.toLowerCase().includes(q);
-        const matchAddress = lead.address?.toLowerCase().includes(q);
-        const matchRoad = lead.road?.toLowerCase().includes(q);
-        const matchSub = lead.subdistrict?.toLowerCase().includes(q);
-        const matchPhone = lead.phone?.includes(q);
-        if (!matchName && !matchCompany && !matchAddress && !matchRoad && !matchSub && !matchPhone) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    // Sort by distance from user GPS
-    return results.sort((a, b) => {
-      const distA = calculateDistanceKm(userLocation.lat, userLocation.lng, a.lat, a.lng);
-      const distB = calculateDistanceKm(userLocation.lat, userLocation.lng, b.lat, b.lng);
-      return distA - distB;
-    });
-  }, [leads, selectedDistrict, selectedRadius, searchQuery, userLocation]);
-
+  // Current Company / Team ID (If user is owner, use their own id or existing company_id)
+  const effectiveCompanyId = profile?.company_id || profile?.id || user?.id;
   const isCompany = profile?.account_type === 'company';
-  const displayCompanyName = profile?.company_name || 'บริษัทของฉัน';
-  const displayName = profile?.full_name || user?.email?.split('@')[0] || 'ผู้ใช้งาน';
+  const isOwner = !profile?.role || profile?.role === 'owner';
+  const displayTeamName = isCompany ? (profile?.company_name || 'บริษัทของฉัน') : `ทีมของ ${profile?.full_name || 'ฉัน'}`;
+
+  // Fetch Team Members
+  const fetchTeam = async () => {
+    if (!effectiveCompanyId) return;
+    setIsLoadingTeam(true);
+    try {
+      const res = await fetch(`/api/team?companyId=${effectiveCompanyId}`, { cache: 'no-store' });
+      const json = await res.json();
+      if (json.success && json.members) {
+        setTeamMembers(json.members as UserProfile[]);
+      } else {
+        // Fallback: direct query
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .or(`company_id.eq.${effectiveCompanyId},id.eq.${effectiveCompanyId}`)
+          .order('created_at', { ascending: true });
+        if (data) setTeamMembers(data as UserProfile[]);
+      }
+    } catch (err: any) {
+      console.warn('Fetch team error:', err);
+    } finally {
+      setIsLoadingTeam(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user && profile) {
+      fetchTeam();
+    }
+  }, [user, profile, effectiveCompanyId]);
+
+  // Handle Add Member to Team
+  const handleAddMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmail.trim()) {
+      setFeedback({ type: 'error', text: 'กรุณากรอกอีเมลของสมาชิก' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setFeedback(null);
+
+    try {
+      const res = await fetch('/api/team', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: newEmail.trim(),
+          fullName: newFullName.trim() || newEmail.split('@')[0],
+          phone: newPhone.trim() || null,
+          role: newRole,
+          companyId: effectiveCompanyId,
+          companyName: profile?.company_name || displayTeamName,
+          taxId: profile?.tax_id || null,
+          branch: profile?.branch || 'สำนักงานใหญ่',
+        }),
+      });
+
+      const json = await res.json();
+
+      if (json.success) {
+        setFeedback({ type: 'success', text: json.message || 'เพิ่มสมาชิกเข้าสู่ทีมสำเร็จ!' });
+        setNewEmail('');
+        setNewFullName('');
+        setNewPhone('');
+        setIsAddModalOpen(false);
+        await fetchTeam();
+      } else {
+        setFeedback({ type: 'error', text: json.error || 'ไม่สามารถเพิ่มสมาชิกได้' });
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', text: err.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle Remove Member from Team
+  const handleRemoveMember = async (memberId: string, memberName: string) => {
+    if (!confirm(`คุณต้องการนำ "${memberName}" ออกจากทีมใช่หรือไม่?`)) return;
+
+    try {
+      const res = await fetch(`/api/team?memberId=${memberId}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (json.success) {
+        setFeedback({ type: 'success', text: `นำ ${memberName} ออกจากทีมเรียบร้อย` });
+        await fetchTeam();
+      } else {
+        setFeedback({ type: 'error', text: json.error || 'ไม่สามารถลบสมาชิกได้' });
+      }
+    } catch (err: any) {
+      setFeedback({ type: 'error', text: err.message });
+    }
+  };
+
+  // Copy Invite Link
+  const handleCopyInviteLink = () => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const link = `${origin}/auth/callback?team_id=${effectiveCompanyId}`;
+    navigator.clipboard.writeText(link);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2500);
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#070b14] text-slate-100 selection:bg-amber-500 selection:text-slate-950 font-sans">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans">
       
-      {/* 1. App Shell Navbar */}
-      <Navbar onOpenAuth={handleOpenAuth} />
+      {/* 1. App Top Navigation */}
+      <Navbar onOpenAuth={(mode = 'signin') => { setAuthModalMode(mode); setIsAuthModalOpen(true); }} />
 
-      {/* 2. Main Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
-        
-        {/* User Status Welcome Banner (When Logged In) */}
-        {user ? (
-          <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
-            <div className="flex items-center gap-3.5">
-              <div className={`h-11 w-11 rounded-2xl flex items-center justify-center font-black text-lg shrink-0 border ${
-                isCompany
-                  ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
-                  : 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40'
-              }`}>
-                {isCompany ? '🏢' : '👤'}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm sm:text-base font-black text-white">
-                    ยินดีต้อนรับ, {displayName}
-                  </h2>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
-                    isCompany
-                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                      : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
-                  }`}>
-                    {isCompany ? `🏢 ${displayCompanyName}` : '👤 บัญชีบุคคลธรรมดา'}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
-                  <MapPin className="w-3 h-3 text-cyan-400" />
-                  <span>{userLocation.label}</span>
-                  {profile?.phone && (
-                    <span className="text-slate-500 font-mono ml-2">• โทร: {profile.phone}</span>
-                  )}
-                </p>
-              </div>
-            </div>
+      {/* 2. Main Team Workspace */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
 
-            <div className="flex items-center gap-2 self-end sm:self-center text-xs text-slate-400 font-mono">
-              <span className="hidden sm:inline">บัญชี:</span>
-              <span className="text-slate-300">{user.email}</span>
+        {/* Feedback Alert */}
+        {feedback && (
+          <div className={`p-4 rounded-2xl border flex items-center justify-between transition animate-in fade-in duration-200 ${
+            feedback.type === 'success' 
+              ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-200' 
+              : 'bg-rose-950/60 border-rose-500/40 text-rose-200'
+          }`}>
+            <div className="flex items-center gap-2.5 text-xs font-bold">
+              {feedback.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertCircle className="w-4 h-4 text-rose-400" />}
+              <span>{feedback.text}</span>
             </div>
-          </div>
-        ) : (
-          <div className="p-4 sm:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
-            <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 text-xs font-bold">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Samut Prakan Factory Radar</span>
-              </div>
-              <h2 className="text-base sm:text-xl font-black text-white">
-                เรดาร์ค้นหา 989 โรงงานอุตสาหกรรม จ.สมุทรปราการ
-              </h2>
-              <p className="text-xs text-slate-400">
-                เข้าถึงพิกัด GPS โรงงาน, เบอร์โทร, เว็บไซต์ และเส้นทางนำทางครอบคลุม 6 อำเภอ
-              </p>
-            </div>
-
-            <button
-              onClick={() => handleOpenAuth('signin')}
-              className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 cursor-pointer self-start sm:self-center shrink-0 active:scale-95 flex items-center gap-1.5"
-            >
-              <Zap className="w-4 h-4 text-slate-950" />
-              <span>เข้าสู่ระบบเพื่อใช้งานเต็มรูปแบบ</span>
-            </button>
+            <button onClick={() => setFeedback(null)} className="text-slate-400 hover:text-white text-xs">✕</button>
           </div>
         )}
 
-        {/* 3. District Breakdown Filter Buttons */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2">
-          <button
-            onClick={() => setSelectedDistrict('ALL')}
-            className={`p-3 rounded-2xl border text-left transition cursor-pointer ${
-              selectedDistrict === 'ALL'
-                ? 'bg-amber-500/10 border-amber-500/60 text-amber-300 shadow-lg shadow-amber-500/10'
-                : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
-            }`}
-          >
-            <div className="text-[10px] font-medium text-slate-400">ทุกอำเภอ</div>
-            <div className="text-base sm:text-lg font-black text-white mt-0.5">{leads.length}</div>
-          </button>
-
-          {districts.map((d) => (
-            <button
-              key={d}
-              onClick={() => setSelectedDistrict(d)}
-              className={`p-3 rounded-2xl border text-left transition cursor-pointer ${
-                selectedDistrict === d
-                  ? 'bg-amber-500/10 border-amber-500/60 text-amber-300 shadow-lg shadow-amber-500/10'
-                  : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
-              }`}
-            >
-              <div className="text-[10px] font-medium text-slate-400 truncate">อ.{d}</div>
-              <div className="text-base sm:text-lg font-black text-white mt-0.5">
-                {districtCounts[d] || 0}
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* 4. Filter & View Switcher Bar */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-lg flex flex-wrap items-center justify-between gap-3">
-          
-          {/* Search Input */}
-          <div className="relative flex-1 min-w-[200px] sm:min-w-[280px]">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="ค้นหาชื่อโรงงาน, ถนน, ตำบล หรือเบอร์โทร..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400 transition font-medium"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-
-          {/* Controls: Radius & View Toggle */}
-          <div className="flex items-center gap-2 shrink-0">
-            
-            {/* Radius Filter */}
-            <div className="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5">
-              <SlidersHorizontal className="w-3.5 h-3.5 text-cyan-400" />
-              <select
-                value={selectedRadius}
-                onChange={(e) => setSelectedRadius(e.target.value)}
-                className="bg-transparent text-xs text-slate-200 outline-none cursor-pointer font-medium pr-1"
-              >
-                <option value="ALL">รัศมี: ทั้งหมด</option>
-                <option value="5">รัศมี 5 กม.</option>
-                <option value="10">รัศมี 10 กม.</option>
-                <option value="15">รัศมี 15 กม.</option>
-                <option value="25">รัศมี 25 กม.</option>
-              </select>
+        {/* User Not Logged In */}
+        {!user ? (
+          <div className="p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-center space-y-5 shadow-2xl">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+              <Users className="w-8 h-8" />
             </div>
-
-            {/* View Switcher Tabs (Map vs Table) */}
-            <div className="flex items-center p-1 rounded-xl bg-slate-950 border border-slate-800">
+            <div className="space-y-1.5">
+              <h2 className="text-xl font-black text-white">เข้าสู่ระบบเพื่อจัดการทีมและเพิ่มสมาชิก</h2>
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
+                รองรับการเพิ่มทีมงานขาย (Sales Reps), มอบหมายงาน, และแชร์ข้อมูลโรงงานร่วมกัน
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-3 pt-2">
               <button
-                onClick={() => setActiveTab('map')}
-                className={`py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                  activeTab === 'map'
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
-                    : 'text-slate-400 hover:text-white'
-                }`}
+                onClick={() => { setAuthModalMode('signin'); setIsAuthModalOpen(true); }}
+                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 cursor-pointer active:scale-95 flex items-center gap-2"
               >
-                <Layers className="w-3.5 h-3.5" />
-                <span>แผนที่</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('table')}
-                className={`py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                  activeTab === 'table'
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <ListFilter className="w-3.5 h-3.5" />
-                <span>ตาราง</span>
+                <Zap className="w-4 h-4" />
+                <span>เข้าสู่ระบบตอนนี้</span>
               </button>
             </div>
-
-            {/* Results Count Badge */}
-            <div className="hidden sm:inline-flex text-xs text-slate-400 px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl font-medium">
-              พบ <strong className="text-amber-400 font-bold ml-1 mr-1">{filteredLeads.length}</strong> แห่ง
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* 5. Main Content: Map Radar View OR Table View */}
-        {activeTab === 'map' ? (
-          <div className="space-y-3">
-            <FactoryMap
-              leads={filteredLeads}
-              userLocation={userLocation}
-              isLiveTracking={isLiveTracking}
-              onToggleLiveTracking={toggleLiveTracking}
-              selectedDistrict={selectedDistrict}
-              onDistrictSelect={(d) => setSelectedDistrict(d)}
-              selectedRadius={selectedRadius}
-            />
           </div>
         ) : (
-          /* Table View */
-          isLoading ? (
-            <div className="p-12 rounded-3xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-slate-400 space-y-3">
-              <div className="h-8 w-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-xs font-bold text-slate-300">กำลังดึงข้อมูลโรงงานจาก Supabase...</p>
-            </div>
-          ) : filteredLeads.length === 0 ? (
-            <div className="p-12 rounded-3xl bg-slate-900 border border-slate-800 text-center text-slate-500">
-              <p className="text-sm font-bold text-slate-400">ไม่พบข้อมูลโรงงานที่ตรงกับเงื่อนไข</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-800 bg-slate-900 text-slate-400 font-bold">
-                    <th className="py-3.5 px-4 w-12 text-center">#</th>
-                    <th className="py-3.5 px-4">ชื่อโรงงาน / บริษัท</th>
-                    <th className="py-3.5 px-4">ที่อยู่ / ถนน</th>
-                    <th className="py-3.5 px-4">อำเภอ</th>
-                    <th className="py-3.5 px-4">เบอร์โทร</th>
-                    <th className="py-3.5 px-4">เว็บไซต์</th>
-                    <th className="py-3.5 px-4">การนำทาง</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60">
-                  {filteredLeads.slice(0, 50).map((lead, idx) => {
-                    const distKm = calculateDistanceKm(
-                      userLocation.lat,
-                      userLocation.lng,
-                      lead.lat,
-                      lead.lng
-                    ).toFixed(1);
+          /* Logged In Team Console */
+          <div className="space-y-6">
+            
+            {/* Team Header Banner */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 shadow-2xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className={`p-4 rounded-2xl ${
+                    isCompany ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                  }`}>
+                    {isCompany ? <Building2 className="w-8 h-8" /> : <Users className="w-8 h-8" />}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-xl sm:text-2xl font-black text-white">
+                        {displayTeamName}
+                      </h1>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-black border ${
+                        isCompany ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                      }`}>
+                        {isCompany ? '🏢 นิติบุคคล / บริษัท' : '👤 บุคคลธรรมดา / Solo Team'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 flex items-center gap-2">
+                      <span>หัวหน้าทีม: <strong>{profile?.full_name || user.email}</strong></span>
+                      <span>•</span>
+                      <span className="font-mono text-cyan-400">สมาชิกในทีม: {teamMembers.length} คน</span>
+                    </p>
+                  </div>
+                </div>
 
-                    return (
-                      <tr key={lead.id || idx} className="hover:bg-slate-800/40 transition">
-                        <td className="py-3 px-4 text-center font-mono text-slate-500">{idx + 1}</td>
-                        <td className="py-3 px-4 font-bold text-white">
-                          <div>{lead.name}</div>
-                          {lead.company_name && lead.company_name !== lead.name && (
-                            <div className="text-[11px] text-slate-400 font-normal">{lead.company_name}</div>
-                          )}
-                          <div className="text-[10px] text-cyan-400 font-mono mt-0.5">
-                            📍 ห่างจากคุณ ~{distKm} กม.
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-slate-300">
-                          {lead.address || lead.road || '-'}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 font-medium text-[11px] border border-slate-700">
-                            {lead.district || '-'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 font-mono text-slate-300">
-                          {lead.phone ? (
-                            <a
-                              href={`tel:${lead.phone}`}
-                              className="text-amber-400 hover:underline flex items-center gap-1"
-                            >
-                              <Phone className="w-3 h-3" />
-                              <span>{lead.phone}</span>
-                            </a>
-                          ) : (
-                            <span className="text-slate-600">-</span>
-                          )}
-                        </td>
-                        <td className="py-3 px-4">
-                          {lead.website ? (
-                            <a
-                              href={lead.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-cyan-400 hover:underline flex items-center gap-1 max-w-[140px] truncate"
-                            >
-                              <ExternalLink className="w-3 h-3 shrink-0" />
-                              <span className="truncate">{lead.website.replace(/^https?:\/\//, '')}</span>
-                            </a>
-                          ) : (
-                            <span className="text-slate-600">-</span>
-                          )}
-                        </td>
-                        <td className="py-3 px-4">
-                          <a
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${lead.lat},${lead.lng}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold border border-slate-700 flex items-center gap-1 transition w-fit"
-                          >
-                            <Navigation className="w-3 h-3 text-amber-400" />
-                            <span>นำทาง</span>
-                          </a>
+                {/* Team Actions */}
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <button
+                    onClick={handleCopyInviteLink}
+                    className="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition border border-slate-700 cursor-pointer flex items-center gap-2 shadow-sm"
+                  >
+                    {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
+                    <span>{copiedLink ? 'คัดลอกลิงก์แล้ว!' : 'คัดลอกลิงก์เชิญทีม'}</span>
+                  </button>
+
+                  <button
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 cursor-pointer active:scale-95 flex items-center gap-2"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>+ เพิ่มสมาชิกใหม่</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+                <div className="text-slate-400 text-xs font-medium flex items-center justify-between">
+                  <span>จำนวนสมาชิกทั้งหมด</span>
+                  <Users className="w-4 h-4 text-cyan-400" />
+                </div>
+                <div className="text-2xl font-black text-white">{teamMembers.length} คน</div>
+                <div className="text-[10px] text-slate-500">รวมหัวหน้าทีมและลูกทีม</div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+                <div className="text-slate-400 text-xs font-medium flex items-center justify-between">
+                  <span>ผู้บริหาร / หัวหน้าทีม (Owner)</span>
+                  <Crown className="w-4 h-4 text-amber-400" />
+                </div>
+                <div className="text-2xl font-black text-amber-300">
+                  {teamMembers.filter((m) => !m.role || m.role === 'owner').length} คน
+                </div>
+                <div className="text-[10px] text-slate-500">สิทธิ์ดูแลระบบและดูรายงาน</div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+                <div className="text-slate-400 text-xs font-medium flex items-center justify-between">
+                  <span>ทีมเซลส์ / พนักงานขาย (Sales)</span>
+                  <Briefcase className="w-4 h-4 text-emerald-400" />
+                </div>
+                <div className="text-2xl font-black text-emerald-400">
+                  {teamMembers.filter((m) => m.role === 'sales').length} คน
+                </div>
+                <div className="text-[10px] text-slate-500">สิทธิ์เข้าพบลูกค้าและวางรูท</div>
+              </div>
+            </div>
+
+            {/* Team Members List Card */}
+            <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-sm font-black text-white">รายชื่อสมาชิกและสิทธิ์ในทีม (Team Members & Roles)</h3>
+                </div>
+                <button
+                  onClick={fetchTeam}
+                  disabled={isLoadingTeam}
+                  className="p-1.5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isLoadingTeam ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+
+              {/* Members Table */}
+              <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-800 bg-slate-950 text-slate-400 font-bold">
+                      <th className="py-3.5 px-4 w-12 text-center">#</th>
+                      <th className="py-3.5 px-4">ชื่อสมาชิก</th>
+                      <th className="py-3.5 px-4">อีเมล (Login Account)</th>
+                      <th className="py-3.5 px-4">เบอร์โทรศัพท์</th>
+                      <th className="py-3.5 px-4">บทบาท / สิทธิ์ (Role)</th>
+                      <th className="py-3.5 px-4">สถานะ</th>
+                      <th className="py-3.5 px-4 text-center">การจัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {teamMembers.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="p-8 text-center text-slate-500">
+                          {isLoadingTeam ? 'กำลังโหลดข้อมูลสมาชิก...' : 'ยังไม่มีสมาชิกในทีม (กด "+ เพิ่มสมาชิกใหม่" เพื่อเพิ่มลูกทีม)'}
                         </td>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              {filteredLeads.length > 50 && (
-                <div className="p-3 text-center text-xs text-slate-500 border-t border-slate-800 bg-slate-900/80">
-                  แสดง 50 รายการแรก จากทั้งหมด {filteredLeads.length} โรงงาน
-                </div>
-              )}
+                    ) : (
+                      teamMembers.map((member, idx) => {
+                        const isThisUser = member.id === user.id || member.email === user.email;
+                        const isMemberOwner = !member.role || member.role === 'owner';
+
+                        return (
+                          <tr key={member.id || idx} className="hover:bg-slate-800/40 transition">
+                            <td className="py-3.5 px-4 text-center font-mono text-slate-500">{idx + 1}</td>
+                            <td className="py-3.5 px-4 font-bold text-white">
+                              <div className="flex items-center gap-2">
+                                <div className="w-7 h-7 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xs">
+                                  {isMemberOwner ? '👑' : '💼'}
+                                </div>
+                                <div>
+                                  <span>{member.full_name || 'สมาชิกในทีม'}</span>
+                                  {isThisUser && (
+                                    <span className="ml-2 text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold">
+                                      (ตัวคุณ)
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-4 font-mono text-cyan-400">
+                              {member.email}
+                            </td>
+                            <td className="py-3.5 px-4 text-slate-300 font-mono">
+                              {member.phone || '-'}
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-black border flex items-center gap-1 w-fit ${
+                                isMemberOwner
+                                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                                  : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                              }`}>
+                                {isMemberOwner ? <Crown className="w-3 h-3" /> : <Briefcase className="w-3 h-3" />}
+                                <span>{isMemberOwner ? 'Owner (หัวหน้าทีม)' : 'Sales (ทีมเซลส์)'}</span>
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                <span>พร้อมใช้งาน</span>
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              {!isThisUser && !isMemberOwner ? (
+                                <button
+                                  onClick={() => handleRemoveMember(member.id, member.full_name || member.email)}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 transition cursor-pointer"
+                                  title="นำออกจากทีม"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              ) : (
+                                <span className="text-slate-600 text-[10px]">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
             </div>
-          )
+
+          </div>
         )}
 
       </main>
 
-      {/* 6. Auth Modal */}
+      {/* 3. Add Member Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+          <div
+            onClick={() => setIsAddModalOpen(false)}
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm animate-in fade-in"
+          />
+          <div className="relative z-10 max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">เพิ่มสมาชิกเข้าสู่ทีม</h3>
+                  <p className="text-xs text-slate-400">ระบุอีเมลของลูกทีมเพื่อดึงเข้าสังกัด</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                className="text-slate-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAddMember} className="space-y-3.5">
+              {/* Email */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-300">อีเมลสมาชิก (Login Email) *</label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="เช่น sales1@company.com"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition"
+                  />
+                </div>
+              </div>
+
+              {/* Full Name */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-300">ชื่อ - นามสกุล หรือ ชื่อเซลส์</label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={newFullName}
+                    onChange={(e) => setNewFullName(e.target.value)}
+                    placeholder="เช่น สมศักดิ์ การขาย"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition"
+                  />
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-300">เบอร์โทรศัพท์</label>
+                <div className="relative">
+                  <Phone className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="tel"
+                    value={newPhone}
+                    onChange={(e) => setNewPhone(e.target.value)}
+                    placeholder="เช่น 081-234-5678"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition"
+                  />
+                </div>
+              </div>
+
+              {/* Role */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-300">สิทธิ์การใช้งาน (Role)</label>
+                <select
+                  value={newRole}
+                  onChange={(e: any) => setNewRole(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-amber-400 transition font-medium"
+                >
+                  <option value="sales">💼 Sales (ทีมเซลส์ - วางรูทวิ่งและส่งรายงาน)</option>
+                  <option value="manager">👔 Manager (ผู้จัดการ - ดูแลทีมและมอบหมายงาน)</option>
+                </select>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-xs font-black transition shadow-lg shadow-amber-500/20 active:scale-95 disabled:opacity-50"
+                >
+                  {isSubmitting ? 'กำลังบันทึก...' : 'เพิ่มเข้าสู่ทีม'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 4. Universal Auth Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         initialMode={authModalMode}
       />
 
-      {/* 7. Identity Onboarding Modal (First-time Identity Choice) */}
+      {/* 5. First-Time Identity Onboarding Modal */}
       <IdentityOnboardingModal
         isOpen={isOnboardingOpen}
         onComplete={() => setIsOnboardingOpen(false)}
