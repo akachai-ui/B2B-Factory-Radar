@@ -1,76 +1,82 @@
-# 📋 สรุปผลการปฏิบัติงานประจำวัน (Daily Work Summary)
-**วันที่:** 3 กันยายน 2026  
-**โปรเจกต์:** RouteHunter (B2B Factory Radar & Sales Automation Platform)  
-**Production URL:** [https://b2bfactoryradar.vercel.app](https://b2bfactoryradar.vercel.app)  
-**Repository:** `akachai-ui/B2B-Factory-Radar` (Branch: `main`)  
+# สรุปผลการพัฒนาระบบ RouteHunter (B2B Factory Radar) ประจำวัน
+
+**วันที่บันทึก:** 5 กันยายน 2026  
+**สถานะโปรเจกต์:** ใช้งานได้จริง 100% ทั้งบน Localhost (`http://localhost:3000`) และ Production (`https://b2bfactoryradar.vercel.app`)  
+**Repository:** `akachai-ui/B2B-Factory-Radar` (Branch: `main`)
 
 ---
 
-## 🌟 1. ภาพรวมความสำเร็จของงานในวันนี้ (Executive Summary)
-วันนี้ได้ทำการพัฒนา ปรับปรุงคุณภาพข้อมูล ออกแบบประสบการณ์ผู้ใช้ (UX) และเชื่อมต่อฐานข้อมูลระบบจริงแบบครบวงจร โดยมีไฮไลท์สำคัญดังนี้:
+## 🎯 1. ภารกิจหลักที่ทำสำเร็จในวันนี้
 
-1. **Clean & Prune Leads Dataset (100% สมุทรปราการ):** คัดกรองและลบโรงงานนอกจังหวัดสมุทรปราการออกทั้งหมด คงเหลือเฉพาะโรงงานที่มีพิกัดประตูทางเข้าจริง **989 โรงงานคุณภาพ** ใน 6 อำเภอ
-2. **เชื่อมต่อ Live Supabase Database:** ปรับให้ระบบหน้าเว็บและเรดาร์แผนที่ดึงข้อมูลสดจากตาราง `leads` บน Supabase โดยตรงแบบ Real-time
-3. **ปรับแต่งข้อความการตลาด (B2B Copywriting):** อัปเกรดข้อความโปรโมทเป็น **"ครอบคลุม 6 อำเภอ 990+ โรงงาน"** ครบทั้ง 3 ภาษา (ไทย 🇹🇭 / อังกฤษ 🇬🇧 / จีน 🇨🇳)
-4. **ออกแบบ UX แบบไร้แรงเสียดทาน (Zero-Friction Onboarding):** ล็อกอินแล้วพาเข้าใช้งานได้ทันที ไม่เด้งป๊อปอัปบังคับกรอกข้อมูลขวางทาง โดยตั้งชื่อบริษัทเริ่มต้นให้อัตโนมัติจากชื่อผู้ใช้
-5. **ปรับหน้า Dashboard สำหรับช่วงพัฒนา:** แสดงการแจ้งเตือนสถานะ *"อยู่ระหว่างพัฒนา (Under Development)"* พร้อมการ์ดสรุปข้อมูลโปรไฟล์ผู้ใช้งาน และปุ่มลัดกลับสู่หน้าแผนที่เรดาร์
+### 1.1 Clean Slate Reset (ล้างระบบเดิมเป็น 0 เพื่อเริ่มใหม่อย่างมีมาตรฐาน)
+* ลบคอมโพเนนต์เก่า, Modal ซ้ำซ้อน, และโค้ดที่ไม่จำเป็นออกทั้งหมดกว่า 4,500 บรรทัด
+* เหลือเฉพาะฐานข้อมูล **`leads` (โรงงานสมุทรปราการ 989 แห่ง)** และการเชื่อมต่อ Supabase
+* จัดการโครงสร้างโค้ดใหม่ให้สะอาด เป็นระเบียบ และรองรับการขยายตัว
 
----
+### 1.2 Step 1: ระบบ Authentication สากล & การจัดการโปรไฟล์ผู้ใช้
+* **Universal Google OAuth & Email/Password**:
+  * รองรับ 1-Click Google Sign-In ด้วย Dynamic Origin (`window.location.origin/auth/callback`) ใช้งานได้ทันทีทั้ง Localhost และ Production โดยไม่ต้องแก้ URL ซ้ำซ้อน
+  * ดักรับ Callback ด้วย `/auth/callback` รองรับทั้ง PKCE Code Exchange และ Token Hash
+* **มาตรฐานระดับโลก Stale-While-Revalidate & Server Validation**:
+  * โหลด UI ทันทีใน 0 วินาทีจาก Local Cache
+  * ตรวจสอบสิทธิ์จริงกับ Supabase ในเบื้องหลัง หาก User ถูกลบ/แบนจากฐานข้อมูล ระบบจะสั่ง Logout เคลียร์เครื่องทันทีอย่างปลอดภัย
+* **การแยกประเภทบัญชี (Multi-tenant Account Types)**:
+  * 👤 **บุคคลธรรมดา (Individual)**: สำหรับเซลส์เดี่ยว/ฟรีแลนซ์ ใช้งานคนเดียวแบบคลีน
+  * 🏢 **นิติบุคคล / บริษัท (Company)**: รองรับการกรอกชื่อบริษัท (White-label), เลขประจำตัวผู้เสียภาษี 13 หลัก, และสาขา สำหรับนำไปแสดงบนหัวรายงาน
+* **ตารางและ Trigger ใน Supabase**:
+  * สร้างตาราง `public.profiles` พร้อม Database Trigger `handle_new_user` สร้างโปรไฟล์ให้อัตโนมัติทันทีที่ล็อกอิน
 
-## 🏢 2. สรุปฐานข้อมูลโรงงาน (Database & Geography Breakdown)
-
-ฐานข้อมูลโรงงานฉีดพลาสติกและแม่พิมพ์อุตสาหกรรมในสมุทรปราการ **989 แห่ง** ครอบคลุม 6 อำเภอ:
-
-| ลำดับ | อำเภอในจังหวัดสมุทรปราการ | จำนวนโรงงาน (แห่ง) | โซนนิคม / ถนนสายสำคัญ |
-| :---: | :--- | :---: | :--- |
-| **1** | **อำเภอบางพลี** | **326** | กิ่งแก้ว, เทพารักษ์, บางพลีใหญ่, ราชาเทวะ |
-| **2** | **อำเภอเมืองสมุทรปราการ** | **276** | นิคมอุตสาหกรรมบางปู, แพรกษา, ท้ายบ้าน |
-| **3** | **อำเภอพระประแดง** | **112** | สุขสวัสดิ์, ปู่เจ้าสมิงพราย, สำโรงใต้, บางพึ่ง |
-| **4** | **อำเภอพระสมุทรเจดีย์** | **111** | แหลมฟ้าผ่า, ปากคลองบางปลากด, ในคลองบางปลากด |
-| **5** | **อำเภอบางบ่อ** | **83** | บางบ่อ, บางเพรียง, คลองด่าน |
-| **6** | **อำเภอบางเสาธง** | **81** | นิคมอุตสาหกรรมบางพลี, บางเสาธง, ศีรษะจรเข้ |
-| **รวม** | **จ.สมุทรปราการ 100%** | **989 แห่ง** | **ครอบคลุมทุกนิคมอุตสาหกรรม** |
-
----
-
-## 🎯 3. สรุปการปรับปรุงด้าน UX & การตลาด (UX & Marketing)
-
-### 3.1 หน้าแรก Landing Page (High-Value Masked Teaser)
-* ผู้ใช้ทั่วไป (Guest) สามารถเลื่อนดูหมุดทั้ง **989 แห่ง** บนแผนที่ได้อิสระ
-* แสดงชื่อโรงงาน, ป้ายยืนยันพิกัดประตูทางเข้า (100% Gate GPS), ระยะทางสดจากรถ (`🚗 ห่างจากคุณ 3.2 km`), และเบอร์โทรแบบมาสก์ (`02-740-XXXX`)
-* **ไม่มีการเด้งป๊อปอัปขวางกวนใจ** เมื่อกดหมุดหรือเปิดดูการ์ด
-
-### 3.2 การตลาด 3 ภาษา (TH / EN / ZH)
-* **ภาษาไทย:** `ครอบคลุม 6 อำเภอ 990+ โรงงานเป้าหมาย` / `ศูนย์บัญชาการพิกัดโรงงาน 6 อำเภอ 990+ แห่ง`
-* **English:** `990+ Factory Leads Across 6 Districts` / `990+ Factory Radar Command Center`
-* **中文:** `覆盖6大行政区 990+ 注塑工厂线索库` / `覆盖6大行政区 990+ 家工厂雷达控制中心`
+### 1.3 Step 2: แผนที่เรดาร์โรงงานสมุทรปราการ (Samut Prakan Factory Radar Map)
+* **Interactive Leaflet Map**:
+  * แสดงหมุดโรงงานอุตสาหกรรมทั้ง **989 แห่ง** จาก Supabase อย่างลื่นไหล พร้อมระบบ Marker Cluster จัดกลุ่ม
+  * **เส้นขอบเขต 6 อำเภอ (GeoJSON Polygons)**: แสดงและไฮไลต์สีทองตามอำเภอที่เลือก (*บางพลี 326, เมืองสมุทรปราการ 276, พระประแดง 111, พระสมุทรเจดีย์ 109, บางบ่อ 85, บางเสาธง 82 แห่ง*)
+* **Live GPS & รัศมีระยะทาง**:
+  * ตรวจจับพิกัด GPS สดของผู้ใช้ พร้อมแสดงหมุดเรืองแสงแบบเรียลไทม์
+  * คำนวณระยะทาง (กม.) ถึงแต่ละโรงงานแบบอัตโนมัติ
+  * วาดวงกลมรัศมีรอบตัวตามตัวกรอง (5 กม., 10 กม., 15 กม., 25 กม.)
+* **Smart Factory Card & Tools**:
+  * คลิกดูรายละเอียดโรงงาน, เบอร์โทร (กดโทรออกได้ทันที), ลิงก์เว็บไซต์ และปุ่มเปิดนำทางด้วย Google Maps
+  * ปุ่มลัดซูมหาตำแหน่งฉัน, ภาพรวมทั้งจังหวัด, สลับโหมดแผนที่มืด/สว่าง
+  * ตัวสลับมุมมอง: 🗺️ แผนที่เรดาร์ (Map View) vs 📋 ตารางรายการ (Table View)
 
 ---
 
-## 🛠️ 4. สรุปหน้า Dashboard (Under Development Mode)
-เมื่อผู้ใช้งานเข้าสู่ระบบ (Sign In / Sign Up):
-1. ระบบจะพาเข้าสู่หน้า `/dashboard` ทันที
-2. แสดงแบนเนอร์แจ้งเตือน:
-   * ⏳ `ระบบแดชบอร์ดเต็มรูปแบบ อยู่ระหว่างพัฒนา (Under Development)`
-   * 🚀 `ระบบศูนย์บัญชาการติดตามงานขายระดับทีม (CRM & Pipeline Dashboard) กำลังอยู่ระหว่างขั้นตอนการพัฒนาขั้นสุดท้าย`
-3. แสดงการ์ดสรุปข้อมูลโปรไฟล์:
-   * 👤 **ชื่อผู้ใช้งาน:** ดึงจาก Metadata ของผู้ใช้
-   * 📧 **อีเมล:** อีเมลที่ล็อกอิน
-   * 🏢 **บริษัท / ทีม:** ตั้งชื่อเริ่มต้นให้ เช่น `บริษัทของคุณ [ชื่อผู้ใช้]`
-4. มีปุ่มลัด **`[ 🧭 ดูเรดาร์แผนที่โรงงาน 989 แห่ง (หน้าแรก) ]`** และ **`[ 🚪 ออกจากระบบ ]`**
+## 🏗️ 2. โครงสร้างไฟล์และสถาปัตยกรรมปัจจุบัน
+
+```
+├── app/
+│   ├── auth/callback/page.tsx      # Universal OAuth Callback Handler
+│   ├── globals.css                 # Tailwind CSS styles
+│   ├── layout.tsx                  # RootLayout with AuthProvider & Leaflet Scripts
+│   └── page.tsx                    # Main App Shell & Radar Workspace
+├── components/
+│   ├── AuthModal.tsx               # Login / Register Modal (Google + Email)
+│   ├── FactoryMap.tsx              # High-performance Leaflet Radar Map
+│   └── Navbar.tsx                  # Header with Profile & Account Type Modal
+├── contexts/
+│   └── AuthContext.tsx             # Stale-While-Revalidate Auth Provider
+├── lib/
+│   ├── geojson/                    # Samut Prakan District & Sub-district boundaries
+│   ├── initialData.ts              # 989 Factory Leads fallback cache
+│   ├── supabase.ts                 # Supabase client instance
+│   └── types.ts                    # TypeScript types (FactoryLead, UserProfile, etc.)
+└── schema.sql                      # Database migration schema for Supabase
+```
 
 ---
 
-## 🔧 5. การแก้ไขปัญหาทางเทคนิคและเสถียรภาพ (Technical Fixes)
-1. **Supabase Profiles Schema:** รองรับฟิลด์ `role`, `company_name`, `phone`, `pdpa_consent` แบบครบถ้วน
-2. **Safe LocalStorage Parser:** เพิ่ม Safe JSON Parsing ใน `lib/leadStatusStorage.ts` และ `lib/portfolioStorage.ts` ป้องกันหน้าเว็บ Crash
-3. **Leaflet MarkerCluster Auto-Loader:** ปรับให้โหลดสคริปต์แผนที่อัตโนมัติแบบคู่ขนาน ไม่ค้างที่หน้าหมุนโหลด
-4. **OAuth URL Hash Sanitizer:** ทำความสะอาด URL เมื่อล็อกอินผ่าน OAuth ให้เรียบเนียน ไม่ค้าง Token ในแถบ Address Bar
-5. **Next.js Production Build:** ตรวจสอบ Typecheck และผ่านการ Build ระดับ Production 100% ไร้ Error
+## 🚀 3. แผนการพัฒนาในครั้งถัดไป (Next Session Roadmap)
+
+1. **Step 3: Sales Route Planner (ระบบจัดรูทวิ่งเซลส์ & AI TSP Optimizer)**
+   * ปุ่มกด `+ เพิ่มเข้าทริปวันนี้` ในแต่ละโรงงาน
+   * คำนวณระยะทางรวมทั้งหมด (กม.) และเวลาขับรถโดยประมาณ
+   * ปุ่ม AI จัดเรียงลำดับจุดแวะที่ประหยัดเวลาที่สุด (TSP Nearest-Neighbor)
+   * 1-Click เปิดนำทาง Google Maps แบบ Multi-Stop ทุกจุดแวะในคราวเดียว
+2. **Step 4: Daily Report & LINE Export**
+   * ปุ่มคัดลอกสรุปทริปประจำวัน พร้อมแจกแจงระยะทางแต่ละจุด ส่งเข้ากลุ่ม LINE ของบริษัทใน 1 คลิก
+3. **Step 5: Mobile App Polish**
+   * ปรับแต่ง UI ให้เปิดใช้งานบนโทรศัพท์มือถือได้อย่างลื่นไหล (Bottom Sheet Drawer & Mobile Floating Actions)
 
 ---
 
-## 🚀 6. สถานะการนำส่งระบบ (Deployment Status)
-* **GitHub Main Branch:** Commit ล่าสุด `f42d01c` (Synced & Pushed)
-* **Vercel Production:** Deployed & Live ที่ [https://b2bfactoryradar.vercel.app](https://b2bfactoryradar.vercel.app)
-* **Local Development Server:** พร้อมทำงานที่ `http://localhost:3000`
+*บันทึกข้อมูลเรียบร้อยและซิงค์ขึ้น GitHub พร้อมเริ่มงานต่อได้ทันทีในครั้งถัดไป*
