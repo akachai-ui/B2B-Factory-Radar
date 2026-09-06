@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Layers,
@@ -15,6 +16,7 @@ import {
   ShieldCheck,
   FileText,
   Phone,
+  Terminal,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -175,6 +177,16 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                         <Edit3 className="w-4 h-4 text-amber-400" />
                         <span>ตั้งค่าโปรไฟล์ & ประเภทบัญชี</span>
                       </button>
+
+                      {/* Dev Monitor Action */}
+                      <Link
+                        href="/dev"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="w-full p-2.5 rounded-xl hover:bg-slate-800 text-amber-300 text-xs font-medium flex items-center gap-2.5 transition cursor-pointer"
+                      >
+                        <Terminal className="w-4 h-4 text-amber-400" />
+                        <span>หน้า Dev Monitor & ภาพรวม</span>
+                      </Link>
 
                       {/* Divider */}
                       <div className="h-px bg-slate-800 my-1" />
