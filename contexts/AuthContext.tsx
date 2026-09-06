@@ -161,7 +161,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       provider: 'facebook',
       options: {
         redirectTo: redirectUrl,
-        scopes: 'email,public_profile',
       },
     });
 
