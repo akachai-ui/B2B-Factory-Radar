@@ -74,23 +74,19 @@ export default function TeamManagementPage() {
   const isOwner = !profile?.role || profile?.role === 'owner';
   const displayTeamName = isCompany ? (profile?.company_name || 'บริษัทของฉัน') : `ทีมของ ${profile?.full_name || 'ฉัน'}`;
 
-  // Fetch Team Members
+  // Fetch Team Members directly from Supabase
   const fetchTeam = async () => {
     if (!effectiveCompanyId) return;
     setIsLoadingTeam(true);
     try {
-      const res = await fetch(`/api/team?companyId=${effectiveCompanyId}`, { cache: 'no-store' });
-      const json = await res.json();
-      if (json.success && json.members) {
-        setTeamMembers(json.members as UserProfile[]);
-      } else {
-        // Fallback: direct query
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .or(`company_id.eq.${effectiveCompanyId},id.eq.${effectiveCompanyId}`)
-          .order('created_at', { ascending: true });
-        if (data) setTeamMembers(data as UserProfile[]);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .or(`company_id.eq.${effectiveCompanyId},id.eq.${effectiveCompanyId}`)
+        .order('created_at', { ascending: true });
+
+      if (data && !error) {
+        setTeamMembers(data as UserProfile[]);
       }
     } catch (err: any) {
       console.warn('Fetch team error:', err);
@@ -105,7 +101,7 @@ export default function TeamManagementPage() {
     }
   }, [user, profile, effectiveCompanyId]);
 
-  // Handle Add Member to Team
+  // Handle Add Member to Team directly with Supabase
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEmail.trim()) {
@@ -116,36 +112,74 @@ export default function TeamManagementPage() {
     setIsSubmitting(true);
     setFeedback(null);
 
+    const cleanEmail = newEmail.toLowerCase().trim();
+
     try {
-      const res = await fetch('/api/team', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: newEmail.trim(),
-          fullName: newFullName.trim() || newEmail.split('@')[0],
-          phone: newPhone.trim() || null,
-          role: newRole,
-          companyId: effectiveCompanyId,
-          companyName: profile?.company_name || displayTeamName,
-          taxId: profile?.tax_id || null,
-          branch: profile?.branch || 'สำนักงานใหญ่',
-        }),
-      });
+      // 1. Check if user profile already exists
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', cleanEmail)
+        .maybeSingle();
 
-      const json = await res.json();
+      if (existingProfile) {
+        // Update existing member
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            company_id: effectiveCompanyId,
+            role: newRole,
+            company_name: profile?.company_name || displayTeamName,
+            tax_id: profile?.tax_id || null,
+            branch: profile?.branch || 'สำนักงานใหญ่',
+            account_type: 'company',
+            onboarded: true,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingProfile.id);
 
-      if (json.success) {
-        setFeedback({ type: 'success', text: json.message || 'เพิ่มสมาชิกเข้าสู่ทีมสำเร็จ!' });
-        setNewEmail('');
-        setNewFullName('');
-        setNewPhone('');
-        setIsAddModalOpen(false);
-        await fetchTeam();
+        if (updateError) throw updateError;
+
+        setFeedback({
+          type: 'success',
+          text: `เพิ่มคุณ ${existingProfile.full_name || cleanEmail} เข้าสู่ทีมเรียบร้อยแล้ว!`,
+        });
       } else {
-        setFeedback({ type: 'error', text: json.error || 'ไม่สามารถเพิ่มสมาชิกได้' });
+        // Insert new invited member
+        const tempId = crypto.randomUUID();
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: tempId,
+              email: cleanEmail,
+              full_name: newFullName.trim() || cleanEmail.split('@')[0],
+              phone: newPhone.trim() || null,
+              role: newRole,
+              company_id: effectiveCompanyId,
+              company_name: profile?.company_name || displayTeamName,
+              tax_id: profile?.tax_id || null,
+              branch: profile?.branch || 'สำนักงานใหญ่',
+              account_type: 'company',
+              onboarded: true,
+            },
+          ]);
+
+        if (insertError) throw insertError;
+
+        setFeedback({
+          type: 'success',
+          text: `เชิญ ${cleanEmail} เข้าสู่ทีมเรียบร้อย!`,
+        });
       }
+
+      setNewEmail('');
+      setNewFullName('');
+      setNewPhone('');
+      setIsAddModalOpen(false);
+      await fetchTeam();
     } catch (err: any) {
-      setFeedback({ type: 'error', text: err.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
+      setFeedback({ type: 'error', text: err.message || 'เกิดข้อผิดพลาดในการเพิ่มสมาชิก' });
     } finally {
       setIsSubmitting(false);
     }
@@ -156,16 +190,22 @@ export default function TeamManagementPage() {
     if (!confirm(`คุณต้องการนำ "${memberName}" ออกจากทีมใช่หรือไม่?`)) return;
 
     try {
-      const res = await fetch(`/api/team?memberId=${memberId}`, { method: 'DELETE' });
-      const json = await res.json();
-      if (json.success) {
-        setFeedback({ type: 'success', text: `นำ ${memberName} ออกจากทีมเรียบร้อย` });
-        await fetchTeam();
-      } else {
-        setFeedback({ type: 'error', text: json.error || 'ไม่สามารถลบสมาชิกได้' });
-      }
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          company_id: null,
+          role: 'owner',
+          account_type: 'individual',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', memberId);
+
+      if (error) throw error;
+
+      setFeedback({ type: 'success', text: `นำ ${memberName} ออกจากทีมเรียบร้อย` });
+      await fetchTeam();
     } catch (err: any) {
-      setFeedback({ type: 'error', text: err.message });
+      setFeedback({ type: 'error', text: err.message || 'เกิดข้อผิดพลาดในการลบสมาชิก' });
     }
   };
 
