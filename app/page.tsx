@@ -1031,10 +1031,12 @@ export default function LeadsRadarMainPage() {
                 selectedDistrict={selectedDistrict}
                 onDistrictSelect={(d) => setSelectedDistrict(d)}
                 selectedRadius={selectedRadius}
+                onSelectRadius={(r) => setSelectedRadius(r)}
                 onLeadClick={(lead) => handleOpenLeadModal(lead)}
                 districts={districts}
                 districtCounts={districtCounts}
                 totalLeadCount={leads.length}
+                userName={profile?.full_name || user?.user_metadata?.full_name || user?.email || 'ทีมงานขาย'}
               />
             </div>
 
@@ -1595,10 +1597,12 @@ export default function LeadsRadarMainPage() {
                 selectedDistrict={selectedDistrict}
                 onDistrictSelect={(d) => setSelectedDistrict(d)}
                 selectedRadius={selectedRadius}
+                onSelectRadius={(r) => setSelectedRadius(r)}
                 onLeadClick={(lead) => setMobileSelectedLead(lead)}
                 districts={districts}
                 districtCounts={districtCounts}
                 totalLeadCount={leads.length}
+                userName={profile?.full_name || user?.user_metadata?.full_name || user?.email || 'ทีมงานขาย'}
               />
             </div>
 

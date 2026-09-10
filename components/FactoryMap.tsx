@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FactoryLead } from '@/lib/types';
 import districtsGeoJson from '@/lib/geojson/samutprakan_districts.json';
+import { MorningBriefingCard } from './MorningBriefingCard';
 import {
   MapPin,
   Navigation,
@@ -24,10 +25,12 @@ interface FactoryMapProps {
   selectedDistrict: string;
   onDistrictSelect?: (district: string) => void;
   selectedRadius: string;
+  onSelectRadius?: (radius: string) => void;
   onLeadClick?: (lead: FactoryLead) => void;
   districts?: string[];
   districtCounts?: Record<string, number>;
   totalLeadCount?: number;
+  userName?: string;
 }
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -52,10 +55,12 @@ export function FactoryMap({
   selectedDistrict,
   onDistrictSelect,
   selectedRadius,
+  onSelectRadius,
   onLeadClick,
   districts,
   districtCounts,
   totalLeadCount,
+  userName,
 }: FactoryMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -534,6 +539,22 @@ export function FactoryMap({
           </div>
 
         </div>
+      )}
+
+      {/* Morning Briefing Floating Card (When no specific lead is selected) */}
+      {!selectedLead && (
+        <MorningBriefingCard
+          userName={userName}
+          userLocation={userLocation}
+          leads={leads}
+          selectedDistrict={selectedDistrict}
+          onSelectRadius={(rad) => onSelectRadius && onSelectRadius(rad)}
+          onFocusLead={(lead) => {
+            setSelectedLead(lead);
+            if (onLeadClick) onLeadClick(lead);
+          }}
+          onSelectDistrict={(d) => onDistrictSelect && onDistrictSelect(d)}
+        />
       )}
 
     </div>
