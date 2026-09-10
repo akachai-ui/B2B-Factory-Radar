@@ -1999,23 +1999,33 @@ export default function LeadsRadarMainPage() {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+            <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-800">
+              {activeLeadModal.phone ? (
+                <a
+                  href={`tel:${activeLeadModal.phone.replace(/[^0-9]/g, '')}`}
+                  className="h-11 px-4 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-sm"
+                >
+                  <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>โทร {activeLeadModal.phone}</span>
+                </a>
+              ) : (
+                <button
+                  onClick={() => setActiveLeadModal(null)}
+                  className="h-11 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs flex items-center justify-center transition cursor-pointer"
+                >
+                  ปิดหน้าต่าง
+                </button>
+              )}
+
               <a
                 href={activeLeadModal.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${activeLeadModal.lat},${activeLeadModal.lng}`}
                 target="_blank"
                 rel="noreferrer"
-                className="px-4 py-2 rounded-xl bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-slate-950 font-bold text-xs flex items-center gap-1.5 transition"
+                className="h-11 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer"
               >
-                <Navigation className="w-3.5 h-3.5" />
-                <span>นำทาง Google Maps</span>
+                <Navigation className="w-4 h-4 fill-slate-950 shrink-0" />
+                <span>เปิด GPS นำทาง</span>
               </a>
-
-              <button
-                onClick={() => setActiveLeadModal(null)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
-              >
-                ปิดหน้าต่าง
-              </button>
             </div>
 
           </div>

@@ -504,38 +504,48 @@ export function FactoryMap({
           </div>
 
           {/* Quick Contact & Navigation Actions */}
-          <div className="flex items-center gap-2 pt-1">
-            {selectedLead.phone && (
+          <div className="space-y-2 pt-1">
+            <div className="grid grid-cols-2 gap-2">
+              {selectedLead.phone ? (
+                <a
+                  href={`tel:${selectedLead.phone.replace(/[^0-9]/g, '')}`}
+                  className="h-11 px-3 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-sm"
+                >
+                  <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span className="truncate">โทรออก</span>
+                </a>
+              ) : (
+                <button
+                  disabled
+                  className="h-11 px-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-600 font-medium text-xs flex items-center justify-center gap-1.5 cursor-not-allowed"
+                >
+                  <Phone className="w-4 h-4 text-slate-600 shrink-0" />
+                  <span>ไม่มีเบอร์โทร</span>
+                </button>
+              )}
+
               <a
-                href={`tel:${selectedLead.phone.replace(/[^0-9]/g, '')}`}
-                className="flex-1 py-2 px-3 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95"
+                href={`https://www.google.com/maps/dir/?api=1&destination=${selectedLead.lat},${selectedLead.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-11 px-3 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer"
               >
-                <Phone className="w-3.5 h-3.5" />
-                <span>โทร {selectedLead.phone}</span>
+                <Navigation className="w-4 h-4 fill-slate-950 shrink-0" />
+                <span className="truncate">นำทาง GPS</span>
               </a>
-            )}
+            </div>
 
             {selectedLead.website && (
               <a
                 href={selectedLead.website.startsWith('http') ? selectedLead.website : `https://${selectedLead.website}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium flex items-center justify-center gap-1 transition"
-                title="เข้าชมเว็บไซต์"
+                className="w-full py-2 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 text-slate-400 hover:text-cyan-300 text-[11px] font-medium flex items-center justify-center gap-1.5 transition text-center active:scale-95"
               >
-                <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
+                <ExternalLink className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>เยี่ยมชมเว็บไซต์โรงงาน</span>
               </a>
             )}
-
-            <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${selectedLead.lat},${selectedLead.lng}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 transition shadow-md shadow-amber-500/20 active:scale-95"
-            >
-              <Navigation className="w-3.5 h-3.5 fill-slate-950" />
-              <span>นำทาง Google Maps</span>
-            </a>
           </div>
 
         </div>
