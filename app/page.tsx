@@ -1872,7 +1872,12 @@ export default function LeadsRadarMainPage() {
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="h-9 w-9 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
                           {m.avatar_url ? (
-                            <img src={m.avatar_url} alt={m.full_name || 'Member'} className="w-full h-full object-cover" />
+                            <img
+                              src={m.avatar_url}
+                              alt={m.full_name || 'Member'}
+                              referrerPolicy="no-referrer"
+                              className="w-full h-full object-cover"
+                            />
                           ) : isThisOwner ? (
                             <Crown className="w-4 h-4 text-amber-400" />
                           ) : (
@@ -1954,6 +1959,7 @@ export default function LeadsRadarMainPage() {
                     <img
                       src={profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture}
                       alt={profile?.full_name || 'Avatar'}
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover"
                     />
                   ) : (

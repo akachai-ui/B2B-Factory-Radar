@@ -45,7 +45,12 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
   const currentAccountType = isInvitedMember ? 'company' : (profile?.account_type || (profile?.company_name && profile.company_name !== 'บริษัทของฉัน' ? 'company' : 'individual'));
   const displayCompanyName = profile?.company_name || 'บริษัทของฉัน';
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'ผู้ใช้งาน';
-  const currentAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+  const googleAvatar = user?.user_metadata?.avatar_url 
+    || user?.user_metadata?.picture 
+    || (user?.identities?.[0]?.identity_data as any)?.avatar_url 
+    || (user?.identities?.[0]?.identity_data as any)?.picture
+    || null;
+  const currentAvatar = (profile?.avatar_url && profile.avatar_url.trim() !== '') ? profile.avatar_url : (googleAvatar || null);
 
   const handleOpenProfileModal = () => {
     setAccountType(currentAccountType);
@@ -137,7 +142,12 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                 >
                   <div className="h-7 w-7 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 font-black text-xs flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
                     {currentAvatar ? (
-                      <img src={currentAvatar} alt={displayName} className="w-full h-full object-cover" />
+                      <img
+                        src={currentAvatar}
+                        alt={displayName}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       currentAccountType === 'company' ? '🏢' : '👤'
                     )}
@@ -180,7 +190,12 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 font-black text-sm flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-amber-500/20">
                             {currentAvatar ? (
-                              <img src={currentAvatar} alt={displayName} className="w-full h-full object-cover" />
+                              <img
+                                src={currentAvatar}
+                                alt={displayName}
+                                referrerPolicy="no-referrer"
+                                className="w-full h-full object-cover"
+                              />
                             ) : (
                               currentAccountType === 'company' ? '🏢' : '👤'
                             )}
@@ -294,9 +309,14 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
             <div className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 flex items-center gap-4">
               {/* Avatar Preview */}
               <div className="relative shrink-0">
-                <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-amber-400/10 border-2 border-amber-500/40 p-0.5 overflow-hidden flex items-center justify-center shadow-lg shadow-amber-500/10">
+                <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-amber-400/10 border-2 border-amber-500/40 p-0.5 overflow-hidden flex items-center justify-center shadow-lg shadow-amber-500/10 bg-slate-900">
                   {currentAvatar ? (
-                    <img src={currentAvatar} alt="Avatar" className="w-full h-full object-cover rounded-[14px]" />
+                    <img
+                      src={currentAvatar}
+                      alt="Avatar"
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover rounded-[14px]"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-xl font-black text-amber-300 bg-slate-900 rounded-[14px]">
                       {fullName ? fullName.charAt(0).toUpperCase() : '👤'}

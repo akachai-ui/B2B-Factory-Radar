@@ -107,15 +107,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data && !error) {
+        const googleAvatar = currentUser.user_metadata?.avatar_url 
+          || currentUser.user_metadata?.picture 
+          || (currentUser.identities?.[0]?.identity_data as any)?.avatar_url 
+          || (currentUser.identities?.[0]?.identity_data as any)?.picture 
+          || null;
         const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem(`rh_avatar_${currentUser.id}`) : null;
-        const resolvedAvatar = data.avatar_url || currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || cachedAvatar || null;
+        const resolvedAvatar = (data.avatar_url && data.avatar_url.trim() !== '') 
+          ? data.avatar_url 
+          : (googleAvatar || cachedAvatar || null);
+
         setProfile({
           ...(data as UserProfile),
           avatar_url: resolvedAvatar,
         });
       } else if (!data) {
         // If profile row doesn't exist yet, insert a clean default
-        const initialAvatar = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || null;
+        const initialAvatar = currentUser.user_metadata?.avatar_url 
+          || currentUser.user_metadata?.picture 
+          || (currentUser.identities?.[0]?.identity_data as any)?.avatar_url 
+          || (currentUser.identities?.[0]?.identity_data as any)?.picture 
+          || null;
         const newProfile: Partial<UserProfile> = {
           id: currentUser.id,
           email: cleanEmail,
