@@ -966,22 +966,22 @@ export default function LeadsRadarMainPage() {
           <div className="space-y-6 animate-in fade-in duration-200">
             
             {/* Search & Quick Controls Bar */}
-            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl">
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5 p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl backdrop-blur-xl">
               
               {/* Search input */}
-              <div className="flex-1 min-w-[260px] relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <div className="flex-1 min-w-[280px] relative">
+                <Search className="w-4 h-4 text-amber-400 absolute left-4 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="ค้นหาชื่อโรงงาน, ถนน, เบอร์โทร..."
-                  className="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400 transition"
+                  placeholder="ค้นหาชื่อโรงงาน, ถนน, หรือเบอร์โทรศัพท์..."
+                  className="w-full pl-11 pr-9 py-2.5 bg-slate-950/90 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs cursor-pointer"
                   >
                     ✕
                   </button>
@@ -989,20 +989,20 @@ export default function LeadsRadarMainPage() {
               </div>
 
               {/* Radius Filter */}
-              <div className="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap">
-                <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1 shrink-0 px-1">
+              <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+                <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5 shrink-0 px-1">
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
                   <span>รัศมีเรดาร์:</span>
                 </span>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-2xl border border-slate-800">
                   {['3', '5', '10', '15', 'ALL'].map((rad) => (
                     <button
                       key={rad}
                       onClick={() => setSelectedRadius(rad)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
                         selectedRadius === rad
-                          ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                          : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+                          ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-md font-black shadow-amber-500/20'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-900'
                       }`}
                     >
                       {rad === 'ALL' ? 'ทั้งหมด' : `${rad} กม.`}
@@ -1013,9 +1013,9 @@ export default function LeadsRadarMainPage() {
 
               {/* GPS Location Status Indicator */}
               <div className="flex items-center justify-between lg:justify-end gap-2 text-xs shrink-0">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 truncate max-w-[220px]" title="พิกัดศูนย์กลางเรดาร์">
+                <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-slate-300 truncate max-w-[240px]" title="พิกัดศูนย์กลางเรดาร์">
                   <span className={`h-2 w-2 rounded-full shrink-0 ${isLiveTracking ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`}></span>
-                  <span className="truncate text-[11px] font-medium">{userLocation.label}</span>
+                  <span className="truncate text-[11px] font-bold">{userLocation.label}</span>
                 </div>
               </div>
 
