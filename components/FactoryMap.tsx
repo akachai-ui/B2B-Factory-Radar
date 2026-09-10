@@ -205,6 +205,26 @@ export function FactoryMap({
     }).addTo(mapInstanceRef.current);
 
     geoJsonLayerRef.current = geoLayer;
+
+    // Smoothly zoom & pan to selected district polygon or province overview
+    if (selectedDistrict !== 'ALL') {
+      let matchedLayer: any = null;
+      geoLayer.eachLayer((layer: any) => {
+        const dName = layer.feature?.properties?.amp_th || '';
+        if (dName.includes(selectedDistrict) || selectedDistrict.includes(dName)) {
+          matchedLayer = layer;
+        }
+      });
+      if (matchedLayer && matchedLayer.getBounds) {
+        mapInstanceRef.current.fitBounds(matchedLayer.getBounds(), {
+          padding: [30, 30],
+          maxZoom: 13,
+          animate: true,
+        });
+      }
+    } else {
+      mapInstanceRef.current.setView([13.6062, 100.6974], 11, { animate: true });
+    }
   }, [selectedDistrict, onDistrictSelect]);
 
   // 4. Render Factory Markers & Clusters
@@ -262,8 +282,8 @@ export function FactoryMap({
     mapInstanceRef.current.addLayer(clusterGroup);
     markersClusterGroupRef.current = clusterGroup;
 
-    // Auto-fit bounds when leads change and not empty
-    if (leads.length > 0 && leads.length <= 100) {
+    // Auto-fit bounds if radius filter is active or specific search query is filtered (when district is ALL)
+    if (selectedRadius !== 'ALL' && leads.length > 0) {
       const validPoints = leads
         .filter((l) => l.lat && l.lng)
         .map((l) => [l.lat, l.lng] as [number, number]);
@@ -271,7 +291,7 @@ export function FactoryMap({
         mapInstanceRef.current.fitBounds(validPoints, { padding: [40, 40], maxZoom: 14 });
       }
     }
-  }, [leads, userLocation, onLeadClick]);
+  }, [leads, userLocation, onLeadClick, selectedRadius]);
 
   // 5. Render User Live GPS Pin & Radius Circle
   useEffect(() => {
