@@ -110,13 +110,13 @@ export function MorningBriefingCard({
         
         {/* Header Bar */}
         <div className="px-4 py-3 bg-gradient-to-r from-amber-500/15 via-slate-900/60 to-transparent border-b border-slate-800/80 flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="p-1 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">
-              <Sparkles className="w-3.5 h-3.5" />
-            </span>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="h-8 w-8 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-sm">
+              <Sparkles className="w-4 h-4" />
+            </div>
             <div className="min-w-0">
               <h4 className="text-xs font-black text-white truncate">
-                {greeting}, คุณ{userName.split(' ')[0]}
+                {greeting}, คุณ {userName.split(' ')[0]}
               </h4>
               <span className="text-[10px] text-amber-300/80 font-medium truncate block">
                 {userLocation.label}
@@ -127,14 +127,14 @@ export function MorningBriefingCard({
           <div className="flex items-center gap-1 shrink-0">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/80 transition cursor-pointer"
+              className="p-1.5 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/80 transition cursor-pointer"
               title={isOpen ? 'ย่อการ์ด' : 'ขยายการ์ด'}
             >
               {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
             </button>
             <button
               onClick={() => setIsDismissed(true)}
-              className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800/80 transition cursor-pointer"
+              className="p-1.5 text-slate-400 hover:text-rose-400 rounded-xl hover:bg-slate-800/80 transition cursor-pointer"
               title="ปิดการ์ด"
             >
               <X className="w-4 h-4" />
@@ -147,10 +147,10 @@ export function MorningBriefingCard({
           <div className="p-3.5 space-y-3">
             
             {/* Quick Insights Box */}
-            <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800/80 text-xs space-y-1.5">
+            <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 text-xs space-y-2">
               <div className="flex items-center justify-between font-bold text-slate-200">
-                <span className="flex items-center gap-1.5 text-amber-300">
-                  <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span className="flex items-center gap-1.5 text-amber-300 font-black">
+                  <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
                   <span>เรดาร์โรงงานรอบตัวคุณ:</span>
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">
@@ -164,17 +164,17 @@ export function MorningBriefingCard({
 
               {/* Nearest Factory Spotlight */}
               {nearbyStats.nearestLead && (
-                <div className="mt-2 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
-                  <div className="min-w-0 pr-2">
+                <div className="mt-2 pt-2.5 border-t border-slate-800/80 flex items-center justify-between gap-2 text-[11px]">
+                  <div className="min-w-0 flex-1">
                     <span className="text-[10px] text-slate-400 block truncate">📍 ใกล้คุณที่สุด ({nearbyStats.nearestDist.toFixed(1)} กม.):</span>
-                    <span className="font-bold text-white truncate block">
+                    <span className="font-bold text-white truncate block mt-0.5">
                       {(nearbyStats.nearestLead as any).name || (nearbyStats.nearestLead as any).factory_name}
                     </span>
                   </div>
                   {onFocusLead && (
                     <button
                       onClick={() => onFocusLead(nearbyStats.nearestLead!)}
-                      className="px-2.5 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[10px] rounded-xl shrink-0 transition shadow cursor-pointer active:scale-95"
+                      className="h-7 px-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[11px] rounded-xl shrink-0 transition shadow-sm cursor-pointer active:scale-95"
                     >
                       ดูข้อมูล
                     </button>
@@ -184,12 +184,12 @@ export function MorningBriefingCard({
             </div>
 
             {/* Quick Action Buttons */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5 pt-0.5">
               <button
                 onClick={() => onSelectRadius('5')}
-                className="py-2.5 px-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 transition cursor-pointer active:scale-95"
+                className="h-11 px-3 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20 transition cursor-pointer active:scale-95 whitespace-nowrap"
               >
-                <Zap className="w-3.5 h-3.5 fill-slate-950" />
+                <Zap className="w-4 h-4 fill-slate-950 shrink-0" />
                 <span>สแกนรอบตัว 5 กม.</span>
               </button>
 
@@ -201,10 +201,10 @@ export function MorningBriefingCard({
                     onSelectRadius('ALL');
                   }
                 }}
-                className="py-2.5 px-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
+                className="h-11 px-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition cursor-pointer active:scale-95 whitespace-nowrap"
               >
-                <Navigation className="w-3.5 h-3.5 text-cyan-400" />
-                <span>{nearbyStats.nearestLead ? 'โรงงานใกล้ที่สุด' : 'ดูทั้งหมด'}</span>
+                <Navigation className="w-4 h-4 text-cyan-400 shrink-0" />
+                <span>{nearbyStats.nearestLead ? 'โรงงานใกล้สุด' : 'ดูทั้งหมด'}</span>
               </button>
             </div>
 
