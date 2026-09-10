@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FactoryLead } from '@/lib/types';
+import { fetchLiveWeather, WeatherData } from '@/lib/weather';
 import {
   Sparkles,
   MapPin,
@@ -12,6 +13,10 @@ import {
   Building2,
   Phone,
   Zap,
+  CloudSun,
+  Umbrella,
+  Wind,
+  Droplets,
 } from 'lucide-react';
 
 interface MorningBriefingCardProps {
@@ -49,6 +54,34 @@ export function MorningBriefingCard({
 }: MorningBriefingCardProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [isDismissed, setIsDismissed] = useState(false);
+  const [showHourlyWeather, setShowHourlyWeather] = useState(false);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [isLoadingWeather, setIsLoadingWeather] = useState(false);
+
+  // Fetch real-time weather for current coordinates (default Samut Prakan)
+  useEffect(() => {
+    let isMounted = true;
+    async function loadWeather() {
+      setIsLoadingWeather(true);
+      try {
+        const data = await fetchLiveWeather(
+          userLocation.lat || 13.6062,
+          userLocation.lng || 100.6974
+        );
+        if (isMounted && data) {
+          setWeather(data);
+        }
+      } catch (err) {
+        console.warn('Weather fetch error:', err);
+      } finally {
+        if (isMounted) setIsLoadingWeather(false);
+      }
+    }
+    loadWeather();
+    return () => {
+      isMounted = false;
+    };
+  }, [userLocation.lat, userLocation.lng]);
 
   // Time-based greeting
   const greeting = useMemo(() => {
@@ -182,6 +215,73 @@ export function MorningBriefingCard({
                 </div>
               )}
             </div>
+
+            {/* Live Weather Forecast & Field Sales Route Tip */}
+            {weather && (
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-950 border border-cyan-500/30 text-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{weather.weatherIcon}</span>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-black text-white text-xs">{weather.currentTemp}°C</span>
+                        <span className="text-[11px] text-slate-300 font-medium">{weather.weatherDesc}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 block">
+                        ช่วง {weather.minTemp}° - {weather.maxTemp}°C • ชื้น {weather.humidity}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <div className={`px-2 py-1 rounded-xl text-[10px] font-bold flex items-center gap-1 border ${
+                      weather.rainProbability >= 60
+                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                        : weather.rainProbability >= 30
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                        : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    }`}>
+                      <Umbrella className="w-3 h-3 shrink-0" />
+                      <span>ฝน {weather.rainProbability}%</span>
+                    </div>
+
+                    {weather.hourlyForecast.length > 0 && (
+                      <button
+                        onClick={() => setShowHourlyWeather(!showHourlyWeather)}
+                        className="p-1 text-slate-400 hover:text-cyan-300 rounded-lg hover:bg-slate-800 transition cursor-pointer"
+                        title="ดูพยากรณ์รายชั่วโมง"
+                      >
+                        {showHourlyWeather ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Hourly Forecast Trend */}
+                {showHourlyWeather && weather.hourlyForecast.length > 0 && (
+                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-1 overflow-x-auto no-scrollbar animate-in fade-in duration-200">
+                    {weather.hourlyForecast.map((item, idx) => (
+                      <div key={idx} className="flex flex-col items-center px-2 py-1.5 rounded-xl bg-slate-950/60 border border-slate-800/60 min-w-[50px]">
+                        <span className="text-[10px] text-slate-400 font-mono">{item.hour}</span>
+                        <span className="text-xs my-0.5">
+                          {item.weatherCode >= 80 ? '🌧️' : item.weatherCode >= 50 ? '🌦️' : item.weatherCode === 0 ? '☀️' : '🌤️'}
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-200">{item.temp}°</span>
+                        <span className={`text-[9px] font-bold ${item.rainProb >= 50 ? 'text-rose-400' : 'text-cyan-400'}`}>
+                          {item.rainProb}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Smart Field Sales Recommendation */}
+                <div className="pt-1.5 border-t border-slate-800/80 flex items-start gap-1.5 text-[11px] text-cyan-200/90 font-medium">
+                  <span className="shrink-0">💡</span>
+                  <span className="leading-snug">{weather.salesTip}</span>
+                </div>
+              </div>
+            )}
 
             {/* Quick Action Buttons */}
             <div className="grid grid-cols-2 gap-2.5 pt-0.5">
