@@ -20,8 +20,8 @@ export default function AuthCallbackPage() {
 
     // 1. Listen for Supabase Auth state change (Handles OAuth hash, magic links, PKCE)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' || session) {
-        completeAuth('/');
+      if (event === 'SIGNED_IN' && session) {
+        setTimeout(() => completeAuth('/'), 200);
       }
     });
 
@@ -50,14 +50,16 @@ export default function AuthCallbackPage() {
 
         // 1. PKCE Code Exchange Flow
         if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
             console.error('Code exchange error:', error);
             setErrorMsg(error.message);
             return;
           }
-          completeAuth('/');
-          return;
+          if (data?.session) {
+            setTimeout(() => completeAuth('/'), 300);
+            return;
+          }
         }
 
         // 2. Implicit Flow Hash Parsing (e.g. #access_token=...&refresh_token=...)
@@ -72,7 +74,7 @@ export default function AuthCallbackPage() {
               refresh_token: refreshToken || '',
             });
             if (data?.session) {
-              completeAuth('/');
+              setTimeout(() => completeAuth('/'), 300);
               return;
             }
           }
@@ -81,14 +83,14 @@ export default function AuthCallbackPage() {
         // 3. Check if session already active
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          completeAuth('/');
+          setTimeout(() => completeAuth('/'), 200);
           return;
         }
 
         // 4. Fallback redirect after waiting for Supabase to parse
         const timeout = setTimeout(() => {
           completeAuth('/');
-        }, 1200);
+        }, 1500);
 
         return () => clearTimeout(timeout);
       } catch (err: any) {
