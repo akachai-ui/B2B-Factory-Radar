@@ -398,15 +398,40 @@ export function FactoryMap({
           </div>
         </div>
 
-        {/* Recenter GPS */}
-        <button
-          onClick={handleRecenterUser}
-          className="p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-cyan-300 border border-slate-700/80 shadow-xl backdrop-blur-md flex items-center gap-1.5 text-xs font-bold transition cursor-pointer active:scale-95"
-          title="ซูมไปยังตำแหน่ง GPS ของฉัน"
-        >
-          <Crosshair className="w-4 h-4 text-cyan-400" />
-          <span className="hidden sm:inline">ตำแหน่งฉัน</span>
-        </button>
+        {/* Unified Smart GPS Control (Recenter + Live Tracking) */}
+        <div className="flex items-center rounded-2xl bg-slate-900/95 border border-slate-700/80 shadow-xl backdrop-blur-md p-0.5">
+          <button
+            onClick={handleRecenterUser}
+            className="px-3 py-2 rounded-xl text-cyan-300 hover:text-white hover:bg-slate-800/80 flex items-center gap-1.5 text-xs font-bold transition cursor-pointer active:scale-95"
+            title="ซูมไปยังตำแหน่ง GPS ของฉัน"
+          >
+            <Crosshair className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="hidden sm:inline">ตำแหน่งฉัน</span>
+          </button>
+          
+          {onToggleLiveTracking && (
+            <>
+              <div className="w-[1px] h-4 bg-slate-800 my-auto" />
+              <button
+                onClick={onToggleLiveTracking}
+                className={`px-2.5 py-2 rounded-xl flex items-center gap-1.5 text-xs font-bold transition cursor-pointer active:scale-95 ${
+                  isLiveTracking
+                    ? 'text-emerald-300 hover:bg-emerald-950/50'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+                }`}
+                title={isLiveTracking ? 'GPS สดเปิดอยู่ (คลิกเพื่อปิด)' : 'GPS สดปิดอยู่ (คลิกเพื่อเปิด)'}
+              >
+                <span className="relative flex h-2 w-2">
+                  {isLiveTracking && (
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  )}
+                  <span className={`relative inline-flex rounded-full h-2 w-2 ${isLiveTracking ? 'bg-emerald-400' : 'bg-slate-600'}`}></span>
+                </span>
+                <span>{isLiveTracking ? 'GPS สด' : 'GPS ปิด'}</span>
+              </button>
+            </>
+          )}
+        </div>
 
         {/* Recenter Overview */}
         <button
@@ -427,21 +452,6 @@ export function FactoryMap({
           <Layers className="w-4 h-4 text-slate-400" />
           <span className="hidden sm:inline">{mapTheme === 'dark' ? 'โหมดมืด' : 'โหมดสว่าง'}</span>
         </button>
-
-        {/* Live Tracking Status */}
-        {onToggleLiveTracking && (
-          <button
-            onClick={onToggleLiveTracking}
-            className={`p-2.5 rounded-2xl border shadow-xl backdrop-blur-md flex items-center gap-1.5 text-xs font-bold transition cursor-pointer active:scale-95 ${
-              isLiveTracking
-                ? 'bg-emerald-950/90 border-emerald-500/60 text-emerald-300'
-                : 'bg-slate-900/90 border-slate-700 text-slate-400 hover:text-white'
-            }`}
-          >
-            <Radio className={`w-3.5 h-3.5 ${isLiveTracking ? 'animate-pulse text-emerald-400' : ''}`} />
-            <span>{isLiveTracking ? 'GPS สดเปิดอยู่' : 'เปิด GPS สด'}</span>
-          </button>
-        )}
 
       </div>
 

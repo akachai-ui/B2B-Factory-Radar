@@ -1011,25 +1011,12 @@ export default function LeadsRadarMainPage() {
                 </div>
               </div>
 
-              {/* GPS Live Tracking Info & Status */}
+              {/* GPS Location Status Indicator */}
               <div className="flex items-center justify-between lg:justify-end gap-2 text-xs shrink-0">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 truncate max-w-[220px]">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 truncate max-w-[220px]" title="พิกัดศูนย์กลางเรดาร์">
+                  <span className={`h-2 w-2 rounded-full shrink-0 ${isLiveTracking ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`}></span>
                   <span className="truncate text-[11px] font-medium">{userLocation.label}</span>
                 </div>
-
-                <button
-                  onClick={() => setIsLiveTracking(!isLiveTracking)}
-                  className={`p-1.5 px-3 rounded-xl border text-xs font-bold transition shrink-0 cursor-pointer flex items-center gap-1.5 ${
-                    isLiveTracking
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                      : 'bg-slate-800 text-slate-400 border-slate-700'
-                  }`}
-                  title={isLiveTracking ? 'เปิด GPS ติดตามสด' : 'ปิด GPS'}
-                >
-                  <Navigation className={`w-3.5 h-3.5 ${isLiveTracking ? 'text-emerald-400 animate-spin' : 'text-slate-400'}`} />
-                  <span className="text-[11px]">{isLiveTracking ? 'GPS สด' : 'GPS หยุด'}</span>
-                </button>
               </div>
 
             </div>
