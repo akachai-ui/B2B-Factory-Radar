@@ -159,7 +159,7 @@ export default function LeadsRadarMainPage() {
   // Effective Company ID
   const effectiveCompanyId = profile?.company_id || currentCompany?.id || profile?.id || user?.id;
   const isCompany = profile?.account_type === 'company';
-  const isOwnerOrManager = true; // Always allow team invitation and management
+  const isOwner = profile?.role === 'owner' || (user?.id && currentCompany?.owner_id && user.id === currentCompany.owner_id) || (!profile?.role && profile?.account_type !== 'company');
   const displayTeamName = currentCompany?.name || profile?.company_name || (isCompany ? 'บริษัทของฉัน' : `ทีมของ ${profile?.full_name || 'ฉัน'}`);
 
   // Trigger Onboarding for First-Time Users
@@ -490,6 +490,10 @@ export default function LeadsRadarMainPage() {
   // Team Invite Action
   const handleSendTeamInvite = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isOwner) {
+      setFeedback({ type: 'error', text: 'คุณไม่มีสิทธิ์เชิญสมาชิก (เฉพาะเจ้าของทีม / Owner เท่านั้น)' });
+      return;
+    }
     if (!newEmail.trim()) {
       setFeedback({ type: 'error', text: 'กรุณากรอกอีเมลของสมาชิก' });
       return;
@@ -578,6 +582,10 @@ export default function LeadsRadarMainPage() {
 
   // Cancel Pending Invite
   const handleCancelInvitation = async (inviteId: string, email: string) => {
+    if (!isOwner) {
+      setFeedback({ type: 'error', text: 'คุณไม่มีสิทธิ์ยกเลิกคำเชิญ (เฉพาะเจ้าของทีม / Owner เท่านั้น)' });
+      return;
+    }
     if (!confirm(`คุณต้องการยกเลิกคำเชิญของ "${email}" ใช่หรือไม่?`)) return;
     try {
       await supabase
@@ -593,6 +601,10 @@ export default function LeadsRadarMainPage() {
 
   // Remove Member from Team
   const handleRemoveMember = async (memberId: string, memberName: string) => {
+    if (!isOwner) {
+      setFeedback({ type: 'error', text: 'คุณไม่มีสิทธิ์นำสมาชิกออก (เฉพาะเจ้าของทีม / Owner เท่านั้น)' });
+      return;
+    }
     if (!confirm(`คุณต้องการนำ "${memberName}" ออกจากสังกัดบริษัทใช่หรือไม่?`)) return;
     try {
       await supabase
@@ -1329,14 +1341,21 @@ export default function LeadsRadarMainPage() {
                   </div>
                 </div>
 
-                {/* Invite Button */}
-                <button
-                  onClick={() => setIsAddMemberModalOpen(true)}
-                  className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 cursor-pointer active:scale-95 flex items-center gap-2 self-start sm:self-auto shrink-0"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  <span>เชิญสมาชิกใหม่</span>
-                </button>
+                {/* Invite Button or Non-Owner Status Notice */}
+                {isOwner ? (
+                  <button
+                    onClick={() => setIsAddMemberModalOpen(true)}
+                    className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 cursor-pointer active:scale-95 flex items-center gap-2 self-start sm:self-auto shrink-0"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>เชิญสมาชิกใหม่</span>
+                  </button>
+                ) : (
+                  <div className="px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] text-slate-400 flex items-center gap-1.5 self-start sm:self-auto">
+                    <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>ตำแหน่งของคุณ: <strong className="text-white capitalize">{profile?.role === 'manager' ? 'ผู้จัดการ (Manager)' : 'ทีมเซลส์ (Sales)'}</strong> (สิทธิ์จัดการทีมเฉพาะ Owner)</span>
+                  </div>
+                )}
 
               </div>
 
@@ -1414,7 +1433,7 @@ export default function LeadsRadarMainPage() {
 
                       <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
                         <span>เบอร์โทร: {member.phone || '-'}</span>
-                        {isOwnerOrManager && !isThisOwner && (
+                        {isOwner && !isThisOwner && (
                           <button
                             onClick={() => handleRemoveMember(member.id, member.full_name || member.email)}
                             className="text-rose-400 hover:text-rose-300 text-[10px] font-medium flex items-center gap-1 cursor-pointer"
@@ -1437,7 +1456,9 @@ export default function LeadsRadarMainPage() {
                   <div className="p-12 text-center rounded-3xl bg-slate-900 border border-slate-800 text-slate-400 space-y-2">
                     <Clock className="w-8 h-8 mx-auto text-slate-600" />
                     <p className="text-xs font-bold text-slate-300">ไม่มีคำเชิญที่รอยืนยันในขณะนี้</p>
-                    <p className="text-[11px] text-slate-500">สามารถกดปุ่ม "เชิญสมาชิกใหม่" ด้านบนเพื่อส่งคำเชิญ</p>
+                    <p className="text-[11px] text-slate-500">
+                      {isOwner ? 'สามารถกดปุ่ม "เชิญสมาชิกใหม่" ด้านบนเพื่อส่งคำเชิญ' : 'รายการคำเชิญจะได้รับการดูแลโดย Owner ของทีม'}
+                    </p>
                   </div>
                 ) : (
                   pendingInvitations.map((inv) => (
@@ -1477,13 +1498,15 @@ export default function LeadsRadarMainPage() {
                           )}
                         </button>
 
-                        <button
-                          onClick={() => handleCancelInvitation(inv.id, inv.email)}
-                          className="p-1.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 transition cursor-pointer"
-                          title="ยกเลิกคำเชิญ"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {isOwner && (
+                          <button
+                            onClick={() => handleCancelInvitation(inv.id, inv.email)}
+                            className="p-1.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 transition cursor-pointer"
+                            title="ยกเลิกคำเชิญ"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))
