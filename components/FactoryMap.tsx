@@ -13,6 +13,7 @@ import {
   Maximize2,
   Building2,
   Radio,
+  ChevronDown,
 } from 'lucide-react';
 
 interface FactoryMapProps {
@@ -24,6 +25,9 @@ interface FactoryMapProps {
   onDistrictSelect?: (district: string) => void;
   selectedRadius: string;
   onLeadClick?: (lead: FactoryLead) => void;
+  districts?: string[];
+  districtCounts?: Record<string, number>;
+  totalLeadCount?: number;
 }
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -49,6 +53,9 @@ export function FactoryMap({
   onDistrictSelect,
   selectedRadius,
   onLeadClick,
+  districts,
+  districtCounts,
+  totalLeadCount,
 }: FactoryMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -56,6 +63,9 @@ export function FactoryMap({
   const geoJsonLayerRef = useRef<any>(null);
   const userMarkerRef = useRef<any>(null);
   const radiusCircleRef = useRef<any>(null);
+
+  const defaultDistricts = ['บางพลี', 'เมืองสมุทรปราการ', 'พระประแดง', 'พระสมุทรเจดีย์', 'บางบ่อ', 'บางเสาธง'];
+  const districtList = districts || defaultDistricts;
 
   const [mapTheme, setMapTheme] = useState<'dark' | 'streets'>('dark');
   const tileLayerRef = useRef<any>(null);
@@ -363,8 +373,31 @@ export function FactoryMap({
       <div ref={mapContainerRef} className="w-full h-full z-0" />
 
       {/* Floating Map Controls (Top-Left) */}
-      <div className="absolute top-4 left-4 z-[400] flex flex-wrap items-center gap-2">
+      <div className="absolute top-4 left-4 z-[400] flex flex-wrap items-center gap-2 max-w-[calc(100%-2rem)]">
         
+        {/* District Selector Dropdown inside Map */}
+        <div className="relative flex items-center">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-slate-900/95 hover:bg-slate-850 text-slate-100 border border-amber-500/50 shadow-xl shadow-amber-500/10 backdrop-blur-md text-xs font-bold transition">
+            <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
+            <select
+              value={selectedDistrict}
+              onChange={(e) => onDistrictSelect && onDistrictSelect(e.target.value)}
+              className="bg-transparent text-white font-bold text-xs outline-none cursor-pointer pr-4 appearance-none hover:text-amber-300 transition"
+              aria-label="เลือกพื้นที่อำเภอ"
+            >
+              <option value="ALL" className="bg-slate-900 text-white py-1.5">
+                🗺️ ทุกอำเภอ {totalLeadCount ? `(${totalLeadCount} โรงงาน)` : ''}
+              </option>
+              {districtList.map((d) => (
+                <option key={d} value={d} className="bg-slate-900 text-white py-1.5">
+                  📍 อ.{d} {districtCounts?.[d] ? `(${districtCounts[d]} โรงงาน)` : ''}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-amber-400 shrink-0 pointer-events-none -ml-3" />
+          </div>
+        </div>
+
         {/* Recenter GPS */}
         <button
           onClick={handleRecenterUser}

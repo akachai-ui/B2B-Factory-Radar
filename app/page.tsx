@@ -1034,57 +1034,7 @@ export default function LeadsRadarMainPage() {
 
             </div>
 
-            {/* District Filter Chips */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-                <span className="font-bold flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                  <span>เลือกพื้นที่อำเภอ (จ.สมุทรปราการ 6 อำเภอ):</span>
-                </span>
-                <span>แสดง {filteredLeads.length} จาก {leads.length} โรงงาน</span>
-              </div>
-
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
-                <button
-                  onClick={() => setSelectedDistrict('ALL')}
-                  className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 cursor-pointer ${
-                    selectedDistrict === 'ALL'
-                      ? 'bg-slate-100 text-slate-950 font-black shadow-md'
-                      : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
-                >
-                  <span>ทุกอำเภอ</span>
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300">
-                    {leads.length}
-                  </span>
-                </button>
-
-                {districts.map((d) => {
-                  const count = districtCounts[d] || 0;
-                  const isSelected = selectedDistrict === d;
-                  return (
-                    <button
-                      key={d}
-                      onClick={() => setSelectedDistrict(d)}
-                      className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 cursor-pointer ${
-                        isSelected
-                          ? 'bg-amber-400 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                          : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
-                      }`}
-                    >
-                      <span>{d}</span>
-                      <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                        isSelected ? 'bg-slate-950 text-amber-300 font-bold' : 'bg-slate-800 text-slate-400'
-                      }`}>
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Radar Map Component */}
+            {/* Radar Map Component with District Dropdown inside */}
             <div className="relative rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950">
               <FactoryMap
                 leads={filteredLeads}
@@ -1095,6 +1045,9 @@ export default function LeadsRadarMainPage() {
                 onDistrictSelect={(d) => setSelectedDistrict(d)}
                 selectedRadius={selectedRadius}
                 onLeadClick={(lead) => handleOpenLeadModal(lead)}
+                districts={districts}
+                districtCounts={districtCounts}
+                totalLeadCount={leads.length}
               />
             </div>
 
@@ -1696,6 +1649,9 @@ export default function LeadsRadarMainPage() {
                 onDistrictSelect={(d) => setSelectedDistrict(d)}
                 selectedRadius={selectedRadius}
                 onLeadClick={(lead) => setMobileSelectedLead(lead)}
+                districts={districts}
+                districtCounts={districtCounts}
+                totalLeadCount={leads.length}
               />
             </div>
 
