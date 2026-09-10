@@ -2001,8 +2001,8 @@ export default function LeadsRadarMainPage() {
                 className="w-full py-3 px-4 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-between transition shadow-sm cursor-pointer active:scale-98"
               >
                 <div className="flex items-center gap-2.5">
-                  <Camera className="w-4 h-4 text-amber-400" />
-                  <span>เปลี่ยนรูปโปรไฟล์ & ตั้งค่าบัญชี</span>
+                  <Edit3 className="w-4 h-4 text-amber-400" />
+                  <span>ตั้งค่าข้อมูลโปรไฟล์ & สังกัด</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-amber-400/60" />
               </button>

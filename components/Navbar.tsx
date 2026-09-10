@@ -17,10 +17,7 @@ import {
   FileText,
   Phone,
   Terminal,
-  Camera,
-  Upload,
-  Trash2,
-  Image as ImageIcon,
+  ExternalLink,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -41,9 +38,6 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
   const [taxId, setTaxId] = useState(profile?.tax_id || '');
   const [branch, setBranch] = useState(profile?.branch || 'สำนักงานใหญ่');
   const [phone, setPhone] = useState(profile?.phone || '');
-  const [avatarUrl, setAvatarUrl] = useState<string>(
-    profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''
-  );
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -60,7 +54,6 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
     setTaxId(profile?.tax_id || '');
     setBranch(profile?.branch || 'สำนักงานใหญ่');
     setPhone(profile?.phone || '');
-    setAvatarUrl(profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || '');
     setIsProfileModalOpen(true);
     setIsDropdownOpen(false);
     setSaveSuccess(false);
@@ -72,63 +65,18 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
     return () => window.removeEventListener('open-profile-modal', handleOpen);
   }, [currentAccountType, profile, user]);
 
-  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 8 * 1024 * 1024) {
-      alert('กรุณาเลือกไฟล์ภาพขนาดไม่เกิน 8 MB');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (readerEvent) => {
-      const img = new window.Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxDim = 300;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > maxDim) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          }
-        } else {
-          if (height > maxDim) {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-          setAvatarUrl(dataUrl);
-        }
-      };
-      img.src = readerEvent.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleSaveProfile = async () => {
     setIsSaving(true);
     setSaveSuccess(false);
 
     if (isInvitedMember) {
-      // Invited members can update their personal name, phone and photo
+      // Invited members can only update their personal name and phone
       await updateProfile({
         full_name: fullName.trim() || displayName,
         phone: phone.trim(),
-        avatar_url: avatarUrl || null,
       });
     } else {
-      // Owners / Individuals can update their account type, photo and company details
+      // Owners / Individuals can update their account type and company details
       await updateProfile({
         account_type: accountType,
         full_name: fullName.trim() || displayName,
@@ -136,7 +84,6 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
         tax_id: accountType === 'company' ? taxId.trim() : (profile?.tax_id || null),
         branch: accountType === 'company' ? branch.trim() : (profile?.branch || 'สำนักงานใหญ่'),
         phone: phone.trim(),
-        avatar_url: avatarUrl || null,
       });
     }
 
@@ -343,67 +290,44 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
               </button>
             </div>
 
-            {/* Avatar / Profile Picture Upload Section */}
+            {/* Google Synced Avatar Section */}
             <div className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 flex items-center gap-4">
-              {/* Avatar Preview with Camera overlay */}
-              <div className="relative group shrink-0">
+              {/* Avatar Preview */}
+              <div className="relative shrink-0">
                 <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-amber-400/10 border-2 border-amber-500/40 p-0.5 overflow-hidden flex items-center justify-center shadow-lg shadow-amber-500/10">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover rounded-[14px]" />
+                  {currentAvatar ? (
+                    <img src={currentAvatar} alt="Avatar" className="w-full h-full object-cover rounded-[14px]" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-xl font-black text-amber-300 bg-slate-900 rounded-[14px]">
                       {fullName ? fullName.charAt(0).toUpperCase() : '👤'}
                     </div>
                   )}
                 </div>
-
-                <label
-                  title="เปลี่ยนรูปภาพ"
-                  className="absolute -bottom-1 -right-1 p-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md cursor-pointer transition active:scale-95 flex items-center justify-center border border-slate-900"
-                >
-                  <Camera className="w-3.5 h-3.5" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageFileChange}
-                    className="hidden"
-                  />
-                </label>
               </div>
 
-              {/* Avatar Controls */}
+              {/* Google Sync Info & Direct Link */}
               <div className="flex-1 space-y-1.5 min-w-0">
                 <div>
                   <h5 className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <ImageIcon className="w-3.5 h-3.5 text-amber-400" />
                     <span>รูปภาพโปรไฟล์</span>
+                    <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                      Google Synced
+                    </span>
                   </h5>
-                  <p className="text-[10px] text-slate-400">รองรับรูปถ่ายจากกล้อง หรือเลือกไฟล์จากเครื่อง</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
+                    ระบบดึงรูปโปรไฟล์จากบัญชี Google ของคุณโดยอัตโนมัติ
+                  </p>
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                  <label className="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] font-bold text-amber-300 transition cursor-pointer flex items-center gap-1.5 active:scale-95">
-                    <Upload className="w-3 h-3 text-amber-400" />
-                    <span>เลือกรูปภาพ</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageFileChange}
-                      className="hidden"
-                    />
-                  </label>
-
-                  {avatarUrl && (
-                    <button
-                      type="button"
-                      onClick={() => setAvatarUrl('')}
-                      className="px-2 py-1 rounded-xl bg-rose-950/30 hover:bg-rose-950/60 border border-rose-800/40 text-[11px] font-bold text-rose-300 transition cursor-pointer flex items-center gap-1 active:scale-95"
-                    >
-                      <Trash2 className="w-3 h-3 text-rose-400" />
-                      <span>ลบรูป</span>
-                    </button>
-                  )}
-                </div>
+                <a
+                  href="https://myaccount.google.com/personal-info"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 hover:text-amber-200 hover:underline transition"
+                >
+                  <span>จัดการรูปที่ Google Account</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
             </div>
 
