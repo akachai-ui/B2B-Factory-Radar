@@ -965,17 +965,17 @@ export default function LeadsRadarMainPage() {
           <div className="space-y-6 animate-in fade-in duration-200">
             
             {/* Search & Quick Controls Bar */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl">
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl">
               
               {/* Search input */}
-              <div className="lg:col-span-4 relative">
+              <div className="flex-1 min-w-[260px] relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="ค้นหาชื่อโรงงาน, ถนน, เบอร์โทร..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400 transition"
+                  className="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400 transition"
                 />
                 {searchQuery && (
                   <button
@@ -988,36 +988,38 @@ export default function LeadsRadarMainPage() {
               </div>
 
               {/* Radius Filter */}
-              <div className="lg:col-span-4 flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
+              <div className="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap">
                 <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1 shrink-0 px-1">
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
                   <span>รัศมีเรดาร์:</span>
                 </span>
-                {['3', '5', '10', '15', 'ALL'].map((rad) => (
-                  <button
-                    key={rad}
-                    onClick={() => setSelectedRadius(rad)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
-                      selectedRadius === rad
-                        ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                        : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
-                    }`}
-                  >
-                    {rad === 'ALL' ? 'ทั้งหมด' : `${rad} กม.`}
-                  </button>
-                ))}
+                <div className="flex items-center gap-1">
+                  {['3', '5', '10', '15', 'ALL'].map((rad) => (
+                    <button
+                      key={rad}
+                      onClick={() => setSelectedRadius(rad)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
+                        selectedRadius === rad
+                          ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                          : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
+                      }`}
+                    >
+                      {rad === 'ALL' ? 'ทั้งหมด' : `${rad} กม.`}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* GPS Live Tracking Info & Status */}
-              <div className="lg:col-span-4 flex items-center justify-between lg:justify-end gap-2 text-xs">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 truncate">
+              <div className="flex items-center justify-between lg:justify-end gap-2 text-xs shrink-0">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 truncate max-w-[220px]">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
                   <span className="truncate text-[11px] font-medium">{userLocation.label}</span>
                 </div>
 
                 <button
                   onClick={() => setIsLiveTracking(!isLiveTracking)}
-                  className={`p-2 rounded-xl border text-xs font-bold transition shrink-0 cursor-pointer flex items-center gap-1.5 ${
+                  className={`p-1.5 px-3 rounded-xl border text-xs font-bold transition shrink-0 cursor-pointer flex items-center gap-1.5 ${
                     isLiveTracking
                       ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                       : 'bg-slate-800 text-slate-400 border-slate-700'
@@ -1025,7 +1027,7 @@ export default function LeadsRadarMainPage() {
                   title={isLiveTracking ? 'เปิด GPS ติดตามสด' : 'ปิด GPS'}
                 >
                   <Navigation className={`w-3.5 h-3.5 ${isLiveTracking ? 'text-emerald-400 animate-spin' : 'text-slate-400'}`} />
-                  <span className="text-[11px] hidden sm:inline">{isLiveTracking ? 'GPS สด' : 'GPS หยุด'}</span>
+                  <span className="text-[11px]">{isLiveTracking ? 'GPS สด' : 'GPS หยุด'}</span>
                 </button>
               </div>
 
