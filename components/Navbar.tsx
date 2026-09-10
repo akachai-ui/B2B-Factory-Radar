@@ -40,7 +40,8 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const currentAccountType = profile?.account_type || (profile?.company_name && profile.company_name !== 'บริษัทของฉัน' ? 'company' : 'individual');
+  const isInvitedMember = Boolean(profile?.company_id && (profile?.role === 'sales' || profile?.role === 'manager'));
+  const currentAccountType = isInvitedMember ? 'company' : (profile?.account_type || (profile?.company_name && profile.company_name !== 'บริษัทของฉัน' ? 'company' : 'individual'));
   const displayCompanyName = profile?.company_name || 'บริษัทของฉัน';
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'ผู้ใช้งาน';
 
@@ -60,14 +61,23 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
     setIsSaving(true);
     setSaveSuccess(false);
 
-    await updateProfile({
-      account_type: accountType,
-      full_name: fullName.trim() || displayName,
-      company_name: accountType === 'company' ? (companyName.trim() || 'บริษัทของฉัน') : (profile?.company_name || null),
-      tax_id: accountType === 'company' ? taxId.trim() : (profile?.tax_id || null),
-      branch: accountType === 'company' ? branch.trim() : (profile?.branch || 'สำนักงานใหญ่'),
-      phone: phone.trim(),
-    });
+    if (isInvitedMember) {
+      // Invited members can only update their personal name and phone
+      await updateProfile({
+        full_name: fullName.trim() || displayName,
+        phone: phone.trim(),
+      });
+    } else {
+      // Owners / Individuals can update their account type and company details
+      await updateProfile({
+        account_type: accountType,
+        full_name: fullName.trim() || displayName,
+        company_name: accountType === 'company' ? (companyName.trim() || 'บริษัทของฉัน') : (profile?.company_name || null),
+        tax_id: accountType === 'company' ? taxId.trim() : (profile?.tax_id || null),
+        branch: accountType === 'company' ? branch.trim() : (profile?.branch || 'สำนักงานใหญ่'),
+        phone: phone.trim(),
+      });
+    }
 
     setIsSaving(false);
     setSaveSuccess(true);
@@ -257,37 +267,56 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
               </button>
             </div>
 
-            {/* Account Type Selector (Toggle) */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-300">ประเภทผู้ใช้งาน (Account Type)</label>
-              <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-950 border border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setAccountType('individual')}
-                  className={`py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                    accountType === 'individual'
-                      ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 shadow-md'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <User className="w-4 h-4" />
-                  <span>บุคคลธรรมดา</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setAccountType('company')}
-                  className={`py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                    accountType === 'company'
-                      ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-md font-black'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Building2 className="w-4 h-4" />
-                  <span>นิติบุคคล / บริษัท</span>
-                </button>
+            {/* Account Type Selector or Invited Member Banner */}
+            {isInvitedMember ? (
+              <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+                <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-bold text-amber-300">สังกัดองค์กร: {profile?.company_name || 'บริษัท'}</span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      {profile?.role === 'manager' ? 'ผู้จัดการ (Manager)' : 'ทีมขาย (Sales)'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                    บัญชีของคุณได้รับการเชิญเข้าสู่ทีม ข้อมูลบริษัทและสิทธิ์การใช้งานได้รับการดูแลและกำหนดโดย Owner
+                  </p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-300">ประเภทผู้ใช้งาน (Account Type)</label>
+                <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-950 border border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setAccountType('individual')}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                      accountType === 'individual'
+                        ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 shadow-md'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <User className="w-4 h-4" />
+                    <span>บุคคลธรรมดา</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setAccountType('company')}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                      accountType === 'company'
+                        ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-md font-black'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Building2 className="w-4 h-4" />
+                    <span>นิติบุคคล / บริษัท</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Form Fields */}
             <div className="space-y-3 pt-1">
@@ -316,8 +345,8 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                 />
               </div>
 
-              {/* Company Specific Fields */}
-              {accountType === 'company' && (
+              {/* Company Specific Fields (Only for Owner / Individual setting up Company) */}
+              {!isInvitedMember && accountType === 'company' && (
                 <div className="p-3.5 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-3 animate-in fade-in">
                   
                   {/* Company Name */}
