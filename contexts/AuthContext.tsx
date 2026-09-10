@@ -107,13 +107,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data && !error) {
-        setProfile(data as UserProfile);
+        const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem(`rh_avatar_${currentUser.id}`) : null;
+        const resolvedAvatar = data.avatar_url || currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || cachedAvatar || null;
+        setProfile({
+          ...(data as UserProfile),
+          avatar_url: resolvedAvatar,
+        });
       } else if (!data) {
         // If profile row doesn't exist yet, insert a clean default
+        const initialAvatar = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || null;
         const newProfile: Partial<UserProfile> = {
           id: currentUser.id,
           email: cleanEmail,
           full_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || cleanEmail.split('@')[0] || 'ผู้ใช้งาน',
+          avatar_url: initialAvatar,
           account_type: 'individual',
           company_name: null,
           onboarded: false,
@@ -282,6 +289,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!user) return { error: 'No authenticated user' };
     try {
+      if (typeof window !== 'undefined' && updates.avatar_url !== undefined) {
+        if (updates.avatar_url) {
+          localStorage.setItem(`rh_avatar_${user.id}`, updates.avatar_url);
+        } else {
+          localStorage.removeItem(`rh_avatar_${user.id}`);
+        }
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .update({
@@ -293,10 +308,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (data && !error) {
-        setProfile(data as UserProfile);
+        setProfile((prev) => ({
+          ...(data as UserProfile),
+          avatar_url: updates.avatar_url !== undefined ? updates.avatar_url : (data.avatar_url || prev?.avatar_url || null),
+        }));
+      } else {
+        // Optimistic local state update in case of column schema difference
+        setProfile((prev) => (prev ? { ...prev, ...updates } : null));
       }
       return { error };
     } catch (err) {
+      setProfile((prev) => (prev ? { ...prev, ...updates } : null));
       return { error: err };
     }
   };

@@ -73,6 +73,7 @@ export interface UserProfile {
   id: string;
   email: string;
   full_name: string;
+  avatar_url?: string | null;
   account_type?: 'individual' | 'company';
   company_name?: string | null;
   tax_id?: string | null;

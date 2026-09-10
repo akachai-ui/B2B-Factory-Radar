@@ -60,6 +60,7 @@ import {
   Compass,
   Radio,
   LogOut,
+  Camera,
 } from 'lucide-react';
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -1869,8 +1870,14 @@ export default function LeadsRadarMainPage() {
                   return (
                     <div key={m.id} className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 shadow-sm">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="h-9 w-9 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold text-xs shrink-0">
-                          {isThisOwner ? <Crown className="w-4 h-4 text-amber-400" /> : m.full_name?.charAt(0) || '👤'}
+                        <div className="h-9 w-9 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
+                          {m.avatar_url ? (
+                            <img src={m.avatar_url} alt={m.full_name || 'Member'} className="w-full h-full object-cover" />
+                          ) : isThisOwner ? (
+                            <Crown className="w-4 h-4 text-amber-400" />
+                          ) : (
+                            m.full_name?.charAt(0) || '👤'
+                          )}
                         </div>
                         <div className="min-w-0">
                           <div className="font-bold text-white text-xs truncate">{m.full_name || m.email?.split('@')[0]}</div>
@@ -1942,8 +1949,16 @@ export default function LeadsRadarMainPage() {
             {/* User Card */}
             <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-3">
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 font-black text-lg flex items-center justify-center shadow-lg shadow-amber-500/20">
-                  {profile?.account_type === 'company' ? '🏢' : profile?.full_name?.charAt(0) || '👤'}
+                <div className="h-14 w-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 font-black text-lg flex items-center justify-center shadow-lg shadow-amber-500/20 overflow-hidden shrink-0 border border-amber-500/30">
+                  {profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture ? (
+                    <img
+                      src={profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture}
+                      alt={profile?.full_name || 'Avatar'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    profile?.account_type === 'company' ? '🏢' : profile?.full_name?.charAt(0) || '👤'
+                  )}
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-bold text-white text-base truncate">{profile?.full_name || user?.email?.split('@')[0]}</h3>
@@ -1979,6 +1994,19 @@ export default function LeadsRadarMainPage() {
 
             {/* Actions */}
             <div className="space-y-2">
+              <button
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('open-profile-modal'));
+                }}
+                className="w-full py-3 px-4 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-between transition shadow-sm cursor-pointer active:scale-98"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Camera className="w-4 h-4 text-amber-400" />
+                  <span>เปลี่ยนรูปโปรไฟล์ & ตั้งค่าบัญชี</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-amber-400/60" />
+              </button>
+
               <Link
                 href="/dev"
                 className="w-full py-3 px-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-amber-300 text-xs font-bold flex items-center justify-between transition shadow-sm"
