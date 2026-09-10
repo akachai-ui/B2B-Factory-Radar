@@ -10,6 +10,8 @@ import { Navbar } from '@/components/Navbar';
 import { AuthModal } from '@/components/AuthModal';
 import { IdentityOnboardingModal } from '@/components/IdentityOnboardingModal';
 import { PendingInvitationModal } from '@/components/PendingInvitationModal';
+import { MobileBottomNav, MobileTab } from '@/components/MobileBottomNav';
+import { MobileFactoryBottomSheet } from '@/components/MobileFactoryBottomSheet';
 import * as XLSX from 'xlsx';
 import {
   Search,
@@ -56,6 +58,8 @@ import {
   Terminal,
   Activity,
   Compass,
+  Radio,
+  LogOut,
 } from 'lucide-react';
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -104,6 +108,7 @@ export default function LeadsRadarMainPage() {
     signInWithFacebook,
     signInWithPassword,
     signUpWithPassword,
+    signOut,
     updateProfile,
   } = useAuth();
   
@@ -118,6 +123,10 @@ export default function LeadsRadarMainPage() {
 
   // Main Dashboard States (When user is logged in)
   const [mainTab, setMainTab] = useState<'map' | 'table' | 'team'>('map');
+
+  // Mobile App Shell States (When on smartphone)
+  const [mobileTab, setMobileTab] = useState<MobileTab>('radar');
+  const [mobileSelectedLead, setMobileSelectedLead] = useState<FactoryLead | null>(null);
 
   // Leads & Filters
   const [leads, setLeads] = useState<FactoryLead[]>([]);
@@ -848,11 +857,15 @@ export default function LeadsRadarMainPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans">
       
-      {/* 1. App Navigation Bar */}
-      <Navbar onOpenAuth={(mode = 'signin') => { setAuthModalMode(mode); setIsAuthModalOpen(true); }} />
+      {/* ==================================================== */}
+      {/* 1. DESKTOP WORKSPACE VIEW (HIDDEN ON MOBILE SCREENS) */}
+      {/* ==================================================== */}
+      <div className="hidden sm:flex flex-col flex-1">
+        {/* App Navigation Bar */}
+        <Navbar onOpenAuth={(mode = 'signin') => { setAuthModalMode(mode); setIsAuthModalOpen(true); }} />
 
-      {/* 2. Top Banner / System Status Header */}
-      <div className="bg-slate-900/60 border-b border-slate-800/80 backdrop-blur-md">
+        {/* Top Banner / System Status Header */}
+        <div className="bg-slate-900/60 border-b border-slate-800/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             
@@ -1518,6 +1531,494 @@ export default function LeadsRadarMainPage() {
         )}
 
       </main>
+      </div>
+
+      {/* ==================================================== */}
+      {/* 2. SMARTPHONE NATIVE APP SHELL (MOBILE VIEW ONLY)    */}
+      {/* ==================================================== */}
+      <div className="sm:hidden flex flex-col flex-1 min-h-screen pb-20">
+        
+        {/* Mobile Top App Bar */}
+        <header className="sticky top-0 z-40 bg-[#0b0f19]/95 backdrop-blur-xl border-b border-slate-800/90 px-4 py-2.5 flex items-center justify-between gap-2 pt-safe">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="relative h-8 w-8 shrink-0 flex items-center justify-center">
+              <img
+                src="/images/logo.png"
+                alt="RouteHunter"
+                className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+              />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-black text-white leading-none tracking-tight">RouteHunter</span>
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
+                  B2B
+                </span>
+              </div>
+              <span className="text-[10px] text-amber-400/90 font-bold truncate mt-0.5">{displayTeamName}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Live GPS Toggle */}
+            <button
+              onClick={() => {
+                setIsLiveTracking(!isLiveTracking);
+                if (navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition((pos) => {
+                    setUserLocation({
+                      lat: pos.coords.latitude,
+                      lng: pos.coords.longitude,
+                      label: '📍 พิกัดปัจจุบันของคุณ',
+                    });
+                  });
+                }
+              }}
+              className={`p-1.5 px-2 rounded-xl border text-[11px] font-bold flex items-center gap-1 transition cursor-pointer ${
+                isLiveTracking
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 shadow-sm'
+                  : 'bg-slate-900 text-slate-400 border-slate-800'
+              }`}
+              title="GPS Live Tracking"
+            >
+              <Radio className={`w-3.5 h-3.5 ${isLiveTracking ? 'animate-pulse text-emerald-400' : 'text-slate-500'}`} />
+              <span>{isLiveTracking ? 'GPS เปิด' : 'GPS'}</span>
+            </button>
+
+            {/* Profile Avatar Button */}
+            <button
+              onClick={() => setMobileTab('profile')}
+              className={`h-8 w-8 rounded-xl flex items-center justify-center font-black text-xs transition border cursor-pointer ${
+                mobileTab === 'profile'
+                  ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-md ring-2 ring-amber-400/30'
+                  : 'bg-slate-900 text-slate-200 border-slate-800'
+              }`}
+            >
+              {profile?.account_type === 'company' ? '🏢' : profile?.full_name?.charAt(0) || '👤'}
+            </button>
+          </div>
+        </header>
+
+        {/* Feedback Alert on Mobile */}
+        {feedback && (
+          <div className="mx-3 mt-2">
+            <div className={`p-3 rounded-2xl border flex items-center justify-between text-xs font-bold ${
+              feedback.type === 'success'
+                ? 'bg-emerald-950/80 border-emerald-500/40 text-emerald-200'
+                : 'bg-rose-950/80 border-rose-500/40 text-rose-200'
+            }`}>
+              <span>{feedback.text}</span>
+              <button onClick={() => setFeedback(null)} className="text-slate-400 hover:text-white ml-2">✕</button>
+            </div>
+          </div>
+        )}
+
+        {/* ---------------------------------------------------- */}
+        {/* MOBILE TAB 1: RADAR (FULLSCREEN MAP & FLOATING CHIPS)*/}
+        {/* ---------------------------------------------------- */}
+        {mobileTab === 'radar' && (
+          <div className="flex-1 flex flex-col relative animate-in fade-in duration-150">
+            
+            {/* Horizontal District Filter Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2 px-3 bg-slate-950/95 border-b border-slate-800/80 sticky top-12 z-30">
+              <button
+                onClick={() => setSelectedDistrict('ALL')}
+                className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition shrink-0 cursor-pointer ${
+                  selectedDistrict === 'ALL'
+                    ? 'bg-amber-400 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                <span>🗺️ ทุกอำเภอ ({leads.length})</span>
+              </button>
+
+              {districts.map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setSelectedDistrict(d)}
+                  className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition shrink-0 cursor-pointer border ${
+                    selectedDistrict === d
+                      ? 'bg-amber-400 text-slate-950 font-black border-amber-300 shadow-md shadow-amber-500/20'
+                      : 'bg-slate-900 text-slate-400 hover:text-white border-slate-800'
+                  }`}
+                >
+                  <span>{d}</span>
+                  <span className="ml-1 text-[9px] opacity-80">({districtCounts[d] || 0})</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Horizontal Status Filter Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1.5 px-3 bg-slate-950/80 border-b border-slate-800/60 z-20">
+              {STATUS_OPTIONS.map((st) => (
+                <button
+                  key={st.value}
+                  onClick={() => setSelectedStatusFilter(selectedStatusFilter === st.value ? 'ALL' : st.value)}
+                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap transition shrink-0 cursor-pointer border ${
+                    selectedStatusFilter === st.value
+                      ? `${st.bg} ${st.color} border-current font-black ring-1 ring-amber-400 shadow`
+                      : 'bg-slate-900/60 text-slate-400 border-slate-800'
+                  }`}
+                >
+                  <span>{st.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Floating Search Pill */}
+            <div className="p-2.5 bg-slate-950/70 border-b border-slate-800/40 z-20">
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="ค้นหาชื่อโรงงาน, ถนน, หรือเบอร์โทร..."
+                  className="w-full pl-8 pr-8 py-2 bg-slate-900/90 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">✕</button>
+                )}
+              </div>
+            </div>
+
+            {/* Fullscreen Map Container */}
+            <div className="flex-1 w-full h-[calc(100dvh-200px)] min-h-[420px] relative">
+              <FactoryMap
+                leads={filteredLeads}
+                userLocation={userLocation}
+                isLiveTracking={isLiveTracking}
+                onToggleLiveTracking={() => setIsLiveTracking(!isLiveTracking)}
+                selectedDistrict={selectedDistrict}
+                onDistrictSelect={(d) => setSelectedDistrict(d)}
+                selectedRadius={selectedRadius}
+                onLeadClick={(lead) => setMobileSelectedLead(lead)}
+              />
+            </div>
+
+          </div>
+        )}
+
+        {/* ---------------------------------------------------- */}
+        {/* MOBILE TAB 2: FACTORY DIRECTORY (FEED CARDS)         */}
+        {/* ---------------------------------------------------- */}
+        {mobileTab === 'factories' && (
+          <div className="flex-1 p-3.5 space-y-3 animate-in fade-in duration-150">
+            {/* Search and Counts Header */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-white flex items-center gap-1.5">
+                  <Building2 className="w-4 h-4 text-amber-400" />
+                  <span>รายชื่อโรงงาน ({filteredLeads.length})</span>
+                </span>
+                <span className="text-[11px] text-slate-400 font-mono">
+                  {selectedDistrict === 'ALL' ? 'ทุกอำเภอ' : selectedDistrict}
+                </span>
+              </div>
+
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="พิมพ์ค้นหาโรงงาน..."
+                  className="w-full pl-9 pr-8 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">✕</button>
+                )}
+              </div>
+            </div>
+
+            {/* Factory Feed List */}
+            <div className="space-y-2.5">
+              {filteredLeads.length === 0 ? (
+                <div className="p-8 text-center rounded-3xl bg-slate-900 border border-slate-800 text-slate-400 space-y-2">
+                  <Building2 className="w-8 h-8 text-slate-600 mx-auto" />
+                  <p className="text-xs font-bold text-slate-300">ไม่พบโรงงานที่ตรงกับเงื่อนไข</p>
+                  <p className="text-[11px] text-slate-500">ลองเปลี่ยนคำค้นหาหรือเลือกอำเภออื่น</p>
+                </div>
+              ) : (
+                filteredLeads.slice(0, 80).map((lead) => {
+                  const dist = calculateDistanceKm(userLocation.lat, userLocation.lng, lead.lat, lead.lng);
+                  const cleanPhone = lead.phone ? lead.phone.replace(/[^0-9+]/g, '') : '';
+                  const statusCfg = STATUS_OPTIONS.find((s) => s.value === lead.status) || STATUS_OPTIONS[0];
+
+                  return (
+                    <div
+                      key={lead.id || lead.place_id}
+                      className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-md space-y-3"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            {lead.district || 'สมุทรปราการ'}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${statusCfg.bg} ${statusCfg.color}`}>
+                            {statusCfg.label.split(' ')[0]}
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-mono">
+                            📍 {dist < 1 ? `${Math.round(dist * 1000)} ม.` : `${dist.toFixed(1)} กม.`}
+                          </span>
+                        </div>
+
+                        <h4 className="font-bold text-white text-sm leading-snug">{lead.name || lead.factory_name}</h4>
+                        <p className="text-[11px] text-slate-400 line-clamp-1">{lead.address}</p>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 pt-1 border-t border-slate-800/80">
+                        {cleanPhone ? (
+                          <a
+                            href={`tel:${cleanPhone}`}
+                            className="py-2 px-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold flex items-center justify-center gap-1.5 active:scale-95 transition"
+                          >
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>โทร</span>
+                          </a>
+                        ) : (
+                          <button
+                            disabled
+                            className="py-2 px-2 rounded-xl bg-slate-950 border border-slate-800/60 text-slate-600 text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-not-allowed"
+                          >
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>ไม่มีเบอร์</span>
+                          </button>
+                        )}
+
+                        <a
+                          href={`https://www.google.com/maps/dir/?api=1&destination=${lead.lat},${lead.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="py-2 px-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-[11px] font-bold flex items-center justify-center gap-1.5 active:scale-95 transition"
+                        >
+                          <Navigation className="w-3.5 h-3.5" />
+                          <span>นำทาง</span>
+                        </a>
+
+                        <button
+                          onClick={() => setMobileSelectedLead(lead)}
+                          className="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold flex items-center justify-center gap-1.5 border border-slate-700 active:scale-95 transition cursor-pointer"
+                        >
+                          <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                          <span>บันทึก</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ---------------------------------------------------- */}
+        {/* MOBILE TAB 3: TEAM HUB                               */}
+        {/* ---------------------------------------------------- */}
+        {mobileTab === 'team' && (
+          <div className="flex-1 p-3.5 space-y-4 animate-in fade-in duration-150">
+            {/* Team Summary Card */}
+            <div className="p-4 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="space-y-0.5">
+                  <h3 className="font-black text-white text-base">{displayTeamName}</h3>
+                  <p className="text-[11px] text-slate-400">
+                    สาขา: {currentCompany?.branch || profile?.branch || 'สำนักงานใหญ่'} • สมาชิก {teamMembers.length} คน
+                  </p>
+                </div>
+                {isOwner && (
+                  <button
+                    onClick={() => setIsAddMemberModalOpen(true)}
+                    className="py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md cursor-pointer active:scale-95 transition"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>เชิญสมาชิก</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Sub-tabs */}
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
+                <button
+                  onClick={() => setTeamTab('members')}
+                  className={`flex-1 py-1.5 rounded-xl text-xs font-bold transition ${
+                    teamTab === 'members' ? 'bg-slate-100 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  สมาชิก ({teamMembers.length})
+                </button>
+                <button
+                  onClick={() => setTeamTab('pending')}
+                  className={`flex-1 py-1.5 rounded-xl text-xs font-bold transition ${
+                    teamTab === 'pending' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  คำเชิญรอ ({pendingInvitations.length})
+                </button>
+              </div>
+            </div>
+
+            {/* Roster Cards */}
+            {teamTab === 'members' ? (
+              <div className="space-y-2">
+                {teamMembers.map((m) => {
+                  const isThisOwner = m.role === 'owner' || (!m.role && m.id === currentCompany?.owner_id);
+                  const isManager = m.role === 'manager';
+                  return (
+                    <div key={m.id} className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 shadow-sm">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="h-9 w-9 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold text-xs shrink-0">
+                          {isThisOwner ? <Crown className="w-4 h-4 text-amber-400" /> : m.full_name?.charAt(0) || '👤'}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-bold text-white text-xs truncate">{m.full_name || m.email?.split('@')[0]}</div>
+                          <div className="text-[10px] text-slate-400 font-mono truncate">{m.email}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${
+                          isThisOwner ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : isManager ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+                        }`}>
+                          {isThisOwner ? 'Owner' : isManager ? 'Manager' : 'Sales'}
+                        </span>
+                        {isOwner && !isThisOwner && (
+                          <button
+                            onClick={() => handleRemoveMember(m.id, m.full_name || m.email)}
+                            className="p-1 rounded-lg text-rose-400 hover:bg-rose-950/40"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {pendingInvitations.length === 0 ? (
+                  <div className="p-8 text-center rounded-2xl bg-slate-900 border border-slate-800 text-slate-400 text-xs">
+                    ไม่มีคำเชิญที่รอยืนยัน
+                  </div>
+                ) : (
+                  pendingInvitations.map((inv) => (
+                    <div key={inv.id} className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 shadow-sm">
+                      <div className="min-w-0 space-y-0.5">
+                        <div className="text-xs font-bold text-white font-mono truncate">{inv.email}</div>
+                        <div className="text-[10px] text-slate-400">ตำแหน่ง: <span className="text-amber-300 font-bold uppercase">{inv.role}</span></div>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          onClick={() => handleCopySpecificInvite(inv.id)}
+                          className="px-2.5 py-1 rounded-xl bg-slate-800 text-slate-200 text-[10px] font-bold border border-slate-700"
+                        >
+                          {copiedInviteId === inv.id ? '✓ คัดลอกแล้ว' : 'คัดลอก'}
+                        </button>
+                        {isOwner && (
+                          <button
+                            onClick={() => handleCancelInvitation(inv.id, inv.email)}
+                            className="p-1 rounded-lg text-rose-400 hover:bg-rose-950/40"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ---------------------------------------------------- */}
+        {/* MOBILE TAB 4: PROFILE & SETTINGS                     */}
+        {/* ---------------------------------------------------- */}
+        {mobileTab === 'profile' && (
+          <div className="flex-1 p-4 space-y-4 animate-in fade-in duration-150">
+            {/* User Card */}
+            <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 font-black text-lg flex items-center justify-center shadow-lg shadow-amber-500/20">
+                  {profile?.account_type === 'company' ? '🏢' : profile?.full_name?.charAt(0) || '👤'}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-bold text-white text-base truncate">{profile?.full_name || user?.email?.split('@')[0]}</h3>
+                  <p className="text-xs text-slate-400 font-mono truncate">{user?.email}</p>
+                  <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${
+                    profile?.role === 'owner' || !profile?.role ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+                  }`}>
+                    {profile?.role === 'owner' || !profile?.role ? '👑 Owner' : profile?.role === 'manager' ? '👔 Manager' : '💼 Sales'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Company Details */}
+              <div className="pt-3 border-t border-slate-800/80 space-y-2 text-xs">
+                <div className="flex items-center justify-between text-slate-400">
+                  <span>🏢 สังกัดบริษัท:</span>
+                  <span className="font-bold text-amber-300">{displayTeamName}</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-400">
+                  <span>สาขา:</span>
+                  <span className="text-slate-300">{profile?.branch || 'สำนักงานใหญ่'}</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-400">
+                  <span>เลขผู้เสียภาษี:</span>
+                  <span className="font-mono text-slate-300">{profile?.tax_id || '-'}</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-400">
+                  <span>เบอร์โทร:</span>
+                  <span className="font-mono text-slate-300">{profile?.phone || '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-2">
+              <Link
+                href="/dev"
+                className="w-full py-3 px-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-amber-300 text-xs font-bold flex items-center justify-between transition shadow-sm"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Terminal className="w-4 h-4 text-amber-400" />
+                  <span>หน้า Dev QA Monitor & ภาพรวม</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-500" />
+              </Link>
+
+              <button
+                onClick={async () => { await signOut(); }}
+                className="w-full py-3 px-4 rounded-2xl bg-rose-950/40 hover:bg-rose-950/60 border border-rose-800/50 text-rose-300 text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer active:scale-98"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>ออกจากระบบ (Sign Out)</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Fixed Mobile Bottom Navigation Bar */}
+        <MobileBottomNav
+          activeTab={mobileTab}
+          onSelectTab={(t) => setMobileTab(t)}
+          factoryCount={filteredLeads.length}
+        />
+
+        {/* Mobile Slide-up Factory Bottom Sheet */}
+        <MobileFactoryBottomSheet
+          factory={mobileSelectedLead}
+          onClose={() => setMobileSelectedLead(null)}
+          onUpdateStatus={(id, status, notes) => handleUpdateLead(id, { status, notes })}
+          userDistanceKm={
+            mobileSelectedLead
+              ? calculateDistanceKm(userLocation.lat, userLocation.lng, mobileSelectedLead.lat, mobileSelectedLead.lng)
+              : null
+          }
+        />
+
+      </div>
 
       {/* 4. Lead Detail & Notes Modal */}
       {activeLeadModal && (

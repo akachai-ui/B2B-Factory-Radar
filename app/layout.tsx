@@ -1,13 +1,28 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { AuthProvider } from '@/contexts/AuthContext';
 import './globals.css';
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#070b14',
+};
+
 export const metadata: Metadata = {
   title: 'RouteHunter | ฐานข้อมูลโรงงานอุตสาหกรรม สมุทรปราการ',
   description: 'ระบบเรดาร์และฐานข้อมูลโรงงานอุตสาหกรรม จ.สมุทรปราการ',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'RouteHunter',
+  },
   icons: {
     icon: '/favicon.ico',
+    apple: '/images/logo.png',
   },
 };
 
