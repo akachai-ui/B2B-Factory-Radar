@@ -1,71 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FactoryLead, LeadStatus } from '@/lib/types';
+import React from 'react';
+import { FactoryLead } from '@/lib/types';
 import {
   X,
   Phone,
   Navigation,
   Building2,
   MapPin,
-  Sparkles,
-  CheckCircle2,
-  Clock,
-  Briefcase,
-  Layers,
-  MessageSquare,
-  ChevronDown,
-  ExternalLink,
 } from 'lucide-react';
 
 interface MobileFactoryBottomSheetProps {
   factory: FactoryLead | null;
   onClose: () => void;
-  onUpdateStatus?: (id: string, status: LeadStatus, notes?: string) => void;
   userDistanceKm?: number | null;
 }
-
-const STATUS_CONFIG: Record<LeadStatus, { label: string; color: string; bg: string }> = {
-  NEW: { label: 'ใหม่ (ยังไม่ติดต่อ)', color: 'text-cyan-300', bg: 'bg-cyan-500/20 border-cyan-500/30' },
-  CONTACTED: { label: 'โทรติดต่อแล้ว', color: 'text-blue-300', bg: 'bg-blue-500/20 border-blue-500/30' },
-  MEETING: { label: 'นัดหมายเข้าพบ', color: 'text-purple-300', bg: 'bg-purple-500/20 border-purple-500/30' },
-  QUOTED: { label: 'เสนอราคาแล้ว', color: 'text-amber-300', bg: 'bg-amber-500/20 border-amber-500/30' },
-  WON: { label: 'ปิดการขายสำเร็จ (Won)', color: 'text-emerald-300', bg: 'bg-emerald-500/20 border-emerald-500/30' },
-  LOST: { label: 'ไม่สนใจ / ปิดโอกาส', color: 'text-slate-400', bg: 'bg-slate-700/30 border-slate-600/30' },
-};
 
 export function MobileFactoryBottomSheet({
   factory,
   onClose,
-  onUpdateStatus,
   userDistanceKm,
 }: MobileFactoryBottomSheetProps) {
   if (!factory) return null;
 
-  const currentStatus: LeadStatus = (factory.status || factory.lead_status || 'NEW') as LeadStatus;
-  const statusCfg = STATUS_CONFIG[currentStatus] || STATUS_CONFIG.NEW;
-  const [note, setNote] = useState(factory.notes || factory.sales_notes || '');
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  const factoryId = (factory.id || factory.place_id) as string;
   const factoryName = factory.name || factory.factory_name || 'โรงงานอุตสาหกรรม';
   const factoryAddress = factory.address || 'จ.สมุทรปราการ';
   const factoryPhone = factory.phone || '';
   const factoryDistrict = factory.district || 'สมุทรปราการ';
-
-  const handleStatusChange = (newStatus: LeadStatus) => {
-    if (onUpdateStatus && factoryId) {
-      onUpdateStatus(factoryId, newStatus, note);
-    }
-  };
-
-  const handleSaveNote = () => {
-    if (onUpdateStatus && factoryId) {
-      setIsUpdating(true);
-      onUpdateStatus(factoryId, currentStatus, note);
-      setTimeout(() => setIsUpdating(false), 600);
-    }
-  };
 
   const googleMapsUrl = factory.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${factory.lat},${factory.lng}`;
   const cleanPhone = factoryPhone ? factoryPhone.replace(/[^0-9+]/g, '') : '';
@@ -92,9 +53,6 @@ export function MobileFactoryBottomSheet({
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">
                 {factory.district || 'สมุทรปราการ'}
-              </span>
-              <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${statusCfg.bg} ${statusCfg.color}`}>
-                {statusCfg.label}
               </span>
               {userDistanceKm !== null && userDistanceKm !== undefined && (
                 <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
@@ -155,7 +113,7 @@ export function MobileFactoryBottomSheet({
         </div>
 
         {/* Factory Details Box */}
-        <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 space-y-2.5 text-xs">
+        <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 space-y-2.5 text-xs mb-2">
           <div className="flex items-start gap-2 text-slate-300">
             <Building2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <div>
@@ -183,58 +141,6 @@ export function MobileFactoryBottomSheet({
               <span className="font-mono text-emerald-300 font-bold">{factory.phone}</span>
             </div>
           )}
-        </div>
-
-        {/* Lead Status Quick Selector */}
-        <div className="mt-4 space-y-1.5">
-          <label className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
-            <Briefcase className="w-3.5 h-3.5 text-amber-400" />
-            <span>สถานะการติดตามงานขาย (Lead Status):</span>
-          </label>
-          <div className="grid grid-cols-3 gap-1.5">
-            {(Object.keys(STATUS_CONFIG) as LeadStatus[]).map((st) => {
-              const cfg = STATUS_CONFIG[st];
-              const isSelected = currentStatus === st;
-              return (
-                <button
-                  key={st}
-                  type="button"
-                  onClick={() => handleStatusChange(st)}
-                  className={`py-2 px-2 rounded-xl text-[10px] font-bold transition flex items-center justify-center gap-1 cursor-pointer border ${
-                    isSelected
-                      ? `${cfg.bg} ${cfg.color} border-current ring-1 ring-amber-400 font-black shadow-md`
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <span>{cfg.label.split(' ')[0]}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Sales Notes Input */}
-        <div className="mt-4 space-y-1.5 mb-2">
-          <label className="text-[11px] font-bold text-slate-300 flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
-              <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
-              <span>บันทึกการเข้าพบ / ติดต่อ:</span>
-            </span>
-            <button
-              onClick={handleSaveNote}
-              disabled={isUpdating}
-              className="text-[10px] text-amber-400 hover:text-amber-300 font-bold cursor-pointer"
-            >
-              {isUpdating ? 'กำลังบันทึก...' : '💾 บันทึกโน้ต'}
-            </button>
-          </label>
-          <textarea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="จดบันทึก เช่น คุยกับฝ่ายจัดซื้อแล้ว สนใจสินค้าตัวอย่าง นัดส่งใบเสนอราคาพรุ่งนี้..."
-            rows={2}
-            className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition resize-none"
-          />
         </div>
 
       </div>

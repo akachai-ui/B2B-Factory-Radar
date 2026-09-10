@@ -2046,7 +2046,6 @@ export default function LeadsRadarMainPage() {
         <MobileFactoryBottomSheet
           factory={mobileSelectedLead}
           onClose={() => setMobileSelectedLead(null)}
-          onUpdateStatus={(id, status, notes) => handleUpdateLead(id, { status, notes })}
           userDistanceKm={
             mobileSelectedLead
               ? calculateDistanceKm(userLocation.lat, userLocation.lng, mobileSelectedLead.lat, mobileSelectedLead.lng)
@@ -2092,67 +2091,23 @@ export default function LeadsRadarMainPage() {
               )}
             </div>
 
-            {/* Status & Assigned Sales Rep */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400">สถานะการขาย (Status)</label>
-                <select
-                  value={activeLeadModal.status || 'NEW'}
-                  onChange={(e) => handleUpdateLead(activeLeadModal.id || activeLeadModal.place_id, { status: e.target.value as LeadStatus })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-amber-400"
-                >
-                  {STATUS_OPTIONS.map((st) => (
-                    <option key={st.value} value={st.value}>{st.label}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400">มอบหมายเซลส์ (Sales Rep)</label>
-                <select
-                  value={activeLeadModal.sales_rep || ''}
-                  onChange={(e) => handleUpdateLead(activeLeadModal.id || activeLeadModal.place_id, { sales_rep: e.target.value || null })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white outline-none focus:border-amber-400"
-                >
-                  <option value="">-- ยังไม่มอบหมาย --</option>
-                  {teamMembers.map((m) => (
-                    <option key={m.id} value={m.full_name || m.email}>{m.full_name || m.email}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Notes Textarea */}
-            <div className="space-y-1">
-              <label className="text-[11px] font-bold text-slate-400">บันทึกความคืบหน้า / สรุปการเข้าพบ (Notes)</label>
-              <textarea
-                value={modalNotes}
-                onChange={(e) => setModalNotes(e.target.value)}
-                placeholder="เช่น โทรคุยกับฝ่ายจัดซื้อแล้ว สนใจสินค้าตัวอย่าง นัดส่งใบเสนอราคา..."
-                rows={3}
-                className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition"
-              />
-            </div>
-
             {/* Actions */}
             <div className="flex items-center justify-between pt-2 border-t border-slate-800">
               <a
                 href={activeLeadModal.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${activeLeadModal.lat},${activeLeadModal.lng}`}
                 target="_blank"
                 rel="noreferrer"
-                className="px-3.5 py-2 rounded-xl bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-slate-950 font-bold text-xs flex items-center gap-1.5 transition"
+                className="px-4 py-2 rounded-xl bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-slate-950 font-bold text-xs flex items-center gap-1.5 transition"
               >
                 <Navigation className="w-3.5 h-3.5" />
-                <span>นำทาง Maps</span>
+                <span>นำทาง Google Maps</span>
               </a>
 
               <button
-                onClick={handleSaveModalNotes}
-                disabled={isSavingLead}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                onClick={() => setActiveLeadModal(null)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition cursor-pointer"
               >
-                <Check className="w-4 h-4" />
-                <span>{isSavingLead ? 'กำลังบันทึก...' : 'บันทึกข้อมูล'}</span>
+                ปิดหน้าต่าง
               </button>
             </div>
 
