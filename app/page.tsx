@@ -1479,65 +1479,50 @@ export default function LeadsRadarMainPage() {
       {/* ==================================================== */}
       {/* 2. SMARTPHONE NATIVE APP SHELL (MOBILE VIEW ONLY)    */}
       {/* ==================================================== */}
-      <div className="sm:hidden flex flex-col flex-1 min-h-screen pb-20">
+      <div className="sm:hidden flex flex-col flex-1 min-h-screen pb-20 bg-[#080c14]">
         
         {/* Mobile Top App Bar */}
-        <header className="sticky top-0 z-40 bg-[#0b0f19]/95 backdrop-blur-xl border-b border-slate-800/90 px-4 py-2.5 flex items-center justify-between gap-2 pt-safe">
+        <header className="sticky top-0 z-40 bg-[#0b0f19]/90 backdrop-blur-2xl border-b border-slate-800/80 px-4 py-3 flex items-center justify-between gap-3 pt-safe shadow-lg">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="relative h-8 w-8 shrink-0 flex items-center justify-center">
+            <div className="relative h-9 w-9 shrink-0 flex items-center justify-center p-0.5 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-yellow-400/10 border border-amber-500/30">
               <img
                 src="/images/logo.png"
                 alt="RouteHunter"
-                className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+                className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]"
               />
             </div>
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-black text-white leading-none tracking-tight">RouteHunter</span>
-                <span className="px-1.5 py-0.2 rounded text-[8px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
+                <span className="px-1.5 py-0.2 rounded-md text-[8px] font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 uppercase shadow-sm">
                   B2B
                 </span>
               </div>
-              <span className="text-[10px] text-amber-400/90 font-bold truncate mt-0.5">{displayTeamName}</span>
+              <span className="text-[10px] text-amber-300/90 font-bold truncate mt-0.5">{displayTeamName}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Live GPS Toggle */}
-            <button
-              onClick={() => {
-                setIsLiveTracking(!isLiveTracking);
-                if (navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition((pos) => {
-                    setUserLocation({
-                      lat: pos.coords.latitude,
-                      lng: pos.coords.longitude,
-                      label: '📍 พิกัดปัจจุบันของคุณ',
-                    });
-                  });
-                }
-              }}
-              className={`p-1.5 px-2 rounded-xl border text-[11px] font-bold flex items-center gap-1 transition cursor-pointer ${
-                isLiveTracking
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 shadow-sm'
-                  : 'bg-slate-900 text-slate-400 border-slate-800'
-              }`}
-              title="GPS Live Tracking"
-            >
-              <Radio className={`w-3.5 h-3.5 ${isLiveTracking ? 'animate-pulse text-emerald-400' : 'text-slate-500'}`} />
-              <span>{isLiveTracking ? 'GPS เปิด' : 'GPS'}</span>
-            </button>
-
-            {/* Profile Avatar Button */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* User Profile Avatar Button */}
             <button
               onClick={() => setMobileTab('profile')}
-              className={`h-8 w-8 rounded-xl flex items-center justify-center font-black text-xs transition border cursor-pointer ${
+              className={`h-9 w-9 rounded-2xl flex items-center justify-center font-black text-xs transition border cursor-pointer overflow-hidden active:scale-95 ${
                 mobileTab === 'profile'
-                  ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-md ring-2 ring-amber-400/30'
-                  : 'bg-slate-900 text-slate-200 border-slate-800'
+                  ? 'border-amber-400 shadow-md ring-2 ring-amber-400/40'
+                  : 'bg-slate-900 text-slate-200 border-slate-800 hover:border-slate-700'
               }`}
+              title="โปรไฟล์ของคุณ"
             >
-              {profile?.account_type === 'company' ? '🏢' : profile?.full_name?.charAt(0) || '👤'}
+              {profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture ? (
+                <img
+                  src={profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture}
+                  alt="Avatar"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span>{profile?.account_type === 'company' ? '🏢' : profile?.full_name?.charAt(0) || '👤'}</span>
+              )}
             </button>
           </div>
         </header>
@@ -1557,76 +1542,51 @@ export default function LeadsRadarMainPage() {
         )}
 
         {/* ---------------------------------------------------- */}
-        {/* MOBILE TAB 1: RADAR (FULLSCREEN MAP & FLOATING CHIPS)*/}
+        {/* MOBILE TAB 1: RADAR (FULLSCREEN MAP & FLOATING PILLS)*/}
         {/* ---------------------------------------------------- */}
         {mobileTab === 'radar' && (
           <div className="flex-1 flex flex-col relative animate-in fade-in duration-150">
             
-            {/* Horizontal District Filter Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2 px-3 bg-slate-950/95 border-b border-slate-800/80 sticky top-12 z-30">
-              <button
-                onClick={() => setSelectedDistrict('ALL')}
-                className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition shrink-0 cursor-pointer ${
-                  selectedDistrict === 'ALL'
-                    ? 'bg-amber-400 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                <span>🗺️ ทุกอำเภอ ({leads.length})</span>
-              </button>
-
-              {districts.map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setSelectedDistrict(d)}
-                  className={`px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap transition shrink-0 cursor-pointer border ${
-                    selectedDistrict === d
-                      ? 'bg-amber-400 text-slate-950 font-black border-amber-300 shadow-md shadow-amber-500/20'
-                      : 'bg-slate-900 text-slate-400 hover:text-white border-slate-800'
-                  }`}
-                >
-                  <span>{d}</span>
-                  <span className="ml-1 text-[9px] opacity-80">({districtCounts[d] || 0})</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Horizontal Status Filter Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1.5 px-3 bg-slate-950/80 border-b border-slate-800/60 z-20">
-              {STATUS_OPTIONS.map((st) => (
-                <button
-                  key={st.value}
-                  onClick={() => setSelectedStatusFilter(selectedStatusFilter === st.value ? 'ALL' : st.value)}
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap transition shrink-0 cursor-pointer border ${
-                    selectedStatusFilter === st.value
-                      ? `${st.bg} ${st.color} border-current font-black ring-1 ring-amber-400 shadow`
-                      : 'bg-slate-900/60 text-slate-400 border-slate-800'
-                  }`}
-                >
-                  <span>{st.label}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Floating Search Pill */}
-            <div className="p-2.5 bg-slate-950/70 border-b border-slate-800/40 z-20">
+            {/* Sleek Floating Search & Radius Bar */}
+            <div className="p-3 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 space-y-2 z-20">
               <div className="relative">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="ค้นหาชื่อโรงงาน, ถนน, หรือเบอร์โทร..."
-                  className="w-full pl-8 pr-8 py-2 bg-slate-900/90 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400"
+                  className="w-full pl-9 pr-8 py-2 bg-slate-900/90 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400 transition"
                 />
                 {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">✕</button>
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">✕</button>
                 )}
+              </div>
+
+              {/* Radius Quick Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 shrink-0 px-1">
+                  <Zap className="w-3 h-3 text-amber-400" />
+                  <span>รัศมี:</span>
+                </span>
+                {['3', '5', '10', '15', 'ALL'].map((rad) => (
+                  <button
+                    key={rad}
+                    onClick={() => setSelectedRadius(rad)}
+                    className={`px-2.5 py-1 rounded-xl text-[10px] font-bold transition shrink-0 cursor-pointer ${
+                      selectedRadius === rad
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                        : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {rad === 'ALL' ? 'ทั้งหมด' : `${rad} กม.`}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Fullscreen Map Container */}
-            <div className="flex-1 w-full h-[calc(100dvh-200px)] min-h-[420px] relative">
+            <div className="flex-1 w-full h-[calc(100dvh-175px)] min-h-[420px] relative">
               <FactoryMap
                 leads={filteredLeads}
                 userLocation={userLocation}
