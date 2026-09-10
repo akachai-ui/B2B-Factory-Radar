@@ -71,17 +71,19 @@ function generateSalesRecommendation(rainProb: number, weatherCode: number, curr
   return '✨ สภาพอากาศดีเยี่ยม เหมาะแก่การลงพื้นที่พบลูกค้าตลอดทั้งวัน';
 }
 
-// Simple client-side cache
-let cachedWeather: { data: WeatherData; timestamp: number } | null = null;
+// Coordinate-keyed cache (5km resolution)
+const weatherCache = new Map<string, { data: WeatherData; timestamp: number }>();
 const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
 export async function fetchLiveWeather(
   lat: number = 13.6062,
   lng: number = 100.6974
 ): Promise<WeatherData | null> {
+  const coordKey = `${lat.toFixed(2)}_${lng.toFixed(2)}`;
   const now = Date.now();
-  if (cachedWeather && now - cachedWeather.timestamp < CACHE_DURATION_MS) {
-    return cachedWeather.data;
+  const cached = weatherCache.get(coordKey);
+  if (cached && now - cached.timestamp < CACHE_DURATION_MS) {
+    return cached.data;
   }
 
   try {
@@ -131,7 +133,7 @@ export async function fetchLiveWeather(
       hourlyForecast,
     };
 
-    cachedWeather = { data: result, timestamp: now };
+    weatherCache.set(coordKey, { data: result, timestamp: now });
     return result;
   } catch (err) {
     console.warn('Unable to fetch live weather forecast:', err);

@@ -228,7 +228,7 @@ export function MorningBriefingCard({
                         <span className="text-[11px] text-slate-300 font-medium">{weather.weatherDesc}</span>
                       </div>
                       <span className="text-[10px] text-slate-400 block">
-                        ช่วง {weather.minTemp}° - {weather.maxTemp}°C • ชื้น {weather.humidity}%
+                        📍 {userLocation.label || 'สมุทรปราการ'} • ชื้น {weather.humidity}%
                       </span>
                     </div>
                   </div>
