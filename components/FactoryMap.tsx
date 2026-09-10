@@ -68,6 +68,7 @@ export function FactoryMap({
   const geoJsonLayerRef = useRef<any>(null);
   const userMarkerRef = useRef<any>(null);
   const radiusCircleRef = useRef<any>(null);
+  const selectedMarkerRef = useRef<any>(null);
 
   const defaultDistricts = ['บางพลี', 'เมืองสมุทรปราการ', 'พระประแดง', 'พระสมุทรเจดีย์', 'บางบ่อ', 'บางเสาธง'];
   const districtList = districts || defaultDistricts;
@@ -358,6 +359,54 @@ export function FactoryMap({
       radiusCircleRef.current = radiusCircle;
     }
   }, [userLocation, selectedRadius]);
+
+  // 6. Highlight Selected Pin on Map with Glowing Pulse & Distinct Marker
+  useEffect(() => {
+    if (!mapInstanceRef.current || typeof window === 'undefined') return;
+    const L = (window as any).L;
+    if (!L) return;
+
+    if (selectedMarkerRef.current) {
+      mapInstanceRef.current.removeLayer(selectedMarkerRef.current);
+      selectedMarkerRef.current = null;
+    }
+
+    if (!selectedLead || !selectedLead.lat || !selectedLead.lng) return;
+
+    const activeSelectedIcon = L.divIcon({
+      html: `
+        <div class="relative flex items-center justify-center -top-6 -left-6 w-12 h-12 pointer-events-none">
+          <!-- Dynamic Pulsing Radar Ripple -->
+          <div class="absolute inset-0 rounded-full bg-amber-400/40 animate-ping"></div>
+          <div class="absolute -inset-1 rounded-full bg-amber-500/30 animate-pulse"></div>
+          
+          <!-- Distinct Elevated Active Pin -->
+          <div class="relative flex flex-col items-center pointer-events-auto filter drop-shadow-[0_0_16px_rgba(245,158,11,0.9)]">
+            <div class="h-9 w-9 rounded-2xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 text-slate-950 flex items-center justify-center font-black shadow-2xl border-2 border-white scale-110">
+              <svg class="w-4 h-4 fill-slate-950" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+            <div class="w-2.5 h-2.5 bg-yellow-300 rotate-45 -mt-1 shadow-md border-r border-b border-amber-500"></div>
+          </div>
+        </div>
+      `,
+      className: 'custom-selected-pin-icon',
+      iconSize: [0, 0],
+      iconAnchor: [0, 0],
+    });
+
+    const activeMarker = L.marker([selectedLead.lat, selectedLead.lng], {
+      icon: activeSelectedIcon,
+      zIndexOffset: 9999,
+    }).addTo(mapInstanceRef.current);
+
+    selectedMarkerRef.current = activeMarker;
+
+    // Smoothly pan to the selected factory pin
+    mapInstanceRef.current.panTo([selectedLead.lat, selectedLead.lng], {
+      animate: true,
+      duration: 0.8,
+    });
+  }, [selectedLead]);
 
   const handleRecenterUser = () => {
     if (mapInstanceRef.current && userLocation.lat && userLocation.lng) {
