@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Building2,
@@ -37,6 +38,11 @@ export function IdentityOnboardingModal({ isOpen, onComplete }: IdentityOnboardi
     e.preventDefault();
     setErrorMsg(null);
 
+    if (!user) {
+      setErrorMsg('กรุณาเข้าสู่ระบบก่อนดำเนินการ');
+      return;
+    }
+
     if (accountType === 'company' && !companyName.trim()) {
       setErrorMsg('กรุณาระบุชื่อบริษัท / องค์กรของคุณ');
       return;
@@ -45,18 +51,79 @@ export function IdentityOnboardingModal({ isOpen, onComplete }: IdentityOnboardi
     setIsSubmitting(true);
 
     try {
+      let linkedCompanyId = profile?.company_id || null;
+
+      if (accountType === 'company') {
+        // 1. Check if company record already exists for this owner
+        if (linkedCompanyId) {
+          await supabase
+            .from('companies')
+            .update({
+              name: companyName.trim(),
+              tax_id: taxId.trim() || null,
+              branch: branch.trim() || 'สำนักงานใหญ่',
+              phone: phone.trim() || null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', linkedCompanyId);
+        } else {
+          // Check if company exists with owner_id
+          const { data: existingComp } = await supabase
+            .from('companies')
+            .select('id')
+            .eq('owner_id', user.id)
+            .maybeSingle();
+
+          if (existingComp) {
+            linkedCompanyId = existingComp.id;
+            await supabase
+              .from('companies')
+              .update({
+                name: companyName.trim(),
+                tax_id: taxId.trim() || null,
+                branch: branch.trim() || 'สำนักงานใหญ่',
+                phone: phone.trim() || null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', existingComp.id);
+          } else {
+            // Create brand new company record
+            const { data: newComp, error: compError } = await supabase
+              .from('companies')
+              .insert([
+                {
+                  name: companyName.trim(),
+                  tax_id: taxId.trim() || null,
+                  branch: branch.trim() || 'สำนักงานใหญ่',
+                  phone: phone.trim() || null,
+                  owner_id: user.id,
+                },
+              ])
+              .select()
+              .single();
+
+            if (!compError && newComp) {
+              linkedCompanyId = newComp.id;
+            }
+          }
+        }
+      }
+
+      // 2. Update user profile in profiles table
       await updateProfile({
         account_type: accountType,
         full_name: fullName.trim() || user?.email?.split('@')[0] || 'ผู้ใช้งาน',
-        company_name: accountType === 'company' ? (companyName.trim() || 'บริษัทของฉัน') : (profile?.company_name || null),
-        tax_id: accountType === 'company' ? taxId.trim() : (profile?.tax_id || null),
-        branch: accountType === 'company' ? branch.trim() : (profile?.branch || 'สำนักงานใหญ่'),
-        phone: phone.trim(),
+        company_name: accountType === 'company' ? (companyName.trim() || 'บริษัทของฉัน') : null,
+        tax_id: accountType === 'company' ? (taxId.trim() || null) : null,
+        branch: accountType === 'company' ? (branch.trim() || 'สำนักงานใหญ่') : 'สำนักงานใหญ่',
+        phone: phone.trim() || null,
+        company_id: linkedCompanyId,
         onboarded: true,
       });
 
       onComplete();
     } catch (err: any) {
+      console.error('Onboarding update error:', err);
       setErrorMsg(err.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
     } finally {
       setIsSubmitting(false);

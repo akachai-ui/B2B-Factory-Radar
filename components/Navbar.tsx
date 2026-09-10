@@ -83,14 +83,19 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
           
           {/* Brand Logo & Title */}
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-emerald-500 to-cyan-500 text-slate-950 flex items-center justify-center font-black shadow-lg shadow-amber-500/20 shrink-0">
-              <Layers className="w-5 h-5 text-slate-950" />
+          <Link href="/" className="flex items-center gap-3 min-w-0 group cursor-pointer">
+            <div className="relative h-10 w-10 shrink-0 group-hover:scale-105 transition flex items-center justify-center">
+              <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-md" />
+              <img
+                src="/images/logo.png"
+                alt="RouteHunter Logo"
+                className="w-full h-full object-contain relative z-10 drop-shadow-[0_0_10px_rgba(245,158,11,0.4)]"
+              />
             </div>
 
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-base sm:text-lg font-black tracking-tight text-white truncate">
+                <span className="text-base sm:text-lg font-black tracking-tight text-white truncate group-hover:text-amber-300 transition">
                   RouteHunter
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0 uppercase">
@@ -101,7 +106,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                 ฐานข้อมูล 989 โรงงาน & วางแผนรูทขาย จ.สมุทรปราการ
               </span>
             </div>
-          </div>
+          </Link>
 
           {/* Right Section: Auth State / User Menu */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">

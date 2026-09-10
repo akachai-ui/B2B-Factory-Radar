@@ -1,15 +1,30 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 export default function AuthCallbackPage() {
-  const router = useRouter();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    let handled = false;
+
+    const completeAuth = (targetUrl = '/') => {
+      if (handled) return;
+      handled = true;
+      if (typeof window !== 'undefined') {
+        window.location.href = targetUrl;
+      }
+    };
+
+    // 1. Listen for Supabase Auth state change (Handles OAuth hash, magic links, PKCE)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' || session) {
+        completeAuth('/');
+      }
+    });
+
     async function handleAuthCallback() {
       try {
         if (typeof window === 'undefined') return;
@@ -41,25 +56,41 @@ export default function AuthCallbackPage() {
             setErrorMsg(error.message);
             return;
           }
+          completeAuth('/');
+          return;
         }
 
-        // 2. Check if session is active
+        // 2. Implicit Flow Hash Parsing (e.g. #access_token=...&refresh_token=...)
+        if (window.location.hash.includes('access_token')) {
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          const accessToken = hashParams.get('access_token');
+          const refreshToken = hashParams.get('refresh_token');
+
+          if (accessToken) {
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+            });
+            if (data?.session) {
+              completeAuth('/');
+              return;
+            }
+          }
+        }
+
+        // 3. Check if session already active
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          // Successfully verified -> redirect to home
-          router.replace('/');
-        } else {
-          // Give a brief moment for implicit hash to be processed
-          const timeout = setTimeout(async () => {
-            const { data: { session: retrySession } } = await supabase.auth.getSession();
-            if (retrySession) {
-              router.replace('/');
-            } else {
-              router.replace('/');
-            }
-          }, 800);
-          return () => clearTimeout(timeout);
+          completeAuth('/');
+          return;
         }
+
+        // 4. Fallback redirect after waiting for Supabase to parse
+        const timeout = setTimeout(() => {
+          completeAuth('/');
+        }, 1200);
+
+        return () => clearTimeout(timeout);
       } catch (err: any) {
         console.error('Auth callback exception:', err);
         setErrorMsg(err.message || 'เกิดข้อผิดพลาดในการยืนยันตัวตน');
@@ -67,7 +98,11 @@ export default function AuthCallbackPage() {
     }
 
     handleAuthCallback();
-  }, [router]);
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   if (errorMsg) {
     return (
@@ -79,7 +114,7 @@ export default function AuthCallbackPage() {
           <h2 className="text-lg font-bold text-white">เข้าสู่ระบบไม่สำเร็จ</h2>
           <p className="text-xs text-rose-300 leading-relaxed">{errorMsg}</p>
           <button
-            onClick={() => router.replace('/')}
+            onClick={() => { if (typeof window !== 'undefined') window.location.href = '/'; }}
             className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition border border-slate-700 cursor-pointer"
           >
             กลับสู่หน้าแรก

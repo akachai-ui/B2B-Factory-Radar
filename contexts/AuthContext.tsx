@@ -27,14 +27,84 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch live profile from public.profiles in Supabase
+  // Fetch live profile from public.profiles in Supabase with auto-merge for invited users
   const fetchLiveProfile = useCallback(async (currentUser: User) => {
     try {
-      const { data, error } = await supabase
+      const cleanEmail = currentUser.email?.toLowerCase().trim() || '';
+      
+      // 1. First check profile by ID
+      let { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', currentUser.id)
         .maybeSingle();
+
+      // 2. If profile not found by ID, look up by Email (e.g., user was pre-added to team by Owner)
+      if (!data && cleanEmail) {
+        const { data: emailProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .ilike('email', cleanEmail)
+          .maybeSingle();
+
+        if (emailProfile) {
+          // Merge: Update the invited profile's id to match currentUser.id
+          await supabase
+            .from('profiles')
+            .update({
+              id: currentUser.id,
+              full_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || emailProfile.full_name || cleanEmail.split('@')[0],
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', emailProfile.id);
+
+          const { data: mergedProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+
+          data = mergedProfile || emailProfile;
+        }
+      }
+
+      // 3. If profile exists by ID, but has no company_id, check if an invite existed for this email
+      if (data && !data.company_id && cleanEmail) {
+        const { data: inviteRow } = await supabase
+          .from('profiles')
+          .select('*')
+          .ilike('email', cleanEmail)
+          .not('company_id', 'is', null)
+          .maybeSingle();
+
+        if (inviteRow && inviteRow.id !== currentUser.id) {
+          // Adopt the team & company from the invite
+          await supabase
+            .from('profiles')
+            .update({
+              company_id: inviteRow.company_id,
+              company_name: inviteRow.company_name,
+              role: inviteRow.role || 'sales',
+              tax_id: inviteRow.tax_id,
+              branch: inviteRow.branch,
+              account_type: inviteRow.account_type || 'company',
+              onboarded: true,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', currentUser.id);
+
+          // Remove the duplicate placeholder invite
+          await supabase.from('profiles').delete().eq('id', inviteRow.id);
+
+          const { data: updatedWithTeam } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+
+          if (updatedWithTeam) data = updatedWithTeam;
+        }
+      }
 
       if (data && !error) {
         setProfile(data as UserProfile);
@@ -42,8 +112,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // If profile row doesn't exist yet, insert a clean default
         const newProfile: Partial<UserProfile> = {
           id: currentUser.id,
-          email: currentUser.email || '',
-          full_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'ผู้ใช้งาน',
+          email: cleanEmail,
+          full_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || cleanEmail.split('@')[0] || 'ผู้ใช้งาน',
           account_type: 'individual',
           company_name: null,
           onboarded: false,

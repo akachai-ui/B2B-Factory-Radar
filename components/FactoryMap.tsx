@@ -78,19 +78,32 @@ export function FactoryMap({
       // Add Zoom control at top-right
       L.control.zoom({ position: 'topright' }).addTo(map);
 
-      // Tile Layer (Dark Theme by default)
-      const tileUrl =
-        mapTheme === 'dark'
-          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-          : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+      // Tile Layer (Clean Dark Theme by default - No Watermarks)
+      let tileGroup: any;
+      if (mapTheme === 'dark') {
+        const baseLayer = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+          {
+            attribution: '&copy; Esri, HERE, Garmin, OpenStreetMap',
+            maxZoom: 16,
+          }
+        );
+        const refLayer = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+          {
+            maxZoom: 16,
+          }
+        );
+        tileGroup = L.layerGroup([baseLayer, refLayer]).addTo(map);
+      } else {
+        tileGroup = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+          maxZoom: 19,
+          subdomains: 'abc',
+        }).addTo(map);
+      }
 
-      const tileLayer = L.tileLayer(tileUrl, {
-        attribution: '&copy; CartoDB & OpenStreetMap',
-        maxZoom: 19,
-        subdomains: 'abcd',
-      }).addTo(map);
-
-      tileLayerRef.current = tileLayer;
+      tileLayerRef.current = tileGroup;
       mapInstanceRef.current = map;
     }
 
@@ -110,16 +123,31 @@ export function FactoryMap({
 
     mapInstanceRef.current.removeLayer(tileLayerRef.current);
 
-    const tileUrl =
-      mapTheme === 'dark'
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    let tileGroup: any;
+    if (mapTheme === 'dark') {
+      const baseLayer = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+        {
+          attribution: '&copy; Esri, HERE, Garmin, OpenStreetMap',
+          maxZoom: 16,
+        }
+      );
+      const refLayer = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+        {
+          maxZoom: 16,
+        }
+      );
+      tileGroup = L.layerGroup([baseLayer, refLayer]).addTo(mapInstanceRef.current);
+    } else {
+      tileGroup = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19,
+        subdomains: 'abc',
+      }).addTo(mapInstanceRef.current);
+    }
 
-    tileLayerRef.current = L.tileLayer(tileUrl, {
-      attribution: '&copy; CartoDB & OpenStreetMap',
-      maxZoom: 19,
-      subdomains: 'abcd',
-    }).addTo(mapInstanceRef.current);
+    tileLayerRef.current = tileGroup;
   }, [mapTheme]);
 
   // 3. Render Samut Prakan GeoJSON District Polygons

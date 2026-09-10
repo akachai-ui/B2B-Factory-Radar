@@ -55,6 +55,18 @@ export interface Company {
   updated_at?: string;
 }
 
+export interface TeamInvitation {
+  id: string;
+  company_id: string;
+  company_name: string;
+  email: string;
+  role: 'sales' | 'manager';
+  invited_by?: string;
+  status: 'pending' | 'accepted' | 'declined' | 'canceled';
+  created_at?: string;
+  updated_at?: string;
+}
+
 export type CompanyProfile = Company;
 
 export interface UserProfile {
