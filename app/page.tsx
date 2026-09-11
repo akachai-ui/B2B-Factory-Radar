@@ -1361,15 +1361,35 @@ export default function LeadsRadarMainPage() {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`h-11 w-11 rounded-2xl flex items-center justify-center font-bold text-sm ${
-                            isThisOwner
-                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                              : isManager
-                              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                              : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                          }`}>
-                            {isThisOwner ? <Crown className="w-5 h-5 text-amber-400" /> : member.full_name?.charAt(0) || '👤'}
+                          {/* Avatar with Role Badge */}
+                          <div className="relative shrink-0">
+                            <div className="h-12 w-12 rounded-2xl overflow-hidden bg-slate-950 border border-slate-700/80 shadow-md flex items-center justify-center">
+                              {member.avatar_url ? (
+                                <img
+                                  src={member.avatar_url}
+                                  alt={member.full_name || 'Member Avatar'}
+                                  referrerPolicy="no-referrer"
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className={`w-full h-full flex items-center justify-center font-black text-sm ${
+                                  isThisOwner
+                                    ? 'bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950'
+                                    : isManager
+                                    ? 'bg-gradient-to-tr from-purple-500 to-indigo-500 text-white'
+                                    : 'bg-gradient-to-tr from-cyan-500 to-blue-500 text-slate-950'
+                                }`}>
+                                  {member.full_name ? member.full_name.charAt(0).toUpperCase() : '👤'}
+                                </div>
+                              )}
+                            </div>
+                            {isThisOwner && (
+                              <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-md border-2 border-slate-900" title="เจ้าของทีม (Owner)">
+                                <Crown className="w-2.5 h-2.5 fill-slate-950" />
+                              </div>
+                            )}
                           </div>
+
                           <div>
                             <div className="font-bold text-white text-xs truncate max-w-[150px]">
                               {member.full_name || member.email?.split('@')[0]}
@@ -1779,18 +1799,32 @@ export default function LeadsRadarMainPage() {
                   return (
                     <div key={m.id} className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-2 shadow-sm">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="h-9 w-9 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
-                          {m.avatar_url ? (
-                            <img
-                              src={m.avatar_url}
-                              alt={m.full_name || 'Member'}
-                              referrerPolicy="no-referrer"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : isThisOwner ? (
-                            <Crown className="w-4 h-4 text-amber-400" />
-                          ) : (
-                            m.full_name?.charAt(0) || '👤'
+                        {/* Mobile Avatar with Role Badge */}
+                        <div className="relative shrink-0">
+                          <div className="h-10 w-10 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden shadow-sm">
+                            {m.avatar_url ? (
+                              <img
+                                src={m.avatar_url}
+                                alt={m.full_name || 'Member'}
+                                referrerPolicy="no-referrer"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className={`w-full h-full flex items-center justify-center font-black text-xs ${
+                                isThisOwner
+                                  ? 'bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950'
+                                  : isManager
+                                  ? 'bg-gradient-to-tr from-purple-500 to-indigo-500 text-white'
+                                  : 'bg-gradient-to-tr from-cyan-500 to-blue-500 text-slate-950'
+                              }`}>
+                                {m.full_name ? m.full_name.charAt(0).toUpperCase() : '👤'}
+                              </div>
+                            )}
+                          </div>
+                          {isThisOwner && (
+                            <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-md border-2 border-slate-900">
+                              <Crown className="w-2 h-2 fill-slate-950" />
+                            </div>
                           )}
                         </div>
                         <div className="min-w-0">
