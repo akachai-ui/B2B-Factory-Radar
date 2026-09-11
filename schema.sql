@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL,
   full_name TEXT,
+  avatar_url TEXT,
   account_type TEXT DEFAULT 'individual', -- 'individual' หรือ 'company'
   company_name TEXT DEFAULT 'บริษัทของฉัน',
   tax_id TEXT,                            -- เลขผู้เสียภาษี 13 หลัก
@@ -146,10 +147,17 @@ BEGIN
     COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)),
     'บริษัทของฉัน'
   )
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    full_name = COALESCE(EXCLUDED.full_name, public.profiles.full_name);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- 5. Table: team_invitations (ตารางเก็บคำเชิญเข้าร่วมทีม)
 CREATE TABLE IF NOT EXISTS public.team_invitations (

@@ -18,6 +18,8 @@ import {
   Phone,
   Terminal,
   ExternalLink,
+  Camera,
+  Upload,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -38,8 +40,10 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
   const [taxId, setTaxId] = useState(profile?.tax_id || '');
   const [branch, setBranch] = useState(profile?.branch || 'สำนักงานใหญ่');
   const [phone, setPhone] = useState(profile?.phone || '');
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const isInvitedMember = Boolean(profile?.company_id && (profile?.role === 'sales' || profile?.role === 'manager'));
   const currentAccountType = isInvitedMember ? 'company' : (profile?.account_type || (profile?.company_name && profile.company_name !== 'บริษัทของฉัน' ? 'company' : 'individual'));
@@ -59,9 +63,20 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
     setTaxId(profile?.tax_id || '');
     setBranch(profile?.branch || 'สำนักงานใหญ่');
     setPhone(profile?.phone || '');
+    setAvatarUrl(profile?.avatar_url || currentAvatar || '');
     setIsProfileModalOpen(true);
     setIsDropdownOpen(false);
     setSaveSuccess(false);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setAvatarUrl(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   React.useEffect(() => {
@@ -75,16 +90,18 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
     setSaveSuccess(false);
 
     if (isInvitedMember) {
-      // Invited members can only update their personal name and phone
+      // Invited members can only update their personal name, phone and avatar
       await updateProfile({
         full_name: fullName.trim() || displayName,
         phone: phone.trim(),
+        avatar_url: avatarUrl.trim() || null,
       });
     } else {
-      // Owners / Individuals can update their account type and company details
+      // Owners / Individuals can update their account type, company details, and avatar
       await updateProfile({
         account_type: accountType,
         full_name: fullName.trim() || displayName,
+        avatar_url: avatarUrl.trim() || null,
         company_name: accountType === 'company' ? (companyName.trim() || 'บริษัทของฉัน') : (profile?.company_name || null),
         tax_id: accountType === 'company' ? taxId.trim() : (profile?.tax_id || null),
         branch: accountType === 'company' ? branch.trim() : (profile?.branch || 'สำนักงานใหญ่'),
@@ -310,9 +327,9 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
               {/* Avatar Preview */}
               <div className="relative shrink-0">
                 <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-amber-400/10 border-2 border-amber-500/40 p-0.5 overflow-hidden flex items-center justify-center shadow-lg shadow-amber-500/10 bg-slate-900">
-                  {currentAvatar ? (
+                  {avatarUrl ? (
                     <img
-                      src={currentAvatar}
+                      src={avatarUrl}
                       alt="Avatar"
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover rounded-[14px]"
@@ -323,31 +340,54 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                     </div>
                   )}
                 </div>
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
               </div>
 
-              {/* Google Sync Info & Direct Link */}
+              {/* Avatar Upload Actions & Info */}
               <div className="flex-1 space-y-1.5 min-w-0">
                 <div>
                   <h5 className="text-xs font-bold text-white flex items-center gap-1.5">
                     <span>รูปภาพโปรไฟล์</span>
-                    <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                      Google Synced
-                    </span>
+                    {googleAvatar && (
+                      <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                        Google Synced
+                      </span>
+                    )}
                   </h5>
                   <p className="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
-                    ระบบดึงรูปโปรไฟล์จากบัญชี Google ของคุณโดยอัตโนมัติ
+                    อัปโหลดรูปจากเครื่อง หรือซิงค์รูปภาพจากบัญชี
                   </p>
                 </div>
 
-                <a
-                  href="https://myaccount.google.com/personal-info"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 hover:text-amber-200 hover:underline transition"
-                >
-                  <span>จัดการรูปที่ Google Account</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer border border-slate-700 shadow-sm"
+                  >
+                    <Upload className="w-3 h-3 text-amber-400" />
+                    <span>เปลี่ยนรูปภาพ</span>
+                  </button>
+
+                  {googleAvatar && (
+                    <a
+                      href="https://myaccount.google.com/personal-info"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-amber-300 transition"
+                    >
+                      <span>Google Account</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
 

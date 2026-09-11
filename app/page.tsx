@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navbar } from '@/components/Navbar';
 import { AuthModal } from '@/components/AuthModal';
 import { IdentityOnboardingModal } from '@/components/IdentityOnboardingModal';
+import { EditProfileModal } from '@/components/EditProfileModal';
 import { PendingInvitationModal } from '@/components/PendingInvitationModal';
 import { MobileBottomNav, MobileTab } from '@/components/MobileBottomNav';
 import { MobileFactoryBottomSheet } from '@/components/MobileFactoryBottomSheet';
@@ -147,6 +148,7 @@ export default function LeadsRadarMainPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   // Team Data States
   const [teamMembers, setTeamMembers] = useState<UserProfile[]>([]);
@@ -1908,14 +1910,12 @@ export default function LeadsRadarMainPage() {
             {/* Actions */}
             <div className="space-y-2">
               <button
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('open-profile-modal'));
-                }}
+                onClick={() => setIsEditProfileOpen(true)}
                 className="w-full py-3 px-4 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-between transition shadow-sm cursor-pointer active:scale-98"
               >
                 <div className="flex items-center gap-2.5">
                   <Edit3 className="w-4 h-4 text-amber-400" />
-                  <span>ตั้งค่าข้อมูลโปรไฟล์ & สังกัด</span>
+                  <span>ตั้งค่าข้อมูลโปรไฟล์ & รูปภาพ</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-amber-400/60" />
               </button>
@@ -2127,6 +2127,10 @@ export default function LeadsRadarMainPage() {
       <IdentityOnboardingModal
         isOpen={isOnboardingOpen}
         onComplete={() => setIsOnboardingOpen(false)}
+      />
+      <EditProfileModal
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
       />
       <PendingInvitationModal />
 
