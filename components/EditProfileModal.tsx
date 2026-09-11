@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   X,
@@ -55,30 +56,50 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
 
   if (!isOpen) return null;
 
-  // Handle Local Image Upload
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload Image directly to Supabase Storage 'avatars' Bucket (Industry Standard)
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !user) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      setErrorMsg('ขนาดรูปภาพต้องไม่เกิน 2MB');
+    if (file.size > 5 * 1024 * 1024) {
+      setErrorMsg('ขนาดรูปภาพต้องไม่เกิน 5MB');
       return;
     }
 
     setIsUploading(true);
     setErrorMsg(null);
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      setAvatarUrl(base64);
+    try {
+      const fileExt = file.name.split('.').pop() || 'jpg';
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
+
+      // Upload file directly to Supabase Storage 'avatars' bucket
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get permanent Public CDN URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      setAvatarUrl(publicUrl);
+    } catch (err: any) {
+      console.warn('Storage upload error, using local fallback:', err);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setAvatarUrl(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    } finally {
       setIsUploading(false);
-    };
-    reader.onerror = () => {
-      setErrorMsg('เกิดข้อผิดพลาดในการอ่านไฟล์รูป');
-      setIsUploading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
