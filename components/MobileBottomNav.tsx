@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Compass, Building2, Users, User } from 'lucide-react';
+import { Compass, Building2, Users, User, Layers } from 'lucide-react';
 
-export type MobileTab = 'radar' | 'factories' | 'team' | 'profile';
+export type MobileTab = 'radar' | 'dbd' | 'factories' | 'team' | 'profile';
 
 interface MobileBottomNavProps {
   activeTab: MobileTab;
@@ -26,14 +26,20 @@ export function MobileBottomNav({
       badge: null,
     },
     {
+      id: 'dbd' as MobileTab,
+      label: 'DBD 390k',
+      icon: Building2,
+      badge: 'NEW',
+    },
+    {
       id: 'factories' as MobileTab,
       label: 'โรงงาน',
-      icon: Building2,
+      icon: Layers,
       badge: factoryCount > 0 ? (factoryCount > 999 ? '999+' : `${factoryCount}`) : null,
     },
     {
       id: 'team' as MobileTab,
-      label: 'ทีมของฉัน',
+      label: 'ทีม',
       icon: Users,
       badge: null,
     },
@@ -47,7 +53,7 @@ export function MobileBottomNav({
 
   return (
     <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-[1000] bg-[#0b0f19]/95 backdrop-blur-2xl border-t border-slate-800/90 pb-safe shadow-[0_-10px_25px_rgba(0,0,0,0.5)]">
-      <div className="grid grid-cols-4 h-16 max-w-lg mx-auto items-center px-2">
+      <div className="grid grid-cols-5 h-16 max-w-lg mx-auto items-center px-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;

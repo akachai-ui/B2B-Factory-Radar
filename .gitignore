@@ -29,3 +29,5 @@ venv/
 # Temporary outputs
 *.csv
 *.xlsx
+*.parquet
+data/*.parquet

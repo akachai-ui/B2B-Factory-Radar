@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { FactoryLead, UserProfile, TeamInvitation, LeadStatus } from '@/lib/types';
+import { FactoryLead, UserProfile, TeamInvitation, LeadStatus, DBDCompany } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navbar } from '@/components/Navbar';
 import { AuthModal } from '@/components/AuthModal';
@@ -13,6 +13,7 @@ import { EditProfileModal } from '@/components/EditProfileModal';
 import { PendingInvitationModal } from '@/components/PendingInvitationModal';
 import { MobileBottomNav, MobileTab } from '@/components/MobileBottomNav';
 import { MobileFactoryBottomSheet } from '@/components/MobileFactoryBottomSheet';
+import { DBDCompanyExplorer } from '@/components/DBDCompanyExplorer';
 import * as XLSX from 'xlsx';
 import {
   Search,
@@ -124,7 +125,7 @@ export default function LeadsRadarMainPage() {
   const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
 
   // Main Dashboard States (When user is logged in)
-  const [mainTab, setMainTab] = useState<'map' | 'table' | 'team'>('map');
+  const [mainTab, setMainTab] = useState<'map' | 'table' | 'team' | 'dbd'>('map');
 
   // Mobile App Shell States (When on smartphone)
   const [mobileTab, setMobileTab] = useState<MobileTab>('radar');
@@ -143,6 +144,53 @@ export default function LeadsRadarMainPage() {
   const [activeLeadModal, setActiveLeadModal] = useState<FactoryLead | null>(null);
   const [modalNotes, setModalNotes] = useState<string>('');
   const [isSavingLead, setIsSavingLead] = useState<boolean>(false);
+
+  // Handle adding DBD Company into sales pipeline leads
+  const handleAddDBDCompanyToLeads = async (company: DBDCompany) => {
+    try {
+      const newLead: any = {
+        place_id: `dbd_${company.tax_id}`,
+        name: company.name,
+        company_name: company.name,
+        address: `${company.address || ''} ${company.subdistrict ? 'ต.' + company.subdistrict : ''} ${company.district ? 'อ.' + company.district : ''} ${company.province || ''} ${company.postal_code || ''}`.trim(),
+        district: company.district || '',
+        subdistrict: company.subdistrict || '',
+        province: company.province || 'สมุทรปราการ',
+        postal_code: company.postal_code || '',
+        lat: company.lat,
+        lng: company.lng,
+        notes: `[DBD นิติบุคคล] ทุนจดทะเบียน: ${Number(company.registered_capital).toLocaleString()} บาท | TSIC: ${company.tsic_code || '-'} | วัตถุประสงค์: ${company.objective || '-'}`,
+        status: 'NEW',
+        created_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await supabase
+        .from('leads')
+        .upsert(newLead, { onConflict: 'place_id' })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setFeedback({
+        type: 'success',
+        text: `บันทึก "${company.name}" เข้าสู่ Pipeline โรงงานเรียบร้อยแล้ว!`,
+      });
+
+      // Update local leads list
+      setLeads((prev) => {
+        const exists = prev.some((l) => l.place_id === newLead.place_id);
+        if (exists) return prev;
+        return [data as FactoryLead, ...prev];
+      });
+    } catch (err: any) {
+      console.error('Failed to add DBD company to leads:', err);
+      setFeedback({
+        type: 'error',
+        text: `เกิดข้อผิดพลาดในการบันทึก: ${err.message || 'ไม่สามารถบันทึกได้'}`,
+      });
+    }
+  };
 
   // Auth & Modals
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -937,6 +985,18 @@ export default function LeadsRadarMainPage() {
                 )}
               </button>
 
+              <button
+                onClick={() => setMainTab('dbd')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer shrink-0 ${
+                  mainTab === 'dbd'
+                    ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg font-black shadow-indigo-600/30'
+                    : 'text-indigo-300 hover:text-white hover:bg-indigo-950/50 bg-indigo-950/20 border border-indigo-500/30'
+                }`}
+              >
+                <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+                <span>🏢 DBD 390k+ ทั่วประเทศ</span>
+              </button>
+
             </div>
 
           </div>
@@ -1497,6 +1557,17 @@ export default function LeadsRadarMainPage() {
           </div>
         )}
 
+        {/* ---------------------------------------------------- */}
+        {/* TAB 4: DBD NATIONWIDE 390k+ BIG DATA EXPLORER        */}
+        {/* ---------------------------------------------------- */}
+        {mainTab === 'dbd' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <DBDCompanyExplorer
+              onAddToLeads={handleAddDBDCompanyToLeads}
+            />
+          </div>
+        )}
+
       </main>
       </div>
 
@@ -1628,6 +1699,17 @@ export default function LeadsRadarMainPage() {
               />
             </div>
 
+          </div>
+        )}
+
+        {/* ---------------------------------------------------- */}
+        {/* MOBILE TAB: DBD 390K+ NATIONWIDE BIG DATA EXPLORER   */}
+        {/* ---------------------------------------------------- */}
+        {mobileTab === 'dbd' && (
+          <div className="flex-1 p-3.5 space-y-3 animate-in fade-in duration-150">
+            <DBDCompanyExplorer
+              onAddToLeads={handleAddDBDCompanyToLeads}
+            />
           </div>
         )}
 

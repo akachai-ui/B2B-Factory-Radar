@@ -100,3 +100,34 @@ export interface FilterState {
   status?: string;
   category?: string;
 }
+
+export interface DBDCompany {
+  id: number | string;
+  tax_id: string;
+  name: string;
+  registered_capital: number;
+  tsic_code?: string;
+  objective?: string;
+  address?: string;
+  subdistrict?: string;
+  district?: string;
+  province?: string;
+  postal_code?: string;
+  registration_date?: string;
+  dissolution_date?: string | null;
+  status: 'ACTIVE' | 'DISSOLVED' | string;
+  lat: number;
+  lng: number;
+  created_at?: string;
+}
+
+export interface DBDFilterState {
+  search: string;
+  province: string;
+  district: string;
+  capitalRange: 'ALL' | '<5M' | '5M-20M' | '20M-50M' | '>50M' | '>100M';
+  tsicCategory: string;
+  status: 'ACTIVE' | 'ALL';
+}
+
+export type DatasetMode = 'factories' | 'dbd';
