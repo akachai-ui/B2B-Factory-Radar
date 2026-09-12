@@ -233,5 +233,91 @@ CREATE POLICY "Allow delete avatar"
   TO authenticated, anon
   USING (bucket_id = 'avatars');
 
+-- 7. Table: dbd_companies (คลังข้อมูล Big Data นิติบุคคล DBD ทั่วประเทศ 390,924 บริษัท)
+CREATE TABLE IF NOT EXISTS public.dbd_companies (
+  id BIGSERIAL PRIMARY KEY,
+  tax_id VARCHAR(20) NOT NULL,
+  name TEXT NOT NULL,
+  registered_capital NUMERIC DEFAULT 0,
+  tsic_code VARCHAR(10),
+  objective TEXT,
+  address TEXT,
+  subdistrict TEXT,
+  district TEXT,
+  province TEXT,
+  postal_code VARCHAR(10),
+  registration_date VARCHAR(30),
+  dissolution_date VARCHAR(30),
+  status VARCHAR(20) DEFAULT 'ACTIVE',
+  lat DOUBLE PRECISION,
+  lng DOUBLE PRECISION,
+  phone TEXT,
+  website TEXT,
+  place_id TEXT,
+  rating DOUBLE PRECISION,
+  user_ratings_total INTEGER,
+  formatted_address TEXT,
+  is_geocoded BOOLEAN DEFAULT FALSE,
+  geocoded_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.dbd_companies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read access on dbd_companies" ON public.dbd_companies;
+CREATE POLICY "Allow public read access on dbd_companies" 
+  ON public.dbd_companies FOR SELECT TO anon, authenticated USING (true);
+
+-- 8. Table: company_leads (พอร์ตโฟลิโอลูกค้าและท่อส่งงานขาย CRM ระดับ SaaS)
+CREATE TABLE IF NOT EXISTS public.company_leads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  claimed_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  source_type VARCHAR(30) DEFAULT 'dbd',
+  dbd_id BIGINT REFERENCES public.dbd_companies(id) ON DELETE SET NULL,
+  lead_id BIGINT REFERENCES public.leads(id) ON DELETE SET NULL,
+  place_id TEXT,
+  company_name TEXT NOT NULL,
+  tax_id VARCHAR(20),
+  registered_capital NUMERIC DEFAULT 0,
+  tsic_code VARCHAR(10),
+  objective TEXT,
+  address TEXT,
+  subdistrict TEXT,
+  district TEXT,
+  province TEXT,
+  postal_code VARCHAR(10),
+  lat DOUBLE PRECISION,
+  lng DOUBLE PRECISION,
+  phone TEXT,
+  email TEXT,
+  website TEXT,
+  contact_person TEXT,
+  status VARCHAR(30) DEFAULT 'NEW',
+  priority VARCHAR(20) DEFAULT 'MEDIUM',
+  deal_value NUMERIC DEFAULT 0,
+  notes TEXT,
+  last_activity_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.company_leads ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow members to view their company leads" ON public.company_leads;
+CREATE POLICY "Allow members to view their company leads"
+  ON public.company_leads FOR SELECT TO authenticated, anon USING (true);
+
+DROP POLICY IF EXISTS "Allow members to insert their company leads" ON public.company_leads;
+CREATE POLICY "Allow members to insert their company leads"
+  ON public.company_leads FOR INSERT TO authenticated, anon WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow members to update their company leads" ON public.company_leads;
+CREATE POLICY "Allow members to update their company leads"
+  ON public.company_leads FOR UPDATE TO authenticated, anon USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow members to delete their company leads" ON public.company_leads;
+CREATE POLICY "Allow members to delete their company leads"
+  ON public.company_leads FOR DELETE TO authenticated, anon USING (true);
+
 
 
