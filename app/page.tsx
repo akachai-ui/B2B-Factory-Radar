@@ -231,6 +231,19 @@ export default function LeadsRadarMainPage() {
     }
   }, [user, profile]);
 
+  // Handle URL OAuth Errors gracefully
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    const errorParam = url.searchParams.get('error_description') || url.searchParams.get('error');
+    if (errorParam) {
+      console.warn('OAuth redirect notice:', errorParam);
+      setAuthError('เซสชันการเข้าสู่ระบบหมดอายุ หรือถูกยกเลิก กรุณาลองเข้าสู่ระบบใหม่อีกครั้ง');
+      // Clean query params from URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   // Live GPS User Location State (Default: Samut Prakan Center)
   const [userLocation, setUserLocation] = useState<{
     lat: number;
