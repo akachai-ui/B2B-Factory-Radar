@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FactoryLead } from '@/lib/types';
 import districtsGeoJson from '@/lib/geojson/samutprakan_districts.json';
-import { MorningBriefingCard } from './MorningBriefingCard';
 import {
   MapPin,
   Navigation,
@@ -598,22 +597,6 @@ export function FactoryMap({
           </div>
 
         </div>
-      )}
-
-      {/* Morning Briefing Floating Card (When no specific lead is selected) */}
-      {!selectedLead && (
-        <MorningBriefingCard
-          userName={userName}
-          userLocation={userLocation}
-          leads={leads}
-          selectedDistrict={selectedDistrict}
-          onSelectRadius={(rad) => onSelectRadius && onSelectRadius(rad)}
-          onFocusLead={(lead) => {
-            setSelectedLead(lead);
-            if (onLeadClick) onLeadClick(lead);
-          }}
-          onSelectDistrict={(d) => onDistrictSelect && onDistrictSelect(d)}
-        />
       )}
 
     </div>
