@@ -606,29 +606,45 @@ export default function LeadsRadarMainPage() {
     );
   }, []);
 
-  // 1. Fetch Target Factory Leads (Exclusively target_factory_leads)
+  // 1. Fetch Target Factory Leads (Multi-Tier Bulletproof Fallback)
   const fetchLeads = async () => {
     setIsLoadingLeads(true);
     try {
-      const res = await fetch('/api/leads?limit=5000');
-      const data = await res.json();
-      if (data.success && data.leads && data.leads.length > 0) {
-        setLeads(data.leads as FactoryLead[]);
-      } else {
-        // Fallback to local leads_data.json if API fails
-        const fallbackRes = await fetch('/leads_data.json').catch(() => null);
-        if (fallbackRes && fallbackRes.ok) {
-          const json = await fallbackRes.json();
+      // Tier 1: Try Backend API
+      const res = await fetch('/api/leads?limit=5000').catch(() => null);
+      if (res && res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.leads) && data.leads.length > 0) {
+          setLeads(data.leads as FactoryLead[]);
+          return;
+        }
+      }
+
+      // Tier 2: Try Direct Supabase SDK
+      const { data: sbLeads, error } = await supabase.from('leads').select('*').limit(2000);
+      if (!error && sbLeads && sbLeads.length > 0) {
+        setLeads(sbLeads as FactoryLead[]);
+        return;
+      }
+
+      // Tier 3: Static Bundle Fallback (100% Reliable Offline & Fast)
+      const fallbackRes = await fetch('/leads_data.json').catch(() => null);
+      if (fallbackRes && fallbackRes.ok) {
+        const json = await fallbackRes.json();
+        if (Array.isArray(json) && json.length > 0) {
           setLeads(json as FactoryLead[]);
+          return;
         }
       }
     } catch (err) {
-      console.warn('Fetch target leads error, using local fallback:', err);
+      console.warn('Fetch target leads error, using static bundle:', err);
       try {
         const fallbackRes = await fetch('/leads_data.json');
         if (fallbackRes.ok) {
           const json = await fallbackRes.json();
-          setLeads(json as FactoryLead[]);
+          if (Array.isArray(json) && json.length > 0) {
+            setLeads(json as FactoryLead[]);
+          }
         }
       } catch (e) {}
     } finally {
