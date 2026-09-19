@@ -3478,7 +3478,23 @@ export default function LeadsRadarMainPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Owner Team Management Header Button */}
+            {canViewAllTeamLeads && (
+              <button
+                onClick={() => setMobileTab('team')}
+                className={`px-2.5 py-1.5 rounded-xl flex items-center gap-1 text-[11px] font-bold transition border cursor-pointer active:scale-95 ${
+                  mobileTab === 'team'
+                    ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-md shadow-amber-500/25'
+                    : 'bg-slate-900/90 text-amber-300 border-amber-500/30 hover:border-amber-400/50'
+                }`}
+                title="จัดการทีมงาน & คลังกลาง"
+              >
+                <Users className="w-3.5 h-3.5 text-amber-400" />
+                <span>ทีมงาน ({teamMembers.length})</span>
+              </button>
+            )}
+
             {/* User Profile Avatar Button */}
             <button
               onClick={() => setMobileTab('profile')}
@@ -4845,6 +4861,8 @@ export default function LeadsRadarMainPage() {
           }}
           portfolioCount={portfolioLeads.length}
           hasActiveTrip={!!activeTrip}
+          canViewTeam={canViewAllTeamLeads}
+          teamCount={teamMembers.length}
         />
 
         {/* Mobile Slide-up Factory Bottom Sheet */}

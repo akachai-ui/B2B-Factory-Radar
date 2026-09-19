@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Target, ShoppingCart, TrendingUp, Car } from 'lucide-react';
+import { Target, ShoppingCart, TrendingUp, Car, Users } from 'lucide-react';
 
 export type MobileTab = 'portfolio' | 'marketplace' | 'radar' | 'dbd' | 'factories' | 'market' | 'trips' | 'team' | 'profile';
 
@@ -10,6 +10,8 @@ interface MobileBottomNavProps {
   onSelectTab: (tab: MobileTab) => void;
   portfolioCount?: number;
   hasActiveTrip?: boolean;
+  canViewTeam?: boolean;
+  teamCount?: number;
 }
 
 export function MobileBottomNav({
@@ -17,6 +19,8 @@ export function MobileBottomNav({
   onSelectTab,
   portfolioCount = 0,
   hasActiveTrip = false,
+  canViewTeam = false,
+  teamCount = 0,
 }: MobileBottomNavProps) {
   const isPortfolio = activeTab === 'portfolio' || activeTab === 'radar';
   const isMarketplace = activeTab === 'marketplace' || activeTab === 'dbd' || activeTab === 'factories';
@@ -31,30 +35,43 @@ export function MobileBottomNav({
     },
     {
       id: 'marketplace' as MobileTab,
-      label: 'ช้อปหาลูกค้า',
+      label: 'ช้อปเพิ่ม',
       icon: ShoppingCart,
       badge: '989',
       isActive: isMarketplace,
     },
+    ...(canViewTeam
+      ? [
+          {
+            id: 'team' as MobileTab,
+            label: 'ทีมงาน',
+            icon: Users,
+            badge: teamCount > 0 ? `${teamCount}` : null,
+            isActive: activeTab === 'team',
+          },
+        ]
+      : []),
     {
       id: 'market' as MobileTab,
-      label: 'วิเคราะห์ตลาด',
+      label: 'วิเคราะห์',
       icon: TrendingUp,
       badge: null,
       isActive: activeTab === 'market',
     },
     {
       id: 'trips' as MobileTab,
-      label: 'บันทึกเลขไมล์',
+      label: 'บันทึกไมล์',
       icon: Car,
       badge: hasActiveTrip ? 'วิ่งอยู่' : null,
       isActive: activeTab === 'trips',
     },
   ];
 
+  const gridColsClass = navItems.length === 5 ? 'grid-cols-5' : 'grid-cols-4';
+
   return (
     <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-[1000] bg-[#0b0f19]/95 backdrop-blur-2xl border-t border-slate-800/90 pb-safe shadow-[0_-10px_25px_rgba(0,0,0,0.5)]">
-      <div className="grid grid-cols-4 h-16 max-w-lg mx-auto items-center px-1">
+      <div className={`grid ${gridColsClass} h-16 max-w-lg mx-auto items-center px-1`}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.isActive;
