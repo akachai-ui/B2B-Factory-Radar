@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
+import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,12 +14,27 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, error: 'Missing companyId' }, { status: 400 });
     }
 
-    const res = await pool.query(
-      `SELECT * FROM public.profiles WHERE company_id = $1 OR id = $1 ORDER BY created_at ASC`,
-      [companyId]
-    );
+    if (pool) {
+      try {
+        const res = await pool.query(
+          `SELECT * FROM public.profiles WHERE company_id = $1 OR id = $1 ORDER BY created_at ASC`,
+          [companyId]
+        );
+        return NextResponse.json({ success: true, members: res.rows || [] });
+      } catch (poolErr) {
+        console.warn('Team pool query failed, using Supabase client fallback:', poolErr);
+      }
+    }
 
-    return NextResponse.json({ success: true, members: res.rows || [] });
+    // Supabase REST Client fallback
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .or(`company_id.eq.${companyId},id.eq.${companyId}`)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return NextResponse.json({ success: true, members: data || [] });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

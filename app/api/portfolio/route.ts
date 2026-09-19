@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
+import { supabase } from '@/lib/supabase';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -16,47 +17,82 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, count: 0, leads: [] });
     }
 
-    const conditions = ['cl.company_id = $1'];
-    const values: any[] = [company_id];
-    let paramIdx = 2;
+    if (pool) {
+      try {
+        const conditions = ['cl.company_id = $1'];
+        const values: any[] = [company_id];
+        let paramIdx = 2;
 
+        if (user_id === 'UNASSIGNED' || user_id === 'POOL') {
+          conditions.push('cl.user_id IS NULL');
+        } else if (user_id && user_id !== 'ALL' && UUID_REGEX.test(user_id)) {
+          conditions.push(`cl.user_id = $${paramIdx++}`);
+          values.push(user_id);
+        }
+
+        if (status && status !== 'ALL') {
+          conditions.push(`cl.status = $${paramIdx++}`);
+          values.push(status);
+        }
+
+        if (search) {
+          conditions.push(`(cl.company_name ILIKE $${paramIdx} OR cl.tax_id ILIKE $${paramIdx} OR cl.notes ILIKE $${paramIdx})`);
+          values.push(`%${search}%`);
+          paramIdx++;
+        }
+
+        const query = `
+          SELECT 
+            cl.*,
+            p.full_name as sales_rep_name,
+            p.email as sales_rep_email,
+            p.avatar_url as sales_rep_avatar
+          FROM public.company_leads cl
+          LEFT JOIN public.profiles p ON cl.user_id = p.id
+          WHERE ${conditions.join(' AND ')}
+          ORDER BY cl.created_at DESC;
+        `;
+
+        const res = await pool.query(query, values);
+
+        return NextResponse.json({
+          success: true,
+          count: res.rows.length,
+          leads: res.rows,
+        });
+      } catch (poolErr) {
+        console.warn('Portfolio pool query failed, using Supabase client fallback:', poolErr);
+      }
+    }
+
+    // Supabase REST Client fallback (Guaranteed to work on Cloud / Vercel!)
+    let sb = supabase.from('company_leads').select('*, profiles:user_id(full_name, email, avatar_url)').eq('company_id', company_id);
     if (user_id === 'UNASSIGNED' || user_id === 'POOL') {
-      conditions.push('cl.user_id IS NULL');
+      sb = sb.is('user_id', null);
     } else if (user_id && user_id !== 'ALL' && UUID_REGEX.test(user_id)) {
-      conditions.push(`cl.user_id = $${paramIdx++}`);
-      values.push(user_id);
+      sb = sb.eq('user_id', user_id);
     }
-
-
     if (status && status !== 'ALL') {
-      conditions.push(`cl.status = $${paramIdx++}`);
-      values.push(status);
+      sb = sb.eq('status', status);
     }
-
     if (search) {
-      conditions.push(`(cl.company_name ILIKE $${paramIdx} OR cl.tax_id ILIKE $${paramIdx} OR cl.notes ILIKE $${paramIdx})`);
-      values.push(`%${search}%`);
-      paramIdx++;
+      sb = sb.or(`company_name.ilike.%${search}%,tax_id.ilike.%${search}%,notes.ilike.%${search}%`);
     }
+    sb = sb.order('created_at', { ascending: false });
+    const { data: sbData, error: sbError } = await sb;
+    if (sbError) throw sbError;
 
-    const query = `
-      SELECT 
-        cl.*,
-        p.full_name as sales_rep_name,
-        p.email as sales_rep_email,
-        p.avatar_url as sales_rep_avatar
-      FROM public.company_leads cl
-      LEFT JOIN public.profiles p ON cl.user_id = p.id
-      WHERE ${conditions.join(' AND ')}
-      ORDER BY cl.created_at DESC;
-    `;
-
-    const res = await pool.query(query, values);
+    const mapped = (sbData || []).map((cl: any) => ({
+      ...cl,
+      sales_rep_name: cl.profiles?.full_name || null,
+      sales_rep_email: cl.profiles?.email || null,
+      sales_rep_avatar: cl.profiles?.avatar_url || null,
+    }));
 
     return NextResponse.json({
       success: true,
-      count: res.rows.length,
-      leads: res.rows,
+      count: mapped.length,
+      leads: mapped,
     });
   } catch (err: any) {
     console.error('Error fetching portfolio:', err);

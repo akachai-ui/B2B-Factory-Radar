@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
+import { supabase } from '@/lib/supabase';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -13,76 +14,115 @@ export async function GET(request: NextRequest) {
     const active_only = searchParams.get('active_only') === 'true';
     const date = searchParams.get('date');
 
-    const conditions: string[] = [];
-    const values: any[] = [];
-    let paramIdx = 1;
+    if (pool) {
+      try {
+        const conditions: string[] = [];
+        const values: any[] = [];
+        let paramIdx = 1;
 
+        if (company_id && UUID_REGEX.test(company_id)) {
+          conditions.push(`vt.company_id = $${paramIdx++}`);
+          values.push(company_id);
+        }
+
+        if (user_id && UUID_REGEX.test(user_id)) {
+          conditions.push(`vt.user_id = $${paramIdx++}`);
+          values.push(user_id);
+        }
+
+        if (active_only) {
+          conditions.push(`vt.status = 'in_progress'`);
+        } else if (status && status !== 'ALL') {
+          conditions.push(`vt.status = $${paramIdx++}`);
+          values.push(status);
+        }
+
+        if (date) {
+          conditions.push(`vt.trip_date = $${paramIdx++}`);
+          values.push(date);
+        }
+
+        const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+        const query = `
+          SELECT 
+            vt.*,
+            p.full_name AS user_name,
+            p.email AS user_email,
+            p.avatar_url AS user_avatar,
+            ap.full_name AS approver_name
+          FROM public.vehicle_trips vt
+          LEFT JOIN public.profiles p ON vt.user_id = p.id
+          LEFT JOIN public.profiles ap ON vt.approved_by = ap.id
+          ${whereClause}
+          ORDER BY vt.created_at DESC
+          LIMIT 100;
+        `;
+
+        const res = await pool.query(query, values);
+        const trips = res.rows;
+
+        // Fetch checkins for these trips if any
+        if (trips.length > 0) {
+          const tripIds = trips.map((t: any) => t.id);
+          const checkinsRes = await pool.query(
+            `SELECT * FROM public.trip_checkins WHERE trip_id = ANY($1::uuid[]) ORDER BY checkin_time ASC`,
+            [tripIds]
+          );
+          
+          const checkinMap: Record<string, any[]> = {};
+          checkinsRes.rows.forEach((chk: any) => {
+            if (!checkinMap[chk.trip_id]) checkinMap[chk.trip_id] = [];
+            checkinMap[chk.trip_id].push(chk);
+          });
+
+          trips.forEach((t: any) => {
+            t.checkins = checkinMap[t.id] || [];
+          });
+        }
+
+        return NextResponse.json({
+          success: true,
+          count: trips.length,
+          trips,
+          activeTrip: active_only ? (trips[0] || null) : undefined,
+        });
+      } catch (poolErr) {
+        console.warn('Trips pool query failed, using Supabase client fallback:', poolErr);
+      }
+    }
+
+    // Supabase REST Client fallback
+    let sb = supabase.from('vehicle_trips').select('*, trip_checkins(*)');
     if (company_id && UUID_REGEX.test(company_id)) {
-      conditions.push(`vt.company_id = $${paramIdx++}`);
-      values.push(company_id);
+      sb = sb.eq('company_id', company_id);
     }
-
     if (user_id && UUID_REGEX.test(user_id)) {
-      conditions.push(`vt.user_id = $${paramIdx++}`);
-      values.push(user_id);
+      sb = sb.eq('user_id', user_id);
     }
-
     if (active_only) {
-      conditions.push(`vt.status = 'in_progress'`);
+      sb = sb.eq('status', 'in_progress');
     } else if (status && status !== 'ALL') {
-      conditions.push(`vt.status = $${paramIdx++}`);
-      values.push(status);
+      sb = sb.eq('status', status);
     }
-
     if (date) {
-      conditions.push(`vt.trip_date = $${paramIdx++}`);
-      values.push(date);
+      sb = sb.eq('trip_date', date);
     }
+    sb = sb.order('created_at', { ascending: false }).limit(100);
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const { data: tripsData, error: tripsError } = await sb;
+    if (tripsError) throw tripsError;
 
-    const query = `
-      SELECT 
-        vt.*,
-        p.full_name AS user_name,
-        p.email AS user_email,
-        p.avatar_url AS user_avatar,
-        ap.full_name AS approver_name
-      FROM public.vehicle_trips vt
-      LEFT JOIN public.profiles p ON vt.user_id = p.id
-      LEFT JOIN public.profiles ap ON vt.approved_by = ap.id
-      ${whereClause}
-      ORDER BY vt.created_at DESC
-      LIMIT 100;
-    `;
-
-    const res = await pool.query(query, values);
-    const trips = res.rows;
-
-    // Fetch checkins for these trips if any
-    if (trips.length > 0) {
-      const tripIds = trips.map((t: any) => t.id);
-      const checkinsRes = await pool.query(
-        `SELECT * FROM public.trip_checkins WHERE trip_id = ANY($1::uuid[]) ORDER BY checkin_time ASC`,
-        [tripIds]
-      );
-      
-      const checkinMap: Record<string, any[]> = {};
-      checkinsRes.rows.forEach((chk: any) => {
-        if (!checkinMap[chk.trip_id]) checkinMap[chk.trip_id] = [];
-        checkinMap[chk.trip_id].push(chk);
-      });
-
-      trips.forEach((t: any) => {
-        t.checkins = checkinMap[t.id] || [];
-      });
-    }
+    const formattedTrips = (tripsData || []).map((t: any) => ({
+      ...t,
+      checkins: t.trip_checkins || [],
+    }));
 
     return NextResponse.json({
       success: true,
-      count: trips.length,
-      trips,
-      activeTrip: active_only ? (trips[0] || null) : undefined,
+      count: formattedTrips.length,
+      trips: formattedTrips,
+      activeTrip: active_only ? (formattedTrips[0] || null) : undefined,
     });
   } catch (err: any) {
     console.error('Error fetching trips:', err);
