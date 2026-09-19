@@ -1,62 +1,63 @@
 'use client';
 
 import React from 'react';
-import { Compass, Building2, Users, User, Layers } from 'lucide-react';
+import { Target, ShoppingCart, TrendingUp, Car } from 'lucide-react';
 
-export type MobileTab = 'radar' | 'dbd' | 'factories' | 'team' | 'profile';
+export type MobileTab = 'portfolio' | 'marketplace' | 'radar' | 'dbd' | 'factories' | 'market' | 'trips' | 'team' | 'profile';
 
 interface MobileBottomNavProps {
   activeTab: MobileTab;
   onSelectTab: (tab: MobileTab) => void;
-  factoryCount?: number;
-  hasTeam?: boolean;
+  portfolioCount?: number;
+  hasActiveTrip?: boolean;
 }
 
 export function MobileBottomNav({
   activeTab,
   onSelectTab,
-  factoryCount = 989,
-  hasTeam = true,
+  portfolioCount = 0,
+  hasActiveTrip = false,
 }: MobileBottomNavProps) {
+  const isPortfolio = activeTab === 'portfolio' || activeTab === 'radar';
+  const isMarketplace = activeTab === 'marketplace' || activeTab === 'dbd' || activeTab === 'factories';
+
   const navItems = [
     {
-      id: 'radar' as MobileTab,
-      label: 'เรดาร์',
-      icon: Compass,
+      id: 'portfolio' as MobileTab,
+      label: 'พอร์ตฉัน',
+      icon: Target,
+      badge: portfolioCount > 0 ? `${portfolioCount}` : null,
+      isActive: isPortfolio,
+    },
+    {
+      id: 'marketplace' as MobileTab,
+      label: 'ช้อปหาลูกค้า',
+      icon: ShoppingCart,
+      badge: '989',
+      isActive: isMarketplace,
+    },
+    {
+      id: 'market' as MobileTab,
+      label: 'วิเคราะห์ตลาด',
+      icon: TrendingUp,
       badge: null,
+      isActive: activeTab === 'market',
     },
     {
-      id: 'dbd' as MobileTab,
-      label: 'DBD 390k',
-      icon: Building2,
-      badge: 'NEW',
-    },
-    {
-      id: 'factories' as MobileTab,
-      label: 'โรงงาน',
-      icon: Layers,
-      badge: factoryCount > 0 ? (factoryCount > 999 ? '999+' : `${factoryCount}`) : null,
-    },
-    {
-      id: 'team' as MobileTab,
-      label: 'ทีม',
-      icon: Users,
-      badge: null,
-    },
-    {
-      id: 'profile' as MobileTab,
-      label: 'โปรไฟล์',
-      icon: User,
-      badge: null,
+      id: 'trips' as MobileTab,
+      label: 'บันทึกเลขไมล์',
+      icon: Car,
+      badge: hasActiveTrip ? 'วิ่งอยู่' : null,
+      isActive: activeTab === 'trips',
     },
   ];
 
   return (
     <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-[1000] bg-[#0b0f19]/95 backdrop-blur-2xl border-t border-slate-800/90 pb-safe shadow-[0_-10px_25px_rgba(0,0,0,0.5)]">
-      <div className="grid grid-cols-5 h-16 max-w-lg mx-auto items-center px-1">
+      <div className="grid grid-cols-4 h-16 max-w-lg mx-auto items-center px-1">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeTab === item.id;
+          const isActive = item.isActive;
 
           return (
             <button

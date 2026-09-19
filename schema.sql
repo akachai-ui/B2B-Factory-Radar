@@ -319,5 +319,205 @@ DROP POLICY IF EXISTS "Allow members to delete their company leads" ON public.co
 CREATE POLICY "Allow members to delete their company leads"
   ON public.company_leads FOR DELETE TO authenticated, anon USING (true);
 
+-- 9. Table: lead_activities (ประวัติการติดต่อและบันทึกกิจกรรมลูกค้า CRM Timeline)
+CREATE TABLE IF NOT EXISTS public.lead_activities (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_lead_id UUID NOT NULL REFERENCES public.company_leads(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  activity_type VARCHAR(30) DEFAULT 'NOTE', -- 'CALL', 'MEETING', 'QUOTATION', 'LINE', 'NOTE', 'STATUS_CHANGE'
+  content TEXT NOT NULL,
+  status_change VARCHAR(30),
+  deal_value_change NUMERIC,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
 
+ALTER TABLE public.lead_activities ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow members to view their lead activities" ON public.lead_activities;
+CREATE POLICY "Allow members to view their lead activities"
+  ON public.lead_activities FOR SELECT TO authenticated, anon USING (true);
+
+DROP POLICY IF EXISTS "Allow members to insert their lead activities" ON public.lead_activities;
+CREATE POLICY "Allow members to insert their lead activities"
+  ON public.lead_activities FOR INSERT TO authenticated, anon WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow members to update their lead activities" ON public.lead_activities;
+CREATE POLICY "Allow members to update their lead activities"
+  ON public.lead_activities FOR UPDATE TO authenticated, anon USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow members to delete their lead activities" ON public.lead_activities;
+CREATE POLICY "Allow members to delete their lead activities"
+  ON public.lead_activities FOR DELETE TO authenticated, anon USING (true);
+
+-- 10. Table: vehicle_trips (บันทึกทริปการเดินทาง เลขไมล์ และระบบคำนวณค่าน้ำมัน)
+CREATE TABLE IF NOT EXISTS public.vehicle_trips (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  trip_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  
+  -- ข้อมูลยานพาหนะ
+  vehicle_type VARCHAR(30) DEFAULT 'car',      -- 'car' (รถยนต์), 'motorcycle' (มอเตอร์ไซค์), 'van' (รถตู้)
+  license_plate VARCHAR(30),                  -- ทะเบียนรถ เช่น 1กข-9999
+  
+  -- จุดเริ่มต้น (Start Day)
+  start_odometer NUMERIC NOT NULL,            -- เลขไมล์เริ่มต้น (เช่น 120000)
+  start_photo_url TEXT,                       -- รูปถ่ายหน้าปัดไมล์เช้า
+  start_time TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  start_lat DOUBLE PRECISION,
+  start_lng DOUBLE PRECISION,
+  start_location_name TEXT,
+  
+  -- จุดสิ้นสุด (End Day)
+  end_odometer NUMERIC,                       -- เลขไมล์สิ้นสุด (เช่น 120060)
+  end_photo_url TEXT,                         -- รูปถ่ายหน้าปัดไมล์เย็น
+  end_time TIMESTAMP WITH TIME ZONE,
+  end_lat DOUBLE PRECISION,
+  end_lng DOUBLE PRECISION,
+  end_location_name TEXT,
+  
+  -- ผลการคำนวณระยะทาง
+  total_odometer_km NUMERIC,                  -- ไมล์วิ่งจริง (end - start)
+  total_route_km NUMERIC DEFAULT 0,           -- ระยะทางตามรูทลูกค้าที่เช็คอินจริง
+  personal_deduct_km NUMERIC DEFAULT 0,       -- ระยะทางหักธุระส่วนตัว
+  net_claimable_km NUMERIC,                   -- กิโลเมตรสุทธิที่ขอเบิก
+  
+  -- ยอดเงินค่าน้ำมัน
+  fuel_rate_per_km NUMERIC DEFAULT 5.0,       -- อัตราค่าน้ำมัน (เช่น 5.0 บาท/กม.)
+  total_fuel_amount NUMERIC,                  -- ยอดเงินค่าน้ำมันรวม (บาท)
+  
+  -- สถานะและการอนุมัติ
+  status VARCHAR(30) DEFAULT 'in_progress',   -- 'in_progress', 'completed', 'approved', 'rejected'
+  approved_by UUID REFERENCES public.profiles(id),
+  approved_at TIMESTAMP WITH TIME ZONE,
+  rejection_reason TEXT,
+  notes TEXT,
+  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.vehicle_trips ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow members to view their vehicle trips" ON public.vehicle_trips;
+CREATE POLICY "Allow members to view their vehicle trips"
+  ON public.vehicle_trips FOR SELECT TO authenticated, anon USING (true);
+
+DROP POLICY IF EXISTS "Allow members to insert their vehicle trips" ON public.vehicle_trips;
+CREATE POLICY "Allow members to insert their vehicle trips"
+  ON public.vehicle_trips FOR INSERT TO authenticated, anon WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow members to update their vehicle trips" ON public.vehicle_trips;
+CREATE POLICY "Allow members to update their vehicle trips"
+  ON public.vehicle_trips FOR UPDATE TO authenticated, anon USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow members to delete their vehicle trips" ON public.vehicle_trips;
+CREATE POLICY "Allow members to delete their vehicle trips"
+  ON public.vehicle_trips FOR DELETE TO authenticated, anon USING (true);
+
+-- 11. Table: trip_checkins (บันทึกจุดเช็คอินโรงงาน/สถานที่ระหว่างวัน)
+CREATE TABLE IF NOT EXISTS public.trip_checkins (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID NOT NULL REFERENCES public.vehicle_trips(id) ON DELETE CASCADE,
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  company_lead_id UUID REFERENCES public.company_leads(id) ON DELETE SET NULL,
+  
+  checkin_type VARCHAR(30) DEFAULT 'CLIENT_VISIT', -- 'CLIENT_VISIT', 'LUNCH_BREAK', 'GAS_STATION', 'OTHER'
+  location_name TEXT NOT NULL,
+  lat DOUBLE PRECISION NOT NULL,
+  lng DOUBLE PRECISION NOT NULL,
+  distance_from_prev_km NUMERIC DEFAULT 0,
+  photo_url TEXT,
+  notes TEXT,
+  
+  checkin_time TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.trip_checkins ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow members to view their trip checkins" ON public.trip_checkins;
+CREATE POLICY "Allow members to view their trip checkins"
+  ON public.trip_checkins FOR SELECT TO authenticated, anon USING (true);
+
+DROP POLICY IF EXISTS "Allow members to insert their trip checkins" ON public.trip_checkins;
+CREATE POLICY "Allow members to insert their trip checkins"
+  ON public.trip_checkins FOR INSERT TO authenticated, anon WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow members to update their trip checkins" ON public.trip_checkins;
+CREATE POLICY "Allow members to update their trip checkins"
+  ON public.trip_checkins FOR UPDATE TO authenticated, anon USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow members to delete their trip checkins" ON public.trip_checkins;
+CREATE POLICY "Allow members to delete their trip checkins"
+  ON public.trip_checkins FOR DELETE TO authenticated, anon USING (true);
+
+-- 12. Storage Bucket: trip-photos (สำหรับจัดเก็บรูปถ่ายหน้าปัดไมล์และรูปถ่ายเช็คอิน)
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'trip-photos',
+  'trip-photos',
+  true,
+  10485760, -- 10MB
+  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+)
+ON CONFLICT (id) DO UPDATE SET
+  public = true,
+  file_size_limit = 10485760,
+  allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+DROP POLICY IF EXISTS "Public can view trip photos" ON storage.objects;
+CREATE POLICY "Public can view trip photos"
+  ON storage.objects FOR SELECT TO anon, authenticated
+  USING (bucket_id = 'trip-photos');
+
+DROP POLICY IF EXISTS "Allow upload trip photos" ON storage.objects;
+CREATE POLICY "Allow upload trip photos"
+  ON storage.objects FOR INSERT TO authenticated, anon
+  WITH CHECK (bucket_id = 'trip-photos');
+
+DROP POLICY IF EXISTS "Allow update trip photos" ON storage.objects;
+CREATE POLICY "Allow update trip photos"
+  ON storage.objects FOR UPDATE TO authenticated, anon
+  USING (bucket_id = 'trip-photos');
+
+DROP POLICY IF EXISTS "Allow delete trip photos" ON storage.objects;
+CREATE POLICY "Allow delete trip photos"
+  ON storage.objects FOR DELETE TO authenticated, anon
+  USING (bucket_id = 'trip-photos');
+
+-- 13. Table: company_fuel_policies (นโยบายและสูตรคำนวณค่าน้ำมันประจำบริษัท สำหรับ Owner / Admin)
+CREATE TABLE IF NOT EXISTS public.company_fuel_policies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID UNIQUE NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  
+  -- 1. อัตราค่าน้ำมันมาตรฐานแยกตามประเภทรถ (บาท/กม.)
+  car_rate_per_km NUMERIC DEFAULT 5.0,           -- รถยนต์
+  motorcycle_rate_per_km NUMERIC DEFAULT 2.5,    -- มอเตอร์ไซค์
+  van_rate_per_km NUMERIC DEFAULT 6.0,           -- รถกระบะ / รถตู้
+  
+  -- 2. นโยบายการคำนวณ
+  calculation_mode VARCHAR(30) DEFAULT 'odometer', -- 'odometer', 'gps_route', 'min_rule'
+  variance_tolerance_pct NUMERIC DEFAULT 15.0,    -- % ส่วนต่างที่ยอมรับได้
+  
+  -- 3. ความปลอดภัยและข้อกำหนด
+  require_photo_odometer BOOLEAN DEFAULT TRUE,   -- บังคับถ่ายรูปไมล์เช้า/เย็น
+  require_client_checkin BOOLEAN DEFAULT TRUE,   -- ต้องมีเช็คอินลูกค้าอย่างน้อย 1 จุด
+  allow_sales_override_rate BOOLEAN DEFAULT FALSE,-- อนุญาตให้เซลส์แก้เรทเองได้หรือไม่
+  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.company_fuel_policies ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow read company_fuel_policies" ON public.company_fuel_policies;
+CREATE POLICY "Allow read company_fuel_policies"
+  ON public.company_fuel_policies FOR SELECT TO authenticated, anon USING (true);
+
+DROP POLICY IF EXISTS "Allow insert company_fuel_policies" ON public.company_fuel_policies;
+CREATE POLICY "Allow insert company_fuel_policies"
+  ON public.company_fuel_policies FOR INSERT TO authenticated, anon WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow update company_fuel_policies" ON public.company_fuel_policies;
+CREATE POLICY "Allow update company_fuel_policies"
+  ON public.company_fuel_policies FOR UPDATE TO authenticated, anon USING (true) WITH CHECK (true);
 

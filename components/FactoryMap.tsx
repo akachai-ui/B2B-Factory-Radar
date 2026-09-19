@@ -16,11 +16,9 @@ import {
   ChevronDown,
 } from 'lucide-react';
 
-interface FactoryMapProps {
+export interface FactoryMapProps {
   leads: FactoryLead[];
   userLocation: { lat: number; lng: number; label: string };
-  isLiveTracking?: boolean;
-  onToggleLiveTracking?: () => void;
   selectedDistrict: string;
   onDistrictSelect?: (district: string) => void;
   selectedRadius: string;
@@ -30,6 +28,7 @@ interface FactoryMapProps {
   districtCounts?: Record<string, number>;
   totalLeadCount?: number;
   userName?: string;
+  userAvatar?: string | null;
 }
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -49,8 +48,6 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
 export function FactoryMap({
   leads,
   userLocation,
-  isLiveTracking = false,
-  onToggleLiveTracking,
   selectedDistrict,
   onDistrictSelect,
   selectedRadius,
@@ -60,6 +57,7 @@ export function FactoryMap({
   districtCounts,
   totalLeadCount,
   userName,
+  userAvatar,
 }: FactoryMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -272,19 +270,123 @@ export function FactoryMap({
       clusterGroup = L.layerGroup();
     }
 
-    const factoryIcon = L.divIcon({
-      html: `<div class="h-7 w-7 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 flex items-center justify-center font-bold shadow-md shadow-amber-500/30 border border-slate-900 hover:scale-125 transition-transform"><svg class="w-3.5 h-3.5 fill-slate-950" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>`,
-      className: 'custom-factory-pin',
-      iconSize: [28, 28],
-      iconAnchor: [14, 28],
-      popupAnchor: [0, -28],
-    });
-
     leads.forEach((lead) => {
       if (!lead.lat || !lead.lng) return;
 
-      const dist = calculateDistanceKm(userLocation.lat, userLocation.lng, lead.lat, lead.lng);
+      const currentStatus = lead.status;
+      let statusBorderColor = '#f59e0b';
+      let statusBadgeColor = 'bg-amber-500 text-slate-950';
+      let statusLabel = 'ใหม่';
+      let statusRing = 'border-amber-400 ring-amber-400/50';
+      let statusBg = 'from-amber-500 to-yellow-400';
+      let badgeIcon = '•';
+
+      if (currentStatus === 'WON') {
+        statusBorderColor = '#10b981';
+        statusBadgeColor = 'bg-emerald-500 text-slate-950';
+        statusLabel = 'Won สำเร็จ';
+        statusRing = 'border-emerald-400 ring-emerald-400/50';
+        statusBg = 'from-emerald-500 to-teal-400';
+        badgeIcon = '✓';
+      } else if (currentStatus === 'MEETING') {
+        statusBorderColor = '#a855f7';
+        statusBadgeColor = 'bg-purple-500 text-white';
+        statusLabel = 'นัดหมายพบ';
+        statusRing = 'border-purple-400 ring-purple-400/50';
+        statusBg = 'from-purple-500 to-indigo-500';
+        badgeIcon = '📅';
+      } else if (currentStatus === 'QUOTED') {
+        statusBorderColor = '#eab308';
+        statusBadgeColor = 'bg-yellow-400 text-slate-950';
+        statusLabel = 'เสนอราคา';
+        statusRing = 'border-yellow-400 ring-yellow-400/50';
+        statusBg = 'from-yellow-400 to-amber-500';
+        badgeIcon = '฿';
+      } else if (currentStatus === 'CONTACTED') {
+        statusBorderColor = '#3b82f6';
+        statusBadgeColor = 'bg-blue-500 text-white';
+        statusLabel = 'ติดต่อแล้ว';
+        statusRing = 'border-blue-400 ring-blue-400/50';
+        statusBg = 'from-blue-500 to-cyan-400';
+        badgeIcon = '📞';
+      } else if (currentStatus === 'LOST') {
+        statusBorderColor = '#64748b';
+        statusBadgeColor = 'bg-slate-700 text-slate-300';
+        statusLabel = 'ปิดโอกาส';
+        statusRing = 'border-slate-500 ring-slate-500/50';
+        statusBg = 'from-slate-700 to-slate-600';
+        badgeIcon = '✕';
+      }
+
+      const hasSalesRep = Boolean(lead.sales_rep || lead.sales_rep_avatar);
+      const repInitial = lead.sales_rep ? lead.sales_rep.trim().charAt(0).toUpperCase() : '👤';
+
+      let markerHtml = '';
+
+      if (hasSalesRep) {
+        // Customer pin showing Account Manager / Sales Rep Avatar
+        const repAvatarImg = lead.sales_rep_avatar
+          ? `<img src="${lead.sales_rep_avatar}" class="w-full h-full object-cover" alt="${lead.sales_rep || 'Sales'}" />`
+          : `<span class="text-[11px] font-black text-slate-900">${repInitial}</span>`;
+
+        markerHtml = `
+          <div class="relative flex items-center justify-center -top-6 -left-6 w-12 h-12 pointer-events-auto hover:scale-125 transition-transform group cursor-pointer">
+            <!-- Pin Body -->
+            <div class="relative flex flex-col items-center filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]">
+              <!-- Avatar Circle with Status Color Frame -->
+              <div class="h-9 w-9 rounded-full overflow-hidden border-2 ${statusRing} bg-gradient-to-tr from-amber-400 to-yellow-300 shadow-xl flex items-center justify-center ring-2 ring-slate-950">
+                ${repAvatarImg}
+              </div>
+              
+              <!-- Pointer Tail -->
+              <div class="w-2.5 h-2.5 rotate-45 -mt-1 shadow-md border-r border-b" style="background-color: ${statusBorderColor}; border-color: ${statusBorderColor};"></div>
+
+              <!-- Corner CRM Status Badge -->
+              <div class="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full ${statusBadgeColor} border-2 border-slate-950 flex items-center justify-center text-[8px] font-black shadow-lg" title="${statusLabel}">
+                ${badgeIcon}
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        // Raw Factory Pin
+        markerHtml = `
+          <div class="relative flex items-center justify-center -top-4 -left-4 w-8 h-8 pointer-events-auto hover:scale-125 transition-transform cursor-pointer">
+            <div class="h-7 w-7 rounded-xl bg-gradient-to-tr ${statusBg} text-slate-950 flex items-center justify-center font-bold shadow-md shadow-amber-500/30 border border-slate-900">
+              <svg class="w-3.5 h-3.5 fill-slate-950" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+          </div>
+        `;
+      }
+
+      const factoryIcon = L.divIcon({
+        html: markerHtml,
+        className: 'custom-account-manager-pin',
+        iconSize: [0, 0],
+        iconAnchor: [0, 0],
+      });
+
       const marker = L.marker([lead.lat, lead.lng], { icon: factoryIcon });
+
+      // Enhanced Tooltip with Sales Rep & Deal Info
+      const repBadge = lead.sales_rep ? `<div class="text-[11px] text-cyan-300 font-bold flex items-center gap-1">👤 ดูแลโดย: <span>${lead.sales_rep}</span></div>` : '';
+      const dealBadge = lead.deal_value ? `<div class="text-[11px] text-amber-300 font-mono font-bold">💰 มูลค่าดีล: ฿${Number(lead.deal_value).toLocaleString()}</div>` : '';
+
+      marker.bindTooltip(`
+        <div class="p-1 space-y-1 font-sans">
+          <div class="font-black text-white text-xs">${lead.name || lead.company_name}</div>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${statusBadgeColor}">${statusLabel}</span>
+            <span class="text-[10px] text-slate-400">${lead.district || 'สมุทรปราการ'}</span>
+          </div>
+          ${repBadge}
+          ${dealBadge}
+        </div>
+      `, {
+        permanent: false,
+        direction: 'top',
+        className: 'bg-slate-950/95 text-slate-200 border border-slate-700 px-3 py-2 rounded-2xl shadow-2xl backdrop-blur-md',
+      });
 
       marker.on('click', () => {
         setSelectedLead(lead);
@@ -314,16 +416,40 @@ export function FactoryMap({
     const L = (window as any).L;
     if (!L || !userLocation.lat || !userLocation.lng) return;
 
-    // User GPS Marker
+    // User GPS Marker with Custom Avatar
     if (userMarkerRef.current) {
       mapInstanceRef.current.removeLayer(userMarkerRef.current);
     }
 
+    const initial = userName ? userName.trim().charAt(0).toUpperCase() : '👤';
+    const avatarContent = userAvatar
+      ? `<img src="${userAvatar}" class="w-full h-full object-cover" alt="${userName || 'User'}" />`
+      : `<span class="text-xs font-black text-slate-950">${initial}</span>`;
+
     const userGpsIcon = L.divIcon({
-      html: `<div class="relative flex items-center justify-center h-8 w-8"><div class="absolute h-8 w-8 rounded-full bg-cyan-400/30 animate-ping"></div><div class="h-5 w-5 rounded-full bg-cyan-400 border-2 border-slate-950 shadow-lg shadow-cyan-400/50 flex items-center justify-center text-[8px] font-black text-slate-950">📍</div></div>`,
-      className: 'custom-user-gps-icon',
-      iconSize: [32, 32],
-      iconAnchor: [16, 16],
+      html: `
+        <div class="relative flex items-center justify-center -top-7 -left-7 w-14 h-14 pointer-events-none">
+          <!-- Dynamic Animated Radar Rings -->
+          <div class="absolute inset-0 rounded-full bg-cyan-400/35 animate-ping"></div>
+          <div class="absolute -inset-1 rounded-full bg-cyan-500/25 animate-pulse"></div>
+
+          <!-- Avatar Pin Container -->
+          <div class="relative flex flex-col items-center pointer-events-auto filter drop-shadow-[0_0_12px_rgba(6,182,212,0.9)] cursor-pointer hover:scale-110 transition-transform">
+            <div class="h-10 w-10 rounded-full overflow-hidden border-2 border-cyan-300 bg-gradient-to-tr from-amber-400 to-yellow-300 shadow-2xl flex items-center justify-center ring-2 ring-cyan-500/50">
+              ${avatarContent}
+            </div>
+            <!-- Marker Pointer Arrow -->
+            <div class="w-2.5 h-2.5 bg-cyan-300 rotate-45 -mt-1 shadow-md border-r border-b border-cyan-600"></div>
+            <!-- Live GPS Pulse Indicator Badge -->
+            <div class="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-slate-950 flex items-center justify-center shadow" title="GPS Live">
+              <div class="h-1.5 w-1.5 rounded-full bg-white animate-ping"></div>
+            </div>
+          </div>
+        </div>
+      `,
+      className: 'custom-user-gps-avatar-icon',
+      iconSize: [0, 0],
+      iconAnchor: [0, 0],
     });
 
     const userMarker = L.marker([userLocation.lat, userLocation.lng], {
@@ -331,10 +457,10 @@ export function FactoryMap({
       zIndexOffset: 1000,
     }).addTo(mapInstanceRef.current);
 
-    userMarker.bindTooltip('📍 ตำแหน่ง GPS ของคุณ', {
+    userMarker.bindTooltip(`📍 ${userName || 'คุณ'} (ตำแหน่งสด GPS)`, {
       permanent: false,
       direction: 'top',
-      className: 'bg-slate-900 text-cyan-300 font-bold border border-slate-700 px-2 py-1 rounded-lg text-xs',
+      className: 'bg-slate-900 text-cyan-300 font-bold border border-slate-700 px-2.5 py-1 rounded-xl text-xs shadow-xl',
     });
 
     userMarkerRef.current = userMarker;
@@ -451,40 +577,15 @@ export function FactoryMap({
           </div>
         </div>
 
-        {/* Unified Smart GPS Control (Recenter + Live Tracking) */}
-        <div className="flex items-center rounded-2xl bg-slate-900/95 border border-slate-700/80 shadow-xl backdrop-blur-md p-0.5">
-          <button
-            onClick={handleRecenterUser}
-            className="px-3 py-2 rounded-xl text-cyan-300 hover:text-white hover:bg-slate-800/80 flex items-center gap-1.5 text-xs font-bold transition cursor-pointer active:scale-95"
-            title="ซูมไปยังตำแหน่ง GPS ของฉัน"
-          >
-            <Crosshair className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="hidden sm:inline">ตำแหน่งฉัน</span>
-          </button>
-          
-          {onToggleLiveTracking && (
-            <>
-              <div className="w-[1px] h-4 bg-slate-800 my-auto" />
-              <button
-                onClick={onToggleLiveTracking}
-                className={`px-2.5 py-2 rounded-xl flex items-center gap-1.5 text-xs font-bold transition cursor-pointer active:scale-95 ${
-                  isLiveTracking
-                    ? 'text-emerald-300 hover:bg-emerald-950/50'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
-                }`}
-                title={isLiveTracking ? 'GPS สดเปิดอยู่ (คลิกเพื่อปิด)' : 'GPS สดปิดอยู่ (คลิกเพื่อเปิด)'}
-              >
-                <span className="relative flex h-2 w-2">
-                  {isLiveTracking && (
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  )}
-                  <span className={`relative inline-flex rounded-full h-2 w-2 ${isLiveTracking ? 'bg-emerald-400' : 'bg-slate-600'}`}></span>
-                </span>
-                <span>{isLiveTracking ? 'GPS สด' : 'GPS ปิด'}</span>
-              </button>
-            </>
-          )}
-        </div>
+        {/* Standard My Location Recenter Button */}
+        <button
+          onClick={handleRecenterUser}
+          className="p-2.5 rounded-2xl bg-slate-900/95 hover:bg-slate-800 text-cyan-300 hover:text-white border border-slate-700/80 shadow-xl backdrop-blur-md flex items-center gap-1.5 text-xs font-bold transition cursor-pointer active:scale-95"
+          title="ซูมไปยังตำแหน่งของฉัน"
+        >
+          <Crosshair className="w-4 h-4 text-cyan-400" />
+          <span className="hidden sm:inline">ตำแหน่งของฉัน</span>
+        </button>
 
         {/* Recenter Overview */}
         <button

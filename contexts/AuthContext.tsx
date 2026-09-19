@@ -158,29 +158,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function initAuth() {
       try {
-        // 1. Instant Cache Render (0s)
+        // 1. Instant Cache Check (0ms)
         const { data: { session: cachedSession } } = await supabase.auth.getSession();
-        if (mounted && cachedSession?.user) {
+        
+        if (!cachedSession?.user) {
+          // Not logged in -> Immediately show Landing Page without network blocking
+          if (mounted) {
+            setUser(null);
+            setSession(null);
+            setProfile(null);
+            setLoading(false);
+          }
+          return;
+        }
+
+        if (mounted) {
           setSession(cachedSession);
           setUser(cachedSession.user);
         }
 
-        // 2. Background Revalidate against Server
-        const { data: { user: serverUser }, error: serverError } = await supabase.auth.getUser();
+        // 2. Background Revalidate against Server with safety timeout
+        const serverUserPromise = supabase.auth.getUser();
+        const timeoutPromise = new Promise<{ data: { user: null }; error: any }>((resolve) =>
+          setTimeout(() => resolve({ data: { user: null }, error: new Error('Auth timeout') }), 4000)
+        );
+
+        const { data: { user: serverUser }, error: serverError } = (await Promise.race([
+          serverUserPromise,
+          timeoutPromise,
+        ])) as any;
 
         if (!mounted) return;
 
         if (serverError || !serverUser) {
-          // If User was deleted on the server or token is invalid -> Force Logout
-          if (cachedSession) {
+          if (serverError?.message !== 'Auth timeout') {
             console.warn('User invalidated on server -> Logging out');
             await supabase.auth.signOut();
+            setUser(null);
+            setSession(null);
+            setProfile(null);
           }
-          setUser(null);
-          setSession(null);
-          setProfile(null);
         } else {
-          // User is valid on server -> sync profile live from DB
           setUser(serverUser);
           await fetchLiveProfile(serverUser);
         }
@@ -317,7 +335,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
         .eq('id', user.id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (data && !error) {
         setProfile((prev) => ({

@@ -8,6 +8,7 @@ import { Navbar } from '@/components/Navbar';
 import { AuthModal } from '@/components/AuthModal';
 import { IdentityOnboardingModal } from '@/components/IdentityOnboardingModal';
 import { UserProfile, FactoryLead, TeamInvitation } from '@/lib/types';
+import { DatabaseSchemaDoc } from '@/components/DatabaseSchemaDoc';
 import {
   Activity,
   Database,
@@ -290,7 +291,7 @@ export default function DevOverviewPage() {
   const [searchProfileQuery, setSearchProfileQuery] = useState<string>('');
   
   // Default to 'checklist' tab for testing verification
-  const [activeTab, setActiveTab] = useState<'checklist' | 'profiles' | 'companies' | 'overview' | 'database' | 'raw'>('checklist');
+  const [activeTab, setActiveTab] = useState<'checklist' | 'schema' | 'profiles' | 'companies' | 'overview' | 'database' | 'raw'>('schema');
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
 
   // Checklist Check State (interactive checkbox)
@@ -591,7 +592,19 @@ export default function DevOverviewPage() {
             }`}
           >
             <CheckSquare className="w-3.5 h-3.5" />
-            <span>📋 เช็คลิสต์ทดสอบ & สรุปขั้นตอน (Testing Checklist)</span>
+            <span>📋 เช็คลิสต์ทดสอบ (QA Checklist)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('schema')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
+              activeTab === 'schema'
+                ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 text-slate-950 font-black shadow-md shadow-amber-500/20'
+                : 'text-amber-300 hover:text-white hover:bg-amber-500/10 border border-amber-500/30'
+            }`}
+          >
+            <Database className="w-3.5 h-3.5 text-amber-400" />
+            <span>🗄️ โครงสร้างฐานข้อมูล & ER Diagram</span>
           </button>
 
           <button
@@ -654,6 +667,11 @@ export default function DevOverviewPage() {
             <span>Raw JSON State</span>
           </button>
         </div>
+
+        {/* ---------------------------------------------------- */}
+        {/* TAB: DATABASE SCHEMA & ER DIAGRAM                    */}
+        {/* ---------------------------------------------------- */}
+        {activeTab === 'schema' && <DatabaseSchemaDoc />}
 
         {/* ---------------------------------------------------- */}
         {/* TAB: CHECKLIST & ROADMAP VERIFICATION                */}

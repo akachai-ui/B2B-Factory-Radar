@@ -100,7 +100,7 @@ export function IdentityOnboardingModal({ isOpen, onComplete }: IdentityOnboardi
                 },
               ])
               .select()
-              .single();
+              .maybeSingle();
 
             if (!compError && newComp) {
               linkedCompanyId = newComp.id;

@@ -142,17 +142,17 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
 
   return (
     <>
-      <header className="bg-[#0b0f19]/95 backdrop-blur-xl sticky top-0 z-50 border-b border-slate-800/80 shadow-2xl">
+      <header className="backdrop-blur-2xl bg-gradient-to-b from-white/[0.08] via-slate-950/80 to-slate-950/95 sticky top-0 z-50 border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
           
           {/* Brand Logo & Title */}
           <Link href="/" className="flex items-center gap-3 min-w-0 group cursor-pointer">
-            <div className="relative h-10 w-10 shrink-0 group-hover:scale-105 transition flex items-center justify-center">
-              <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-md" />
+            <div className="relative h-10 w-10 shrink-0 group-hover:scale-105 transition-all duration-300 flex items-center justify-center">
+              <div className="absolute inset-0 bg-amber-500/25 rounded-full blur-md group-hover:blur-lg transition" />
               <img
                 src="/images/logo.png"
                 alt="RouteHunter Logo"
-                className="w-full h-full object-contain relative z-10 drop-shadow-[0_0_10px_rgba(245,158,11,0.4)]"
+                className="w-full h-full object-contain relative z-10 drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]"
               />
             </div>
 
@@ -161,7 +161,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                 <span className="text-base sm:text-lg font-black tracking-tight text-white truncate group-hover:text-amber-300 transition">
                   RouteHunter
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0 uppercase">
+                <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black backdrop-blur-md bg-amber-500/20 text-amber-300 border border-amber-400/40 shrink-0 uppercase shadow-[0_0_10px_rgba(245,158,11,0.2)]">
                   B2B Radar
                 </span>
               </div>
@@ -175,12 +175,12 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {user ? (
               <div className="relative">
-                {/* Logged-In User Button */}
+                {/* Logged-In User Button (3D Glass Pill) */}
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2.5 p-1.5 sm:px-3 sm:py-2 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition cursor-pointer group shadow-sm"
+                  className="flex items-center gap-2.5 p-1.5 sm:px-3 sm:py-2 rounded-2xl backdrop-blur-xl bg-white/[0.05] border border-white/15 hover:border-amber-400/40 hover:bg-white/[0.08] transition-all duration-300 cursor-pointer group shadow-lg shadow-black/30 active:scale-95"
                 >
-                  <div className="h-7 w-7 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 font-black text-xs flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                  <div className="h-7 w-7 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 font-black text-xs flex items-center justify-center shrink-0 overflow-hidden shadow-md shadow-amber-500/30 border border-amber-300/40">
                     {currentAvatar ? (
                       <img
                         src={currentAvatar}
@@ -198,10 +198,10 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                       <span className="text-xs font-bold text-white truncate group-hover:text-amber-300 transition">
                         {displayName}
                       </span>
-                      <span className={`px-1.5 py-0.2 rounded text-[8px] font-black uppercase ${
+                      <span className={`px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase backdrop-blur-md border ${
                         currentAccountType === 'company'
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                          : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                          : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
                       }`}>
                         {currentAccountType === 'company' ? 'บริษัท' : 'บุคคล'}
                       </span>
@@ -216,14 +216,14 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition shrink-0" />
                 </button>
 
-                {/* User Dropdown Menu */}
+                {/* User Dropdown Menu (3D Frosted Glass) */}
                 {isDropdownOpen && (
                   <>
                     <div
                       onClick={() => setIsDropdownOpen(false)}
                       className="fixed inset-0 z-40"
                     />
-                    <div className="absolute right-0 mt-2 w-72 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1.5">
+                    <div className="absolute right-0 mt-2 w-72 rounded-[2rem] backdrop-blur-2xl bg-gradient-to-b from-slate-900/95 to-slate-950/98 border border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.7)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] p-3 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-2">
                       
                       {/* User Info Header */}
                       <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800/60 space-y-2.5">
@@ -271,15 +271,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                         <span>ตั้งค่าโปรไฟล์ & ประเภทบัญชี</span>
                       </button>
 
-                      {/* Dev Monitor Action */}
-                      <Link
-                        href="/dev"
-                        onClick={() => setIsDropdownOpen(false)}
-                        className="w-full p-2.5 rounded-xl hover:bg-slate-800 text-amber-300 text-xs font-medium flex items-center gap-2.5 transition cursor-pointer"
-                      >
-                        <Terminal className="w-4 h-4 text-amber-400" />
-                        <span>หน้า Dev Monitor & ภาพรวม</span>
-                      </Link>
+
 
                       {/* Divider */}
                       <div className="h-px bg-slate-800 my-1" />

@@ -8,18 +8,31 @@ import {
   Navigation,
   Building2,
   MapPin,
+  ShoppingCart,
+  Lock,
+  UserCheck,
+  Check,
+  RefreshCw,
 } from 'lucide-react';
 
 interface MobileFactoryBottomSheetProps {
   factory: FactoryLead | null;
   onClose: () => void;
   userDistanceKm?: number | null;
+  onClaim?: (factory: FactoryLead) => void;
+  isClaimedByMe?: boolean;
+  claimedByOtherName?: string | null;
+  isClaiming?: boolean;
 }
 
 export function MobileFactoryBottomSheet({
   factory,
   onClose,
   userDistanceKm,
+  onClaim,
+  isClaimedByMe = false,
+  claimedByOtherName = null,
+  isClaiming = false,
 }: MobileFactoryBottomSheetProps) {
   if (!factory) return null;
 
@@ -39,12 +52,12 @@ export function MobileFactoryBottomSheet({
         className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200"
       />
 
-      {/* Slide-Up Bottom Sheet Card */}
-      <div className="relative z-10 w-full max-h-[85vh] bg-[#0c1222] border-t border-slate-800 rounded-t-[32px] p-5 shadow-[0_-20px_50px_rgba(0,0,0,0.8)] flex flex-col overflow-y-auto no-scrollbar animate-in slide-in-from-bottom duration-300 pb-safe">
+      {/* Slide-Up Bottom Sheet Card (3D Glass Sheet) */}
+      <div className="relative z-10 w-full max-h-[85vh] backdrop-blur-2xl bg-gradient-to-b from-slate-900/95 via-slate-950/98 to-slate-950 border-t border-white/20 rounded-t-[36px] p-5 sm:p-6 shadow-[0_-20px_50px_rgba(0,0,0,0.9)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] flex flex-col overflow-y-auto no-scrollbar animate-in slide-in-from-bottom duration-300 pb-safe">
         
         {/* Drag Handle Bar */}
-        <div className="flex justify-center -mt-2 mb-3">
-          <div className="w-12 h-1.5 rounded-full bg-slate-700/80" />
+        <div className="flex justify-center -mt-2 mb-3.5">
+          <div className="w-14 h-1.5 rounded-full bg-white/20 shadow-sm" />
         </div>
 
         {/* Header Title & Close Button */}
@@ -77,6 +90,41 @@ export function MobileFactoryBottomSheet({
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+
+
+
+        {/* Claim / Ownership Status Banner */}
+        <div className="mt-3">
+          {isClaimedByMe ? (
+            <div className="w-full py-2.5 px-3 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-center gap-2">
+              <UserCheck className="w-4 h-4 text-emerald-400" />
+              <span>อยู่ในพอร์ตงานขายของคุณแล้ว</span>
+            </div>
+          ) : claimedByOtherName ? (
+            <div className="w-full py-2.5 px-3 rounded-2xl bg-slate-800/80 border border-slate-700/80 text-slate-300 text-xs font-medium flex items-center justify-center gap-2">
+              <Lock className="w-4 h-4 text-amber-400" />
+              <span>ถูกดูแลโดย: <strong className="text-white">{claimedByOtherName}</strong></span>
+            </div>
+          ) : onClaim ? (
+            <button
+              onClick={() => onClaim(factory)}
+              disabled={isClaiming}
+              className="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-95 transition cursor-pointer"
+            >
+              {isClaiming ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>กำลังดึงเข้าพอร์ต...</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>🛒 หยิบใส่พอร์ตของฉัน (Claim to Portfolio)</span>
+                </>
+              )}
+            </button>
+          ) : null}
         </div>
 
         {/* Quick 1-Tap Action Buttons Grid */}

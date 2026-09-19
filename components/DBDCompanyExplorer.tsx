@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import dynamic from 'next/dynamic';
 import { DBDCompany, DBDFilterState } from '@/lib/types';
 import * as XLSX from 'xlsx';
 import {
@@ -25,7 +24,10 @@ import {
   ChevronRight,
   ShieldCheck,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  ShoppingCart,
+  Lock,
+  UserCheck
 } from 'lucide-react';
 
 const CAPITAL_OPTIONS: { value: DBDFilterState['capitalRange']; label: string; min?: number; max?: number }[] = [
@@ -71,18 +73,23 @@ const PROVINCE_OPTIONS = [
 ];
 
 interface DBDCompanyExplorerProps {
-  onAddToLeads?: (company: DBDCompany) => Promise<void>;
-  addedTaxIds?: Set<string>;
+  companyId?: string;
+  userId?: string;
+  canExport?: boolean;
+  onClaimSuccess?: (claimedCompany: DBDCompany) => void;
 }
 
-export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DBDCompanyExplorerProps) {
+export function DBDCompanyExplorer({ companyId, userId, canExport = false, onClaimSuccess }: DBDCompanyExplorerProps) {
   const [companies, setCompanies] = useState<DBDCompany[]>([]);
   const [totalInView, setTotalInView] = useState<number>(0);
   const [nationalStats, setNationalStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedCompany, setSelectedCompany] = useState<DBDCompany | null>(null);
-  const [addedIds, setAddedIds] = useState<Set<string>>(addedTaxIds);
-  const [addingId, setAddingId] = useState<string | null>(null);
+
+  // Claimed Mapping (dbd_ID -> { user_id, claimed_by_name })
+  const [claimedMap, setClaimedMap] = useState<Record<string, { user_id: string; claimed_by_name: string }>>({});
+  const [claimingId, setClaimingId] = useState<string | number | null>(null);
+  const [claimToast, setClaimToast] = useState<{ type: 'success' | 'warning' | 'error'; message: string } | null>(null);
 
   // Filters
   const [search, setSearch] = useState('');
@@ -94,6 +101,24 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const clusterGroupRef = useRef<any>(null);
+
+  // Fetch Claimed IDs for this Company
+  const fetchClaimedIds = useCallback(async () => {
+    if (!companyId) return;
+    try {
+      const res = await fetch(`/api/portfolio/claimed-ids?company_id=${companyId}`);
+      const data = await res.json();
+      if (data.success && data.claimed_map) {
+        setClaimedMap(data.claimed_map);
+      }
+    } catch (err) {
+      console.error('Error loading claimed IDs:', err);
+    }
+  }, [companyId]);
+
+  useEffect(() => {
+    fetchClaimedIds();
+  }, [fetchClaimedIds]);
 
   // Load National Stats
   useEffect(() => {
@@ -167,7 +192,7 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
 
     if (!mapInstanceRef.current) {
       const map = L.map(mapContainerRef.current, {
-        center: [13.6062, 100.6974], // Default Bangkok / Samut Prakan
+        center: [13.6062, 100.6974],
         zoom: 10,
         zoomControl: false,
       });
@@ -223,11 +248,24 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
     companies.forEach((company) => {
       if (!company.lat || !company.lng) return;
 
+      const claimInfo = claimedMap[`dbd_${company.id}`];
+      const isClaimedByMe = claimInfo?.user_id === userId;
+      const isClaimedByTeam = Boolean(claimInfo && !isClaimedByMe);
+
       const isLarge = company.registered_capital >= 50000000;
       const isEnterprise = company.registered_capital >= 100000000;
 
-      const markerColor = isEnterprise ? '#fbbf24' : isLarge ? '#a855f7' : '#38bdf8';
-      const markerSize = isEnterprise ? 28 : isLarge ? 24 : 20;
+      const markerColor = isClaimedByMe
+        ? '#10b981' // Emerald for My Portfolio
+        : isClaimedByTeam
+        ? '#64748b' // Slate for Team Claimed
+        : isEnterprise
+        ? '#fbbf24' // Gold
+        : isLarge
+        ? '#a855f7' // Purple
+        : '#38bdf8'; // Cyan
+
+      const markerSize = isClaimedByMe ? 28 : isEnterprise ? 26 : isLarge ? 22 : 18;
 
       const customIcon = L.divIcon({
         className: 'custom-dbd-pin',
@@ -245,7 +283,7 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
             cursor: pointer;
             transition: transform 0.2s;
           ">
-            <div style="width: 6px; height: 6px; background: white; border-radius: 50%;"></div>
+            <div style="width: 5px; height: 5px; background: white; border-radius: 50%;"></div>
           </div>
         `,
         iconSize: [markerSize, markerSize],
@@ -257,6 +295,13 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
       const capitalFormatted = Number(company.registered_capital).toLocaleString();
       const popupHtml = `
         <div style="font-family: sans-serif; min-width: 220px; color: #f8fafc; padding: 4px;">
+          ${
+            isClaimedByMe
+              ? `<div style="font-size: 10px; font-weight: bold; background: #065f46; color: #6ee7b7; padding: 2px 6px; border-radius: 6px; display: inline-block; margin-bottom: 4px;">✅ ในพอร์ตของคุณ</div>`
+              : isClaimedByTeam
+              ? `<div style="font-size: 10px; font-weight: bold; background: #334155; color: #cbd5e1; padding: 2px 6px; border-radius: 6px; display: inline-block; margin-bottom: 4px;">🔒 ${claimInfo.claimed_by_name} กำลังดูแล</div>`
+              : ''
+          }
           <div style="font-size: 11px; font-weight: 700; color: #fbbf24; margin-bottom: 2px;">
             ${company.tax_id}
           </div>
@@ -282,7 +327,7 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
 
     cluster.addTo(mapInstanceRef.current);
     clusterGroupRef.current = cluster;
-  }, [companies]);
+  }, [companies, claimedMap, userId]);
 
   // Handle Province Zoom
   const handleProvinceChange = (province: string) => {
@@ -299,17 +344,60 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
     }
   };
 
-  // Add to Leads Handler
-  const handleAddLead = async (company: DBDCompany) => {
-    if (!onAddToLeads) return;
-    setAddingId(company.tax_id);
+  // 🛒 Shopping: Claim to Portfolio Action
+  const handleClaimCompany = async (company: DBDCompany) => {
+    if (!companyId || !userId) {
+      setClaimToast({ type: 'warning', message: 'กรุณาเข้าสู่ระบบก่อนทำการหยิบลูกค้าเข้าพอร์ต' });
+      return;
+    }
+
+    setClaimingId(company.id);
     try {
-      await onAddToLeads(company);
-      setAddedIds((prev) => new Set([...prev, company.tax_id]));
-    } catch (err) {
-      console.error('Failed to add lead:', err);
+      const res = await fetch('/api/portfolio/claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company_id: companyId,
+          user_id: userId,
+          source_type: 'dbd',
+          dbd_id: company.id,
+          company_name: company.name,
+          tax_id: company.tax_id,
+          registered_capital: company.registered_capital,
+          tsic_code: company.tsic_code,
+          objective: company.objective,
+          address: company.address,
+          subdistrict: company.subdistrict,
+          district: company.district,
+          province: company.province,
+          postal_code: company.postal_code,
+          lat: company.lat,
+          lng: company.lng,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setClaimedMap((prev) => ({
+          ...prev,
+          [`dbd_${company.id}`]: { user_id: userId, claimed_by_name: 'ตัวคุณ' },
+        }));
+        setClaimToast({ type: 'success', message: `🎉 หยิบ "${company.name}" เข้าพอร์ตของคุณเรียบร้อยแล้ว!` });
+        if (onClaimSuccess) onClaimSuccess(company);
+      } else if (data.already_claimed) {
+        setClaimedMap((prev) => ({
+          ...prev,
+          [`dbd_${company.id}`]: { user_id: data.is_own_claim ? userId : 'other', claimed_by_name: data.claimed_by_name },
+        }));
+        setClaimToast({ type: 'warning', message: data.message });
+      } else {
+        setClaimToast({ type: 'error', message: data.error || 'เกิดข้อผิดพลาดในการนำเข้าพอร์ต' });
+      }
+    } catch (err: any) {
+      setClaimToast({ type: 'error', message: err.message || 'เกิดข้อผิดพลาด' });
     } finally {
-      setAddingId(null);
+      setClaimingId(null);
     }
   };
 
@@ -342,19 +430,49 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
 
   return (
     <div className="space-y-6">
-      {/* 1. Header Banner & National Big Data KPI Stats */}
+      {/* Toast Notification */}
+      {claimToast && (
+        <div
+          className={`p-4 rounded-2xl border flex items-center justify-between transition-all animate-in fade-in slide-in-from-top duration-200 ${
+            claimToast.type === 'success'
+              ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-200 shadow-lg shadow-emerald-950/50'
+              : claimToast.type === 'warning'
+              ? 'bg-amber-950/80 border-amber-500/50 text-amber-200 shadow-lg shadow-amber-950/50'
+              : 'bg-rose-950/80 border-rose-500/50 text-rose-200 shadow-lg shadow-rose-950/50'
+          }`}
+        >
+          <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold">
+            {claimToast.type === 'success' ? (
+              <Check className="w-5 h-5 text-emerald-400 shrink-0" />
+            ) : claimToast.type === 'warning' ? (
+              <Lock className="w-5 h-5 text-amber-400 shrink-0" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+            )}
+            <span>{claimToast.message}</span>
+          </div>
+          <button
+            onClick={() => setClaimToast(null)}
+            className="text-slate-400 hover:text-white text-xs p-1"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* 1. Header Banner & Shopping Mall Concept */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/20 p-6 shadow-2xl">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-              ฐานข้อมูลกระทรวงพาณิชย์ (DBD DataWarehouse+)
+              <ShoppingCart className="w-3.5 h-3.5 text-amber-400 animate-bounce" />
+              ศูนย์ค้นหาและช้อปปิ้งลูกค้า B2B (Lead Shopping Marketplace)
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
               <span>ฐานข้อมูลนิติบุคคลทั่วประเทศ 390,000+ รายการ</span>
             </h2>
             <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-              สืบค้นข้อมูลบริษัท ทุนจดทะเบียน วัตถุประสงค์ธุรกิจ และพิกัดทั่วทั้ง 77 จังหวัด ด้วยระบบ PostGIS Spatial Indexing พร้อมดึงเข้าสู่ Sales Pipeline ทันที
+              สแกนค้นหากลุ่มเป้าหมายตามขนาดทุนจดทะเบียนและหมวดอุตสาหกรรม แล้วกด <strong>"🛒 หยิบใส่พอร์ตของฉัน"</strong> เพื่อเริ่มติดตามงานขายและวางแผนรูทเข้าพบ
             </p>
           </div>
 
@@ -367,13 +485,13 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
               </span>
             </div>
             <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 flex flex-col justify-center">
-              <span className="text-[11px] font-medium text-emerald-300">สถานะดำเนินกิจการ</span>
+              <span className="text-[11px] font-medium text-emerald-300">สถานะเปิดกิจการ</span>
               <span className="text-lg sm:text-xl font-black text-emerald-400">
                 {nationalStats?.stats?.active_companies ? Number(nationalStats.stats.active_companies).toLocaleString() : '389,164'}
               </span>
             </div>
             <div className="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/30 flex flex-col justify-center col-span-2 sm:col-span-1">
-              <span className="text-[11px] font-medium text-amber-300">มูลค่าทุนจดทะเบียนรวม</span>
+              <span className="text-[11px] font-medium text-amber-300">ทุนจดทะเบียนรวม</span>
               <span className="text-lg sm:text-xl font-black text-amber-400">
                 1.67 ล้านล้าน฿
               </span>
@@ -465,7 +583,7 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
               <button
                 key={cap.value}
                 onClick={() => setSelectedCapital(cap.value)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                   selectedCapital === cap.value
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
@@ -481,14 +599,16 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
             <span className="text-slate-400 text-xs">
               พบบนหน้าจอ: <strong className="text-amber-400 font-bold">{totalInView.toLocaleString()}</strong> รายการ
             </span>
-            <button
-              onClick={handleExportExcel}
-              disabled={companies.length === 0}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition-all disabled:opacity-50"
-            >
-              <Download className="w-3.5 h-3.5" />
-              Export Excel ({companies.length})
-            </button>
+            {canExport && (
+              <button
+                onClick={handleExportExcel}
+                disabled={companies.length === 0}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition-all disabled:opacity-50 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Export Excel ({companies.length})
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -498,23 +618,23 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
         {/* Left / Top: Interactive PostGIS Leaflet Map */}
         <div className="lg:col-span-7 xl:col-span-8 rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 relative shadow-2xl h-[480px] sm:h-[600px] flex flex-col">
           <div ref={mapContainerRef} className="w-full h-full" />
-          
+
           {/* Map Floating Status Indicator */}
           <div className="absolute top-4 left-4 z-[400] bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl px-3.5 py-2 shadow-xl flex items-center gap-2.5">
             <div className={`w-2.5 h-2.5 rounded-full ${isLoading ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`} />
             <div className="text-xs">
-              <span className="text-slate-400">หมุน/ซูมแผนที่เพื่อดึงข้อมูล: </span>
+              <span className="text-slate-400">สแกนพิกัด: </span>
               <strong className="text-white font-bold">{totalInView.toLocaleString()} บริษัทในมุมมองนี้</strong>
             </div>
           </div>
         </div>
 
-        {/* Right / Bottom: Companies List & Top Capital Cards */}
+        {/* Right / Bottom: Companies List with Shopping / Claim Buttons */}
         <div className="lg:col-span-5 xl:col-span-4 flex flex-col space-y-3 h-[480px] sm:h-[600px]">
           <div className="flex items-center justify-between px-2">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-indigo-400" />
-              รายชื่อบริษัท ({companies.length} รายการแรก)
+              <ShoppingCart className="w-4 h-4 text-amber-400" />
+              แคตตาล็อกบริษัท ({companies.length} รายการแรก)
             </h3>
             {isLoading && (
               <span className="text-xs text-amber-400 animate-pulse flex items-center gap-1">
@@ -533,12 +653,16 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
 
             {companies.map((company) => {
               const isSelected = selectedCompany?.id === company.id;
-              const isAdded = addedIds.has(company.tax_id);
-              const isAdding = addingId === company.tax_id;
+              const claimInfo = claimedMap[`dbd_${company.id}`];
+              const isClaimedByMe = claimInfo?.user_id === userId;
+              const isClaimedByTeam = Boolean(claimInfo && !isClaimedByMe);
+              const isClaiming = claimingId === company.id;
+
               const capitalNum = Number(company.registered_capital);
-              const capitalFormatted = capitalNum >= 1000000 
-                ? `${(capitalNum / 1000000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M` 
-                : `${capitalNum.toLocaleString()} ฿`;
+              const capitalFormatted =
+                capitalNum >= 1000000
+                  ? `${(capitalNum / 1000000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`
+                  : `${capitalNum.toLocaleString()} ฿`;
 
               return (
                 <div
@@ -547,12 +671,26 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
                   className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-indigo-950/40 border-indigo-500/80 shadow-lg shadow-indigo-950/50'
+                      : isClaimedByMe
+                      ? 'bg-emerald-950/20 border-emerald-500/40'
+                      : isClaimedByTeam
+                      ? 'bg-slate-900/50 border-slate-800/60 opacity-85'
                       : 'bg-slate-900/80 border-slate-800/80 hover:border-slate-700 hover:bg-slate-800/50'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="space-y-1 flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
+                        {isClaimedByMe ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                            <Check className="w-3 h-3 text-emerald-400" /> ในพอร์ตของคุณ
+                          </span>
+                        ) : isClaimedByTeam ? (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 border border-slate-700/50 flex items-center gap-1">
+                            <Lock className="w-3 h-3 text-amber-400" /> {claimInfo.claimed_by_name} กำลังดูแล
+                          </span>
+                        ) : null}
+
                         <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/50">
                           {company.tax_id}
                         </span>
@@ -565,6 +703,7 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
                           </span>
                         )}
                       </div>
+
                       <h4 className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-indigo-400">
                         {company.name}
                       </h4>
@@ -573,26 +712,47 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
                       </p>
                     </div>
 
-                    {/* Add to Pipeline Action */}
+                    {/* 🛒 Shopping Button: Claim to Portfolio */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleAddLead(company);
+                        if (!isClaimedByMe && !isClaimedByTeam) {
+                          handleClaimCompany(company);
+                        }
                       }}
-                      disabled={isAdded || isAdding}
-                      className={`p-2 rounded-xl border text-xs font-semibold transition-all flex-shrink-0 ${
-                        isAdded
-                          ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-                          : 'bg-indigo-600/20 hover:bg-indigo-600 border-indigo-500/40 text-indigo-300 hover:text-white'
+                      disabled={isClaimedByMe || isClaimedByTeam || isClaiming}
+                      className={`px-2.5 py-2 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+                        isClaimedByMe
+                          ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 cursor-default'
+                          : isClaimedByTeam
+                          ? 'bg-slate-800/80 border-slate-700/60 text-slate-400 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer'
                       }`}
-                      title={isAdded ? 'บันทึกเข้า Pipeline แล้ว' : 'บันทึกเป็น Lead ในระบบ'}
+                      title={
+                        isClaimedByMe
+                          ? 'อยู่ในพอร์ตของคุณแล้ว'
+                          : isClaimedByTeam
+                          ? `เพื่อนร่วมทีม (${claimInfo.claimed_by_name}) กำลังดูแล`
+                          : 'หยิบใส่พอร์ตของฉัน'
+                      }
                     >
-                      {isAdding ? (
+                      {isClaiming ? (
                         <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      ) : isAdded ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      ) : isClaimedByMe ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span className="hidden sm:inline">ในพอร์ต</span>
+                        </>
+                      ) : isClaimedByTeam ? (
+                        <>
+                          <Lock className="w-3.5 h-3.5 text-slate-400" />
+                          <span className="hidden sm:inline">ถูกเคลมแล้ว</span>
+                        </>
                       ) : (
-                        <PlusCircle className="w-3.5 h-3.5" />
+                        <>
+                          <ShoppingCart className="w-3.5 h-3.5 fill-slate-950" />
+                          <span className="text-[11px]">หยิบใส่พอร์ต</span>
+                        </>
                       )}
                     </button>
                   </div>
@@ -610,7 +770,19 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
             {/* Header */}
             <div className="flex items-start justify-between gap-4 border-b border-slate-800 pb-4">
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {claimedMap[`dbd_${selectedCompany.id}`] ? (
+                    claimedMap[`dbd_${selectedCompany.id}`].user_id === userId ? (
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                        <Check className="w-3.5 h-3.5 text-emerald-400" /> อยู่ในพอร์ตของคุณแล้ว
+                      </span>
+                    ) : (
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                        <Lock className="w-3.5 h-3.5 text-amber-400" /> {claimedMap[`dbd_${selectedCompany.id}`].claimed_by_name} กำลังดูแล
+                      </span>
+                    )
+                  ) : null}
+
                   <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                     เลขทะเบียน {selectedCompany.tax_id}
                   </span>
@@ -624,7 +796,7 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
               </div>
               <button
                 onClick={() => setSelectedCompany(null)}
-                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -692,27 +864,51 @@ export function DBDCompanyExplorer({ onAddToLeads, addedTaxIds = new Set() }: DB
                 </a>
               </div>
 
-              <button
-                onClick={() => handleAddLead(selectedCompany)}
-                disabled={addedIds.has(selectedCompany.tax_id) || addingId === selectedCompany.tax_id}
-                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-lg transition-all ${
-                  addedIds.has(selectedCompany.tax_id)
-                    ? 'bg-emerald-600 text-white cursor-default'
-                    : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-indigo-600/30'
-                }`}
-              >
-                {addingId === selectedCompany.tax_id ? (
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                ) : addedIds.has(selectedCompany.tax_id) ? (
-                  <>
-                    <Check className="w-4 h-4" /> บันทึกใน Pipeline แล้ว
-                  </>
-                ) : (
-                  <>
-                    <PlusCircle className="w-4 h-4" /> บันทึกเข้า Pipeline โรงงาน
-                  </>
-                )}
-              </button>
+              {/* 🛒 Main Claim Button inside Modal */}
+              {(() => {
+                const claimInfo = claimedMap[`dbd_${selectedCompany.id}`];
+                const isClaimedByMe = claimInfo?.user_id === userId;
+                const isClaimedByTeam = Boolean(claimInfo && !isClaimedByMe);
+                const isClaiming = claimingId === selectedCompany.id;
+
+                if (isClaimedByMe) {
+                  return (
+                    <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-bold shadow-md">
+                      <Check className="w-4 h-4 text-emerald-400" />
+                      <span>อยู่ในพอร์ตของคุณแล้ว</span>
+                    </div>
+                  );
+                }
+
+                if (isClaimedByTeam) {
+                  return (
+                    <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-800 border border-slate-700 text-slate-400 text-xs sm:text-sm font-bold">
+                      <Lock className="w-4 h-4 text-amber-400" />
+                      <span>{claimInfo.claimed_by_name} (ทีมคุณ) กำลังดูแล</span>
+                    </div>
+                  );
+                }
+
+                return (
+                  <button
+                    onClick={() => handleClaimCompany(selectedCompany)}
+                    disabled={isClaiming}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-500/25 transition active:scale-95 cursor-pointer"
+                  >
+                    {isClaiming ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>กำลังนำเข้าพอร์ต...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-4 h-4 fill-slate-950" />
+                        <span>🛒 หยิบใส่พอร์ตของฉัน (Claim Lead)</span>
+                      </>
+                    )}
+                  </button>
+                );
+              })()}
             </div>
           </div>
         </div>

@@ -30,10 +30,10 @@ export async function POST(request: Request) {
           },
         ])
         .select()
-        .single();
+        .maybeSingle();
 
-      if (insertError) {
-        return NextResponse.json({ success: false, error: insertError.message }, { status: 500 });
+      if (insertError || !inserted) {
+        return NextResponse.json({ success: false, error: insertError?.message || 'Failed to create invitation' }, { status: 500 });
       }
       finalInviteId = inserted.id;
       newInvite = inserted;
