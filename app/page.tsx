@@ -20,6 +20,7 @@ import { VehicleTripModal } from '@/components/VehicleTripModal';
 import { MileageFuelReportModal } from '@/components/MileageFuelReportModal';
 import { PlasticMarketIntelligence } from '@/components/PlasticMarketIntelligence';
 import { calculateContactHealth, getLeadLastContactDate } from '@/lib/leadUtils';
+import defaultLeadsData from '@/public/leads_data.json';
 import * as XLSX from 'xlsx';
 import {
   Search,
@@ -166,8 +167,8 @@ export default function LeadsRadarMainPage() {
   const [mobileMarketplaceViewMode, setMobileMarketplaceViewMode] = useState<'map' | 'list'>('map');
 
   // Raw Global Master Catalog Leads & Filters (for Marketplace Factory Radar)
-  const [leads, setLeads] = useState<FactoryLead[]>([]);
-  const [isLoadingLeads, setIsLoadingLeads] = useState<boolean>(true);
+  const [leads, setLeads] = useState<FactoryLead[]>((defaultLeadsData as unknown as FactoryLead[]) || []);
+  const [isLoadingLeads, setIsLoadingLeads] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('ALL');
   const [selectedRadius, setSelectedRadius] = useState<string>('ALL');
@@ -740,6 +741,10 @@ export default function LeadsRadarMainPage() {
       setIsLoadingUnassigned(false);
     }
   }, [effectiveCompanyId]);
+
+  useEffect(() => {
+    fetchLeads();
+  }, []);
 
   useEffect(() => {
     if (user) {
