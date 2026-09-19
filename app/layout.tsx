@@ -15,14 +15,23 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: 'RouteHunter | ฐานข้อมูลโรงงานอุตสาหกรรม สมุทรปราการ',
   description: 'ระบบเรดาร์และฐานข้อมูลโรงงานอุตสาหกรรม จ.สมุทรปราการ',
+  manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'RouteHunter',
   },
   icons: {
-    icon: '/favicon.ico',
-    apple: '/images/logo.png',
+    icon: [
+      { url: '/images/logo.png', sizes: '192x192', type: 'image/png' },
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon-precomposed.png', sizes: '180x180', type: 'image/png' },
+      { url: '/images/logo.png', sizes: '192x192', type: 'image/png' },
+    ],
+    shortcut: '/apple-touch-icon.png',
   },
 };
 
@@ -34,6 +43,10 @@ export default function RootLayout({
   return (
     <html lang="th" className="h-full">
       <head>
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-precomposed.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/images/logo.png" />
+        <link rel="manifest" href="/manifest.json" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
