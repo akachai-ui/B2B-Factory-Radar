@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     // Supabase fallback if pool failed
     if (!poolSucceeded) {
-      let sbRes = await supabase
+      let sbRes: any = await supabase
         .from('company_leads')
         .select('id, dbd_id, lead_id, user_id, status, profiles:user_id(full_name, avatar_url)')
         .eq('company_id', company_id);
