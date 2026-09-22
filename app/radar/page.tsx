@@ -192,6 +192,8 @@ export default function LeadsRadarMainPage() {
   const isManager = profile?.role === 'manager';
   const canViewAllTeamLeads = isOwner || isManager;
   const displayTeamName = currentCompany?.name || profile?.company_name || (isCompany ? 'บริษัทของฉัน' : `ทีมของ ${profile?.full_name || 'ฉัน'}`);
+  const currentUserAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+
   // Team Data States
   const [teamMembers, setTeamMembers] = useState<UserProfile[]>([]);
 
