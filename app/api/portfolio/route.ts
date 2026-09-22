@@ -113,30 +113,53 @@ export async function PATCH(request: NextRequest) {
       }
 
       const effectiveUserId = target_user_id && target_user_id !== 'UNASSIGNED' ? target_user_id : null;
-      const res = await pool.query(
-        `UPDATE public.company_leads SET user_id = $1, updated_at = NOW(), last_activity_at = NOW() WHERE id = ANY($2::uuid[]) AND company_id = $3 RETURNING id`,
-        [effectiveUserId, lead_ids, company_id]
-      );
+      let batchSuccess = false;
 
-      // Log assignment activity
-      if (effectiveUserId && res.rows.length > 0) {
+      if (pool) {
         try {
-          const assigneeRes = await pool.query(`SELECT full_name, email FROM public.profiles WHERE id = $1`, [effectiveUserId]);
-          const assigneeName = assigneeRes.rows[0]?.full_name || assigneeRes.rows[0]?.email || 'เซลส์ในทีม';
-          for (const row of res.rows) {
-            await pool.query(
-              `INSERT INTO public.lead_activities (company_id, company_lead_id, user_id, activity_type, content)
-               VALUES ($1, $2, $3, 'NOTE', $4);`,
-              [company_id, row.id, effectiveUserId, `👥 ได้รับมอบหมายงานจากคลังกลางให้คุณ "${assigneeName}" ดูแล`]
-            );
+          const res = await pool.query(
+            `UPDATE public.company_leads SET user_id = $1, updated_at = NOW(), last_activity_at = NOW() WHERE id = ANY($2::uuid[]) AND company_id = $3 RETURNING id`,
+            [effectiveUserId, lead_ids, company_id]
+          );
+
+          if (effectiveUserId && res.rows.length > 0) {
+            try {
+              const assigneeRes = await pool.query(`SELECT full_name, email FROM public.profiles WHERE id = $1`, [effectiveUserId]);
+              const assigneeName = assigneeRes.rows[0]?.full_name || assigneeRes.rows[0]?.email || 'เซลส์ในทีม';
+              for (const row of res.rows) {
+                await pool.query(
+                  `INSERT INTO public.lead_activities (company_id, company_lead_id, user_id, activity_type, content)
+                   VALUES ($1, $2, $3, 'NOTE', $4);`,
+                  [company_id, row.id, effectiveUserId, `👥 ได้รับมอบหมายงานจากคลังกลางให้คุณ "${assigneeName}" ดูแล`]
+                );
+              }
+            } catch (e) {}
           }
-        } catch (e) {}
+          batchSuccess = true;
+          return NextResponse.json({
+            success: true,
+            message: effectiveUserId ? `มอบหมายลูกค้า ${res.rows.length} แห่งให้เซลส์เรียบร้อย` : `ย้ายลูกค้า ${res.rows.length} แห่งเข้าคลังกลางเรียบร้อย`,
+            assignedCount: res.rows.length,
+          });
+        } catch (poolErr) {
+          console.warn('Batch assign pool failed, using Supabase fallback:', poolErr);
+        }
       }
+
+      // Supabase fallback for batch assign
+      const { data: upData, error: upErr } = await supabase
+        .from('company_leads')
+        .update({ user_id: effectiveUserId, updated_at: new Date().toISOString(), last_activity_at: new Date().toISOString() })
+        .in('id', lead_ids)
+        .eq('company_id', company_id)
+        .select('id');
+
+      if (upErr) throw upErr;
 
       return NextResponse.json({
         success: true,
-        message: effectiveUserId ? `มอบหมายลูกค้า ${res.rows.length} แห่งให้เซลส์เรียบร้อย` : `ย้ายลูกค้า ${res.rows.length} แห่งเข้าคลังกลางเรียบร้อย`,
-        assignedCount: res.rows.length,
+        message: effectiveUserId ? `มอบหมายลูกค้า ${(upData || []).length} แห่งให้เซลส์เรียบร้อย` : `ย้ายลูกค้า ${(upData || []).length} แห่งเข้าคลังกลางเรียบร้อย`,
+        assignedCount: (upData || []).length,
       });
     }
 
@@ -147,113 +170,138 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-
     const updates: string[] = ['updated_at = NOW()', 'last_activity_at = NOW()'];
     const values: any[] = [id, company_id];
     let paramIdx = 3;
 
+    const sbUpdates: any = {
+      updated_at: new Date().toISOString(),
+      last_activity_at: new Date().toISOString(),
+    };
+
     if (status !== undefined) {
       updates.push(`status = $${paramIdx++}`);
       values.push(status);
+      sbUpdates.status = status;
     }
     if (notes !== undefined) {
       updates.push(`notes = $${paramIdx++}`);
       values.push(notes);
+      sbUpdates.notes = notes;
     }
     if (deal_value !== undefined) {
       updates.push(`deal_value = $${paramIdx++}`);
       values.push(deal_value);
+      sbUpdates.deal_value = deal_value;
     }
     if (priority !== undefined) {
       updates.push(`priority = $${paramIdx++}`);
       values.push(priority);
+      sbUpdates.priority = priority;
     }
     if (user_id !== undefined) {
       updates.push(`user_id = $${paramIdx++}`);
       values.push(user_id);
+      sbUpdates.user_id = user_id;
     }
     if (contact_person !== undefined) {
       updates.push(`contact_person = $${paramIdx++}`);
       values.push(contact_person);
+      sbUpdates.contact_person = contact_person;
     }
     if (phone !== undefined) {
       updates.push(`phone = $${paramIdx++}`);
       values.push(phone);
+      sbUpdates.phone = phone;
     }
     if (email !== undefined) {
       updates.push(`email = $${paramIdx++}`);
       values.push(email);
+      sbUpdates.email = email;
     }
 
-    // Fetch previous lead state to detect REAL changes and prevent duplicate logs
-    const oldRes = await pool.query(
-      `SELECT status, deal_value, priority, user_id FROM public.company_leads WHERE id = $1 AND company_id = $2`,
-      [id, company_id]
-    );
-
-    if (oldRes.rows.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Lead not found or unauthorized' },
-        { status: 404 }
-      );
-    }
-
-    const oldLead = oldRes.rows[0];
-
-    const query = `
-      UPDATE public.company_leads
-      SET ${updates.join(', ')}
-      WHERE id = $1 AND company_id = $2
-      RETURNING *;
-    `;
-
-    const res = await pool.query(query, values);
-    const updatedLead = res.rows[0];
-
-    // Auto-log status / deal_value / priority updates into lead_activities timeline ONLY if values actually changed
-    try {
-      const statusLabels: Record<string, string> = {
-        NEW: 'ลูกค้าใหม่',
-        CONTACTED: 'โทรติดต่อแล้ว',
-        QUOTED: 'เสนอราคาแล้ว',
-        MEETING: 'นัดหมายพบลูกค้า',
-        WON: 'ปิดการขายสำเร็จ'
-      };
-      const priorityLabels: Record<string, string> = {
-        LOW: 'ต่ำ',
-        MEDIUM: 'ปานกลาง',
-        HIGH: 'สำคัญมาก',
-        URGENT: 'ด่วนพิเศษ'
-      };
-
-      const changes: string[] = [];
-      if (status !== undefined && status !== oldLead.status) {
-        changes.push(`สถานะ: ${statusLabels[status] || status}`);
-      }
-      if (deal_value !== undefined && Number(deal_value) !== Number(oldLead.deal_value || 0)) {
-        changes.push(`มูลค่าดีล: ฿${Number(deal_value).toLocaleString()}`);
-      }
-      if (priority !== undefined && priority !== (oldLead.priority || 'MEDIUM')) {
-        changes.push(`ความสำคัญ: ${priorityLabels[priority] || priority}`);
-      }
-
-      if (changes.length > 0) {
-        await pool.query(
-          `INSERT INTO public.lead_activities (company_id, company_lead_id, user_id, activity_type, content, status_change, deal_value_change)
-           VALUES ($1, $2, $3, 'STATUS_CHANGE', $4, $5, $6);`,
-          [
-            company_id,
-            id,
-            user_id || updatedLead.user_id,
-            `🔄 อัปเดตข้อมูล CRM: ${changes.join(' • ')}`,
-            status || null,
-            deal_value !== undefined ? deal_value : null
-          ]
+    if (pool) {
+      try {
+        const oldRes = await pool.query(
+          `SELECT status, deal_value, priority, user_id FROM public.company_leads WHERE id = $1 AND company_id = $2`,
+          [id, company_id]
         );
+
+        if (oldRes.rows.length > 0) {
+          const oldLead = oldRes.rows[0];
+          const query = `
+            UPDATE public.company_leads
+            SET ${updates.join(', ')}
+            WHERE id = $1 AND company_id = $2
+            RETURNING *;
+          `;
+
+          const res = await pool.query(query, values);
+          const updatedLead = res.rows[0];
+
+          try {
+            const statusLabels: Record<string, string> = {
+              NEW: 'ลูกค้าใหม่',
+              CONTACTED: 'โทรติดต่อแล้ว',
+              QUOTED: 'เสนอราคาแล้ว',
+              MEETING: 'นัดหมายพบลูกค้า',
+              WON: 'ปิดการขายสำเร็จ'
+            };
+            const priorityLabels: Record<string, string> = {
+              LOW: 'ต่ำ',
+              MEDIUM: 'ปานกลาง',
+              HIGH: 'สำคัญมาก',
+              URGENT: 'ด่วนพิเศษ'
+            };
+
+            const changes: string[] = [];
+            if (status !== undefined && status !== oldLead.status) {
+              changes.push(`สถานะ: ${statusLabels[status] || status}`);
+            }
+            if (deal_value !== undefined && Number(deal_value) !== Number(oldLead.deal_value || 0)) {
+              changes.push(`มูลค่าดีล: ฿${Number(deal_value).toLocaleString()}`);
+            }
+            if (priority !== undefined && priority !== (oldLead.priority || 'MEDIUM')) {
+              changes.push(`ความสำคัญ: ${priorityLabels[priority] || priority}`);
+            }
+
+            if (changes.length > 0) {
+              await pool.query(
+                `INSERT INTO public.lead_activities (company_id, company_lead_id, user_id, activity_type, content, status_change, deal_value_change)
+                 VALUES ($1, $2, $3, 'STATUS_CHANGE', $4, $5, $6);`,
+                [
+                  company_id,
+                  id,
+                  user_id || updatedLead.user_id,
+                  `🔄 อัปเดตข้อมูล CRM: ${changes.join(' • ')}`,
+                  status || null,
+                  deal_value !== undefined ? deal_value : null
+                ]
+              );
+            }
+          } catch (logErr) {}
+
+          return NextResponse.json({
+            success: true,
+            lead: updatedLead,
+            message: 'อัปเดตข้อมูลพอร์ตสำเร็จ',
+          });
+        }
+      } catch (poolErr) {
+        console.warn('Update portfolio pool failed, using Supabase fallback:', poolErr);
       }
-    } catch (logErr) {
-      console.warn('Auto-log lead activity failed:', logErr);
     }
+
+    // Supabase fallback for single update
+    const { data: updatedLead, error: upErr } = await supabase
+      .from('company_leads')
+      .update(sbUpdates)
+      .eq('id', id)
+      .eq('company_id', company_id)
+      .select()
+      .single();
+
+    if (upErr) throw upErr;
 
     return NextResponse.json({
       success: true,
@@ -287,48 +335,99 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const formattedNote = reason_label
+      ? note
+        ? `[เหตุผลที่คืนคลัง]: ${reason_label} • โน้ต: ${note}`
+        : `[เหตุผลที่คืนคลัง]: ${reason_label}`
+      : null;
+
+    const timelineContent = reason_label
+      ? note
+        ? `📥 คืนลูกค้าเข้าคลังกลาง\n• สาเหตุ: ${reason_label}\n• รายละเอียด: ${note}`
+        : `📥 คืนลูกค้าเข้าคลังกลาง\n• สาเหตุ: ${reason_label}`
+      : '📥 เซลส์ปล่อยลูกค้าออกจากพอร์ตส่วนตัว ส่งคืนเข้าสู่คลังลูกค้ารอจัดสรรของบริษัท';
+
+    if (pool) {
+      try {
+        if (mode === 'permanent') {
+          await pool.query(
+            `DELETE FROM public.company_leads WHERE id = $1 AND company_id = $2;`,
+            [id, company_id]
+          );
+          return NextResponse.json({
+            success: true,
+            message: 'ถอนการจองและส่งคืนสู่ศูนย์รวมข้อมูลเรียบร้อยแล้ว',
+          });
+        }
+
+        let updateQuery = `UPDATE public.company_leads SET user_id = NULL, updated_at = NOW(), last_activity_at = NOW() WHERE id = $1 AND company_id = $2 RETURNING *;`;
+        let queryParams: any[] = [id, company_id];
+
+        if (formattedNote) {
+          updateQuery = `UPDATE public.company_leads SET user_id = NULL, notes = $3, updated_at = NOW(), last_activity_at = NOW() WHERE id = $1 AND company_id = $2 RETURNING *;`;
+          queryParams = [id, company_id, formattedNote];
+        }
+
+        const res = await pool.query(updateQuery, queryParams);
+
+        try {
+          await pool.query(
+            `INSERT INTO public.lead_activities (company_id, company_lead_id, user_id, activity_type, content)
+             VALUES ($1, $2, $3, 'NOTE', $4);`,
+            [company_id, id, user_id || null, timelineContent]
+          );
+        } catch (e) {}
+
+        return NextResponse.json({
+          success: true,
+          message: 'ส่งคืนลูกค้ารายนี้เข้าสู่ "คลังลูกค้ารอจัดสรร" เรียบร้อยแล้ว',
+        });
+      } catch (poolErr) {
+        console.warn('DELETE portfolio pool failed, using Supabase fallback:', poolErr);
+      }
+    }
+
+    // Supabase fallback for DELETE / Release
     if (mode === 'permanent') {
-      await pool.query(
-        `DELETE FROM public.company_leads WHERE id = $1 AND company_id = $2;`,
-        [id, company_id]
-      );
+      const { error: delErr } = await supabase
+        .from('company_leads')
+        .delete()
+        .eq('id', id)
+        .eq('company_id', company_id);
+
+      if (delErr) throw delErr;
+
       return NextResponse.json({
         success: true,
         message: 'ถอนการจองและส่งคืนสู่ศูนย์รวมข้อมูลเรียบร้อยแล้ว',
       });
     }
 
-    // Default: Soft Release to Company Unassigned Pool (user_id = NULL)
-    let updateQuery = `UPDATE public.company_leads SET user_id = NULL, updated_at = NOW(), last_activity_at = NOW() WHERE id = $1 AND company_id = $2 RETURNING *;`;
-    let queryParams: any[] = [id, company_id];
-
-    if (reason_label) {
-      const formattedNote = note
-        ? `[เหตุผลที่คืนคลัง]: ${reason_label} • โน้ต: ${note}`
-        : `[เหตุผลที่คืนคลัง]: ${reason_label}`;
-      updateQuery = `UPDATE public.company_leads SET user_id = NULL, notes = $3, updated_at = NOW(), last_activity_at = NOW() WHERE id = $1 AND company_id = $2 RETURNING *;`;
-      queryParams = [id, company_id, formattedNote];
+    const updates: any = {
+      user_id: null,
+      updated_at: new Date().toISOString(),
+      last_activity_at: new Date().toISOString(),
+    };
+    if (formattedNote) {
+      updates.notes = formattedNote;
     }
 
-    const res = await pool.query(updateQuery, queryParams);
+    const { error: upErr } = await supabase
+      .from('company_leads')
+      .update(updates)
+      .eq('id', id)
+      .eq('company_id', company_id);
 
-    if (res.rows.length === 0) {
-      return NextResponse.json({ success: false, error: 'Lead not found' }, { status: 404 });
-    }
+    if (upErr) throw upErr;
 
-    // Log the release activity to timeline
     try {
-      const timelineContent = reason_label
-        ? note
-          ? `📥 คืนลูกค้าเข้าคลังกลาง\n• สาเหตุ: ${reason_label}\n• รายละเอียด: ${note}`
-          : `📥 คืนลูกค้าเข้าคลังกลาง\n• สาเหตุ: ${reason_label}`
-        : '📥 เซลส์ปล่อยลูกค้าออกจากพอร์ตส่วนตัว ส่งคืนเข้าสู่คลังลูกค้ารอจัดสรรของบริษัท';
-
-      await pool.query(
-        `INSERT INTO public.lead_activities (company_id, company_lead_id, user_id, activity_type, content)
-         VALUES ($1, $2, $3, 'NOTE', $4);`,
-        [company_id, id, user_id || null, timelineContent]
-      );
+      await supabase.from('lead_activities').insert({
+        company_id,
+        company_lead_id: id,
+        user_id: user_id || null,
+        activity_type: 'NOTE',
+        content: timelineContent,
+      });
     } catch (e) {}
 
     return NextResponse.json({
