@@ -54,14 +54,14 @@ export default function HomePage() {
           {/* Quick Action Navigation Buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
             <a
-              href="/app"
+              href="/radar"
               className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white font-bold text-xs sm:text-sm border border-slate-800 hover:border-amber-500/40 transition-all duration-300 shadow-md active:scale-95"
             >
               <LogIn className="w-3.5 h-3.5 text-amber-400" />
               <span>เข้าสู่ระบบ</span>
             </a>
             <a
-              href="/app"
+              href="/radar"
               className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-slate-950 font-black text-xs sm:text-sm hover:brightness-110 transition-all duration-300 shadow-lg shadow-amber-500/20"
             >
               <span>เปิดใช้งานระบบ</span>
@@ -139,7 +139,7 @@ export default function HomePage() {
             {/* Quick Access Action Buttons in Hero */}
             <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-md">
               <a
-                href="/app"
+                href="/radar"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-slate-950 font-black text-sm hover:brightness-110 transition-all duration-300 shadow-xl shadow-amber-500/25 active:scale-95"
               >
                 <LogIn className="w-4 h-4" />
@@ -405,7 +405,7 @@ export default function HomePage() {
               </div>
               
               <a
-                href="/app"
+                href="/radar"
                 className="w-full py-3.5 px-6 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-center text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
               >
                 เลือกแพ็กเกจรายเดือน
@@ -474,7 +474,7 @@ export default function HomePage() {
               </div>
 
               <a
-                href="/app"
+                href="/radar"
                 className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-slate-950 font-black text-center text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 active:scale-95"
               >
                 เลือกแพ็กเกจรายปี (ประหยัดสูงสุด)
@@ -685,7 +685,7 @@ export default function HomePage() {
               </p>
             </div>
             <a
-              href="/app"
+              href="/radar"
               className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-slate-950 font-black text-xs sm:text-sm hover:brightness-110 transition-all duration-300 shadow-lg shadow-amber-500/25 shrink-0 flex items-center justify-center gap-2 active:scale-95"
             >
               ทดลองใช้งานระบบ
@@ -721,7 +721,7 @@ export default function HomePage() {
           <span>โทรหาคุณ Max</span>
         </a>
         <a
-          href="/app"
+          href="/radar"
           className="py-2 px-3.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 font-bold text-xs flex items-center justify-center gap-1 active:scale-95"
         >
           <LogIn className="w-3.5 h-3.5 text-amber-400" />
