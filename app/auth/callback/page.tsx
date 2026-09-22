@@ -10,7 +10,7 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     let handled = false;
 
-    const completeAuth = (targetUrl = '/') => {
+    const completeAuth = (targetUrl = '/radar') => {
       if (handled) return;
       handled = true;
       if (typeof window !== 'undefined') {
@@ -21,7 +21,7 @@ export default function AuthCallbackPage() {
     // 1. Listen for Supabase Auth state change (Handles OAuth hash, magic links, PKCE)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        setTimeout(() => completeAuth('/'), 200);
+        setTimeout(() => completeAuth('/radar'), 200);
       }
     });
 
@@ -57,7 +57,7 @@ export default function AuthCallbackPage() {
             return;
           }
           if (data?.session) {
-            setTimeout(() => completeAuth('/'), 300);
+            setTimeout(() => completeAuth('/radar'), 300);
             return;
           }
         }
@@ -74,7 +74,7 @@ export default function AuthCallbackPage() {
               refresh_token: refreshToken || '',
             });
             if (data?.session) {
-              setTimeout(() => completeAuth('/'), 300);
+              setTimeout(() => completeAuth('/radar'), 300);
               return;
             }
           }
@@ -83,13 +83,13 @@ export default function AuthCallbackPage() {
         // 3. Check if session already active
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          setTimeout(() => completeAuth('/'), 200);
+          setTimeout(() => completeAuth('/radar'), 200);
           return;
         }
 
         // 4. Fallback redirect after waiting for Supabase to parse
         const timeout = setTimeout(() => {
-          completeAuth('/');
+          completeAuth('/radar');
         }, 1500);
 
         return () => clearTimeout(timeout);

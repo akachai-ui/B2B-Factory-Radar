@@ -80,6 +80,9 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
           setErrorMsg(error.message === 'Invalid login credentials' ? 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' : error.message);
         } else {
           onClose();
+          if (typeof window !== 'undefined' && window.location.pathname !== '/radar') {
+            window.location.href = '/radar';
+          }
         }
       } else {
         const { error } = await signUpWithPassword(email, password, fullName);
@@ -89,7 +92,10 @@ export function AuthModal({ isOpen, onClose, initialMode = 'signin' }: AuthModal
           setSuccessMsg('สมัครสมาชิกสำเร็จ! เข้าสู่ระบบเรียบร้อย');
           setTimeout(() => {
             onClose();
-          }, 1200);
+            if (typeof window !== 'undefined' && window.location.pathname !== '/radar') {
+              window.location.href = '/radar';
+            }
+          }, 1000);
         }
       }
     } catch (err: any) {
