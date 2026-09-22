@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 import { AuthProvider } from '@/contexts/AuthContext';
 import './globals.css';
 
@@ -56,19 +55,13 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" />
+        <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" />
       </head>
       <body className="min-h-full flex flex-col bg-[#070b14] text-slate-100 antialiased font-sans">
         <AuthProvider>
           {children}
         </AuthProvider>
-        <Script
-          src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-          strategy="beforeInteractive"
-        />
-        <Script
-          src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"
-          strategy="beforeInteractive"
-        />
       </body>
     </html>
   );

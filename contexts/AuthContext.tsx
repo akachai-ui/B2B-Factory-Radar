@@ -211,6 +211,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    const failsafeTimer = setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 800);
+
     initAuth();
 
     // 3. Auth State Change Listener
@@ -236,6 +240,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       mounted = false;
+      clearTimeout(failsafeTimer);
       subscription.unsubscribe();
     };
   }, [fetchLiveProfile]);
