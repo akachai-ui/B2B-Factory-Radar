@@ -192,11 +192,14 @@ export default function LeadsRadarMainPage() {
   const isManager = profile?.role === 'manager';
   const canViewAllTeamLeads = isOwner || isManager;
   const displayTeamName = currentCompany?.name || profile?.company_name || (isCompany ? 'บริษัทของฉัน' : `ทีมของ ${profile?.full_name || 'ฉัน'}`);
-  const currentUserAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+  // Team Data States
+  const [teamMembers, setTeamMembers] = useState<UserProfile[]>([]);
 
-  // Pro / Freemium Access Control & Preview Mode Gate
+  // Pro / Freemium Access Control & Preview Mode Gate (Inherits from Company Owner if approved)
   const isMasterOwner = user?.email?.toLowerCase() === 'akachaiha@gmail.com';
-  const isProUnlocked = isMasterOwner || isOwner || profile?.access_status === 'PRO_UNLOCKED';
+  const companyOwnerMember = teamMembers.find((m) => m.role === 'owner' || (currentCompany?.owner_id && m.id === currentCompany.owner_id));
+  const isCompanyOwnerUnlocked = companyOwnerMember?.access_status === 'PRO_UNLOCKED';
+  const isProUnlocked = isMasterOwner || profile?.access_status === 'PRO_UNLOCKED' || !!isCompanyOwnerUnlocked;
   const isPreviewMode = !isProUnlocked;
   const [isAccessLockModalOpen, setIsAccessLockModalOpen] = useState(false);
   const [accessLockFeatureName, setAccessLockFeatureName] = useState('ฟังก์ชันพิเศษ Pro');
@@ -580,7 +583,6 @@ export default function LeadsRadarMainPage() {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   // Team Data States
-  const [teamMembers, setTeamMembers] = useState<UserProfile[]>([]);
   const [pendingInvitations, setPendingInvitations] = useState<TeamInvitation[]>([]);
   const [teamTab, setTeamTab] = useState<'members' | 'unassigned' | 'pending'>('members');
   const [memberStatusFilter, setMemberStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');

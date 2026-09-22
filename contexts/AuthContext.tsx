@@ -117,12 +117,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ? data.avatar_url 
           : (googleAvatar || cachedAvatar || null);
 
-        const isOwnerAccount = data.role === 'owner' || cleanEmail === 'akachaiha@gmail.com';
-        const resolvedAccessStatus = data.access_status || (isOwnerAccount ? 'PRO_UNLOCKED' : 'PENDING_APPROVAL');
+        const isMaster = cleanEmail === 'akachaiha@gmail.com';
+        const resolvedAccessStatus = (isMaster || data.access_status === 'PRO_UNLOCKED') 
+          ? 'PRO_UNLOCKED' 
+          : (data.access_status || 'PENDING_APPROVAL');
 
         setProfile({
           ...(data as UserProfile),
-          role: (data.role || (isOwnerAccount ? 'owner' : 'sales')) as any,
+          role: (data.role || (isMaster ? 'owner' : 'sales')) as any,
           access_status: resolvedAccessStatus as any,
           avatar_url: resolvedAvatar,
         });
