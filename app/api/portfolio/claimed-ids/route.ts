@@ -34,20 +34,28 @@ export async function GET(request: NextRequest) {
 
     // Supabase fallback if pool failed
     if (!poolSucceeded) {
-      const { data: sbData, error: sbError } = await supabase
+      let sbRes = await supabase
         .from('company_leads')
         .select('id, dbd_id, lead_id, user_id, status, profiles:user_id(full_name, avatar_url)')
         .eq('company_id', company_id);
 
-      if (!sbError && sbData) {
-        rows = sbData.map((r: any) => ({
+      if (sbRes.error && (sbRes.error.message.includes('dbd_id') || sbRes.error.code === 'PGRST204')) {
+        // Safe fallback without dbd_id if column hasn't been migrated yet on cloud
+        sbRes = await supabase
+          .from('company_leads')
+          .select('id, lead_id, user_id, status, profiles:user_id(full_name, avatar_url)')
+          .eq('company_id', company_id);
+      }
+
+      if (!sbRes.error && sbRes.data) {
+        rows = sbRes.data.map((r: any) => ({
           id: r.id,
-          dbd_id: r.dbd_id,
-          lead_id: r.lead_id,
+          dbd_id: (r as any).dbd_id || null,
+          lead_id: (r as any).lead_id || null,
           user_id: r.user_id,
           status: r.status,
-          claimed_by_name: r.profiles?.full_name || null,
-          avatar_url: r.profiles?.avatar_url || null,
+          claimed_by_name: (r as any).profiles?.full_name || null,
+          avatar_url: (r as any).profiles?.avatar_url || null,
         }));
       }
     }
