@@ -18,6 +18,7 @@ import { LeadCRMModal } from '@/components/LeadCRMModal';
 import { ReleaseLeadModal } from '@/components/ReleaseLeadModal';
 import { VehicleTripModal } from '@/components/VehicleTripModal';
 import { MileageFuelReportModal } from '@/components/MileageFuelReportModal';
+import { AccessLockModal } from '@/components/AccessLockModal';
 import { PlasticMarketIntelligence } from '@/components/PlasticMarketIntelligence';
 import { calculateContactHealth, getLeadLastContactDate } from '@/lib/leadUtils';
 import defaultLeadsData from '@/public/leads_data.json';
@@ -193,6 +194,40 @@ export default function LeadsRadarMainPage() {
   const displayTeamName = currentCompany?.name || profile?.company_name || (isCompany ? 'บริษัทของฉัน' : `ทีมของ ${profile?.full_name || 'ฉัน'}`);
   const currentUserAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
 
+  // Pro / Freemium Access Control & Preview Mode Gate
+  const isMasterOwner = user?.email?.toLowerCase() === 'akachaiha@gmail.com';
+  const isProUnlocked = isMasterOwner || isOwner || profile?.access_status === 'PRO_UNLOCKED';
+  const isPreviewMode = !isProUnlocked;
+  const [isAccessLockModalOpen, setIsAccessLockModalOpen] = useState(false);
+  const [accessLockFeatureName, setAccessLockFeatureName] = useState('ฟังก์ชันพิเศษ Pro');
+
+  const requireProAccess = (featureName: string): boolean => {
+    if (isProUnlocked) return true;
+    setAccessLockFeatureName(featureName);
+    setIsAccessLockModalOpen(true);
+    return false;
+  };
+
+  const maskPhoneNumber = (phone?: string | null): string => {
+    if (!phone || phone === '-') return '-';
+    if (isProUnlocked) return phone;
+    const cleaned = phone.replace(/[^0-9]/g, '');
+    if (cleaned.length >= 9) {
+      return `${cleaned.slice(0, 3)}-***-${cleaned.slice(-4)}`;
+    }
+    return phone.slice(0, 3) + '***' + (phone.length > 5 ? phone.slice(-2) : '');
+  };
+
+  const maskEmail = (email?: string | null): string => {
+    if (!email || email === '-') return '-';
+    if (isProUnlocked) return email;
+    const parts = email.split('@');
+    if (parts.length === 2) {
+      return `***@${parts[1]}`;
+    }
+    return '***@***.com';
+  };
+
   // Portfolio Leads (Active Pipeline claimed by sales rep/tenant)
   const [portfolioLeads, setPortfolioLeads] = useState<CompanyLead[]>([]);
   const [isLoadingPortfolio, setIsLoadingPortfolio] = useState<boolean>(false);
@@ -215,6 +250,17 @@ export default function LeadsRadarMainPage() {
   const [isVehicleTripModalOpen, setIsVehicleTripModalOpen] = useState(false);
   const [isFuelReportModalOpen, setIsFuelReportModalOpen] = useState(false);
   const [tripModalMode, setTripModalMode] = useState<'start' | 'end' | 'history' | 'active'>('active');
+
+  const openTripModal = (mode: 'start' | 'end' | 'history' | 'active' = 'active') => {
+    if (!requireProAccess('บันทึกทริปและไมล์รถ (Vehicle Logbook)')) return;
+    setTripModalMode(mode);
+    setIsVehicleTripModalOpen(true);
+  };
+
+  const openFuelReportModal = () => {
+    if (!requireProAccess('สรุปรายงานค่าน้ำมันและภาษี (Fuel Expense Report)')) return;
+    setIsFuelReportModalOpen(true);
+  };
 
   const fetchActiveTrip = useCallback(async () => {
     if (!user?.id) {
@@ -326,6 +372,9 @@ export default function LeadsRadarMainPage() {
 
   // Handle claiming Factory Lead (Maps 989) into company_leads
   const handleClaimFactoryLead = async (lead: FactoryLead) => {
+    if (!requireProAccess('หยิบลูกค้าเข้าพอร์ตและระบบ CRM')) {
+      return;
+    }
     if (!effectiveCompanyId || !user?.id) {
       setFeedback({ type: 'error', text: 'กรุณาเข้าสู่ระบบก่อนหยิบลูกค้าเข้าพอร์ต' });
       return;
@@ -378,6 +427,9 @@ export default function LeadsRadarMainPage() {
 
   // Update Portfolio Lead CRM status/notes/deal value
   const handleUpdatePortfolioLead = async (leadId: string, updates: Partial<CompanyLead>) => {
+    if (!requireProAccess('อัปเดตสถานะและข้อมูลในพอร์ต CRM')) {
+      return;
+    }
     try {
       const res = await fetch('/api/portfolio', {
         method: 'PATCH',
@@ -927,6 +979,9 @@ export default function LeadsRadarMainPage() {
 
   // Update Lead Status or Sales Rep
   const handleUpdateLead = async (leadId: string | number, updates: Partial<FactoryLead>) => {
+    if (!requireProAccess('อัปเดตสถานะและข้อมูลลูกค้า')) {
+      return;
+    }
     try {
       // 1. Optimistic local update
       setLeads((prev) =>
@@ -966,6 +1021,9 @@ export default function LeadsRadarMainPage() {
 
   // Export to Excel (.xlsx) with White-label Branding
   const handleExportExcel = () => {
+    if (!requireProAccess('ส่งออกข้อมูลเป็นไฟล์ Excel (.xlsx)')) {
+      return;
+    }
     const compName = currentCompany?.name || profile?.company_name || 'Innovatech.Co.,Ltd';
     const taxId = currentCompany?.tax_id || profile?.tax_id || '1659900487250';
     const branch = currentCompany?.branch || profile?.branch || 'สำนักงานใหญ่';
@@ -1565,6 +1623,25 @@ export default function LeadsRadarMainPage() {
                   <span className="text-[11px] px-2.5 py-0.5 rounded-full backdrop-blur-md bg-amber-500/15 text-amber-300 border border-amber-400/30 font-bold font-mono shadow-sm truncate max-w-[200px]">
                     {displayTeamName}
                   </span>
+
+                  {isPreviewMode ? (
+                    <button
+                      onClick={() => {
+                        setAccessLockFeatureName('ปลดล็อกสิทธิ์สมาชิก Pro Full Access');
+                        setIsAccessLockModalOpen(true);
+                      }}
+                      className="text-[11px] px-2.5 py-0.5 rounded-full backdrop-blur-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 font-bold flex items-center gap-1 shadow-sm transition active:scale-95 cursor-pointer animate-pulse"
+                      title="บัญชีของคุณอยู่ในสถานะทดลองใช้งาน (Preview Mode) คลิกเพื่อติดต่อผู้ดูแลปลดล็อก Pro"
+                    >
+                      <Lock className="w-3 h-3 text-amber-400" />
+                      <span>Preview Mode (รออนุมัติ Pro)</span>
+                    </button>
+                  ) : (
+                    <span className="text-[11px] px-2.5 py-0.5 rounded-full backdrop-blur-md bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-bold flex items-center gap-1 shadow-sm">
+                      <Crown className="w-3 h-3 text-amber-400" />
+                      <span>PRO UNLOCKED</span>
+                    </span>
+                  )}
                 </div>
                 <p className="text-[11px] text-slate-400 truncate">
                   {mainTab === 'portfolio' && 'แดชบอร์ดติดตามลูกค้าในความดูแล วางแผนเส้นทางพบลูกค้า และอัปเดตสถานะ'}
@@ -1668,7 +1745,7 @@ export default function LeadsRadarMainPage() {
                 {/* 6. Quick Action: Fuel Audit Modal for Owner / Manager */}
                 {canViewAllTeamLeads && (
                   <button
-                    onClick={() => setIsFuelReportModalOpen(true)}
+                    onClick={openFuelReportModal}
                     className="px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md bg-purple-500/10 hover:bg-purple-500/20 border border-purple-400/30 text-purple-300 hover:text-white"
                     title="เปิดรายงานตรวจสอบค่าน้ำมัน (สำหรับฝ่ายบริหาร/บัญชี)"
                   >
@@ -2053,13 +2130,24 @@ export default function LeadsRadarMainPage() {
                               {/* Contact */}
                               <td className="p-3.5 whitespace-nowrap">
                                 {lead.phone ? (
-                                  <a
-                                    href={`tel:${lead.phone}`}
-                                    className="text-cyan-400 hover:underline flex items-center gap-1 font-mono font-bold text-xs"
-                                  >
-                                    <Phone className="w-3 h-3" />
-                                    <span>{lead.phone}</span>
-                                  </a>
+                                  isProUnlocked ? (
+                                    <a
+                                      href={`tel:${lead.phone}`}
+                                      className="text-cyan-400 hover:underline flex items-center gap-1 font-mono font-bold text-xs"
+                                    >
+                                      <Phone className="w-3 h-3" />
+                                      <span>{lead.phone}</span>
+                                    </a>
+                                  ) : (
+                                    <button
+                                      onClick={() => requireProAccess('ดูเบอร์โทรศัพท์และติดต่อลูกค้า')}
+                                      className="text-cyan-400/80 hover:text-cyan-300 flex items-center gap-1 font-mono text-xs cursor-pointer"
+                                      title="แตะเพื่อปลดล็อกเบอร์โทรศัพท์"
+                                    >
+                                      <Lock className="w-3 h-3 text-amber-400" />
+                                      <span>{maskPhoneNumber(lead.phone)}</span>
+                                    </button>
+                                  )
                                 ) : (
                                   <span className="text-slate-600">-</span>
                                 )}
@@ -2336,19 +2424,30 @@ export default function LeadsRadarMainPage() {
                             {/* Contact */}
                             <td className="p-3.5 whitespace-nowrap">
                               {lead.phone ? (
-                                <a
-                                  href={`tel:${lead.phone}`}
-                                  className="text-cyan-400 hover:underline flex items-center gap-1 font-mono font-bold text-xs"
-                                >
-                                  <Phone className="w-3 h-3" />
-                                  <span>{lead.phone}</span>
-                                </a>
+                                isProUnlocked ? (
+                                  <a
+                                    href={`tel:${lead.phone}`}
+                                    className="text-cyan-400 hover:underline flex items-center gap-1 font-mono font-bold text-xs"
+                                  >
+                                    <Phone className="w-3 h-3" />
+                                    <span>{lead.phone}</span>
+                                  </a>
+                                ) : (
+                                  <button
+                                    onClick={() => requireProAccess('ดูเบอร์โทรศัพท์และติดต่อโรงงาน')}
+                                    className="text-cyan-400/80 hover:text-cyan-300 flex items-center gap-1 font-mono text-xs cursor-pointer"
+                                    title="แตะเพื่อปลดล็อกเบอร์โทรศัพท์"
+                                  >
+                                    <Lock className="w-3 h-3 text-amber-400" />
+                                    <span>{maskPhoneNumber(lead.phone)}</span>
+                                  </button>
+                                )
                               ) : (
                                 <span className="text-slate-600">-</span>
                               )}
                               {lead.email && (
-                                <div className="text-[10px] text-slate-400 truncate max-w-[140px] mt-0.5">
-                                  {lead.email}
+                                <div className="text-[10px] text-slate-400 truncate max-w-[140px] mt-0.5 font-mono">
+                                  {maskEmail(lead.email)}
                                 </div>
                               )}
                             </td>
@@ -3043,10 +3142,7 @@ export default function LeadsRadarMainPage() {
                 <div className="flex items-center gap-2.5 flex-wrap">
                   {activeTrip ? (
                     <button
-                      onClick={() => {
-                        setTripModalMode('active');
-                        setIsVehicleTripModalOpen(true);
-                      }}
+                      onClick={() => openTripModal('active')}
                       className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition active:scale-95 cursor-pointer"
                     >
                       <Gauge className="w-4 h-4" />
@@ -3054,10 +3150,7 @@ export default function LeadsRadarMainPage() {
                     </button>
                   ) : (
                     <button
-                      onClick={() => {
-                        setTripModalMode('start');
-                        setIsVehicleTripModalOpen(true);
-                      }}
+                      onClick={() => openTripModal('start')}
                       className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 transition active:scale-95 cursor-pointer"
                     >
                       <Plus className="w-4 h-4 stroke-[3]" />
@@ -3066,10 +3159,7 @@ export default function LeadsRadarMainPage() {
                   )}
 
                   <button
-                    onClick={() => {
-                      setTripModalMode('history');
-                      setIsVehicleTripModalOpen(true);
-                    }}
+                    onClick={() => openTripModal('history')}
                     className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition cursor-pointer"
                   >
                     <History className="w-4 h-4 text-amber-400" />
@@ -3078,7 +3168,7 @@ export default function LeadsRadarMainPage() {
 
                   {canViewAllTeamLeads && (
                     <button
-                      onClick={() => setIsFuelReportModalOpen(true)}
+                      onClick={openFuelReportModal}
                       className="px-3.5 py-2.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-xs font-bold border border-purple-500/40 flex items-center gap-1.5 transition cursor-pointer"
                     >
                       <FileSpreadsheet className="w-4 h-4 text-purple-400" />
@@ -3225,10 +3315,7 @@ export default function LeadsRadarMainPage() {
                     {/* Actions */}
                     <div className="space-y-2 pt-1">
                       <button
-                        onClick={() => {
-                          setTripModalMode('active');
-                          setIsVehicleTripModalOpen(true);
-                        }}
+                        onClick={() => openTripModal('active')}
                         className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition cursor-pointer"
                       >
                         <Camera className="w-4 h-4 text-slate-950" />
@@ -3236,10 +3323,7 @@ export default function LeadsRadarMainPage() {
                       </button>
 
                       <button
-                        onClick={() => {
-                          setTripModalMode('end');
-                          setIsVehicleTripModalOpen(true);
-                        }}
+                        onClick={() => openTripModal('end')}
                         className="w-full py-2.5 px-4 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
                       >
                         <CheckCircle2 className="w-4 h-4 text-rose-400" />
@@ -3276,10 +3360,7 @@ export default function LeadsRadarMainPage() {
                     </div>
 
                     <button
-                      onClick={() => {
-                        setTripModalMode('start');
-                        setIsVehicleTripModalOpen(true);
-                      }}
+                      onClick={() => openTripModal('start')}
                       className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-500/25 active:scale-95 transition cursor-pointer"
                     >
                       <Plus className="w-4 h-4 stroke-[3]" />
@@ -3424,11 +3505,8 @@ export default function LeadsRadarMainPage() {
 
                                 <td className="py-3 px-3 text-right">
                                   <button
-                                    onClick={() => {
-                                      setTripModalMode('history');
-                                      setIsVehicleTripModalOpen(true);
-                                    }}
-                                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-[11px] font-semibold transition"
+                                    onClick={() => openTripModal('history')}
+                                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-[11px] font-semibold transition cursor-pointer"
                                   >
                                     ดูหลักฐาน
                                   </button>
@@ -3474,7 +3552,26 @@ export default function LeadsRadarMainPage() {
                   B2B
                 </span>
               </div>
-              <span className="text-[10px] text-amber-300/90 font-bold truncate mt-0.5">{displayTeamName}</span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-amber-300/90 font-bold truncate max-w-[110px]">{displayTeamName}</span>
+                {isPreviewMode ? (
+                  <button
+                    onClick={() => {
+                      setAccessLockFeatureName('ปลดล็อกสิทธิ์สมาชิก Pro Full Access');
+                      setIsAccessLockModalOpen(true);
+                    }}
+                    className="px-1.5 py-0.2 rounded-full text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40 flex items-center gap-0.5 animate-pulse"
+                  >
+                    <Lock className="w-2.5 h-2.5 text-amber-400" />
+                    <span>Preview</span>
+                  </button>
+                ) : (
+                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-0.5">
+                    <Crown className="w-2.5 h-2.5 text-amber-400" />
+                    <span>PRO</span>
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -3854,13 +3951,23 @@ export default function LeadsRadarMainPage() {
 
                       <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-800">
                         {lead.phone ? (
-                          <a
-                            href={`tel:${lead.phone.replace(/[^0-9]/g, "")}`}
-                            className="py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition"
-                          >
-                            <Phone className="w-3.5 h-3.5" />
-                            <span>โทร</span>
-                          </a>
+                          isProUnlocked ? (
+                            <a
+                              href={`tel:${lead.phone.replace(/[^0-9]/g, "")}`}
+                              className="py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition"
+                            >
+                              <Phone className="w-3.5 h-3.5" />
+                              <span>โทร</span>
+                            </a>
+                          ) : (
+                            <button
+                              onClick={() => requireProAccess('ดูเบอร์โทรศัพท์และติดต่อลูกค้า')}
+                              className="py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition cursor-pointer"
+                            >
+                              <Lock className="w-3.5 h-3.5 text-amber-400" />
+                              <span>โทร</span>
+                            </button>
+                          )
                         ) : (
                           <button disabled className="py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-600 text-xs font-bold flex items-center justify-center gap-1">
                             <span>-</span>
@@ -4531,10 +4638,7 @@ export default function LeadsRadarMainPage() {
                 {/* Action Button Cluster */}
                 <div className="grid grid-cols-1 gap-2 pt-1">
                   <button
-                    onClick={() => {
-                      setTripModalMode('active');
-                      setIsVehicleTripModalOpen(true);
-                    }}
+                    onClick={() => openTripModal('active')}
                     className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 transition cursor-pointer"
                   >
                     <Camera className="w-4 h-4 text-slate-950" />
@@ -4542,10 +4646,7 @@ export default function LeadsRadarMainPage() {
                   </button>
 
                   <button
-                    onClick={() => {
-                      setTripModalMode('end');
-                      setIsVehicleTripModalOpen(true);
-                    }}
+                    onClick={() => openTripModal('end')}
                     className="w-full py-2.5 px-4 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4 text-rose-400" />
@@ -4585,10 +4686,7 @@ export default function LeadsRadarMainPage() {
                 </div>
 
                 <button
-                  onClick={() => {
-                    setTripModalMode('start');
-                    setIsVehicleTripModalOpen(true);
-                  }}
+                  onClick={() => openTripModal('start')}
                   className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-500/25 active:scale-95 transition cursor-pointer"
                 >
                   <Plus className="w-4 h-4 stroke-[3]" />
@@ -4641,10 +4739,7 @@ export default function LeadsRadarMainPage() {
             {/* QUICK ACTIONS & MANAGEMENT TOOLS */}
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => {
-                  setTripModalMode('history');
-                  setIsVehicleTripModalOpen(true);
-                }}
+                onClick={() => openTripModal('history')}
                 className="p-3 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-left transition active:scale-95 cursor-pointer space-y-1.5"
               >
                 <div className="flex items-center justify-between text-amber-400">
@@ -4658,7 +4753,7 @@ export default function LeadsRadarMainPage() {
               </button>
 
               <button
-                onClick={() => setIsFuelReportModalOpen(true)}
+                onClick={openFuelReportModal}
                 className="p-3 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-left transition active:scale-95 cursor-pointer space-y-1.5"
               >
                 <div className="flex items-center justify-between text-emerald-400">
@@ -4681,11 +4776,8 @@ export default function LeadsRadarMainPage() {
                 </h4>
                 {userTrips.length > 0 && (
                   <button
-                    onClick={() => {
-                      setTripModalMode('history');
-                      setIsVehicleTripModalOpen(true);
-                    }}
-                    className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5"
+                    onClick={() => openTripModal('history')}
+                    className="text-[10px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 cursor-pointer"
                   >
                     <span>ดูทั้งหมด ({userTrips.length})</span>
                     <ChevronRight className="w-3 h-3" />
@@ -4718,10 +4810,7 @@ export default function LeadsRadarMainPage() {
                     return (
                       <div
                         key={trip.id}
-                        onClick={() => {
-                          setTripModalMode('history');
-                          setIsVehicleTripModalOpen(true);
-                        }}
+                        onClick={() => openTripModal('history')}
                         className="p-3 rounded-2xl bg-slate-950/70 hover:bg-slate-950 border border-white/5 hover:border-amber-500/30 transition cursor-pointer space-y-2"
                       >
                         <div className="flex items-center justify-between text-xs">
@@ -4855,8 +4944,7 @@ export default function LeadsRadarMainPage() {
           onSelectTab={(t: MobileTab) => {
             setMobileTab(t);
             if (t === 'trips' && !activeTrip) {
-              setTripModalMode('start');
-              setIsVehicleTripModalOpen(true);
+              openTripModal('start');
             }
           }}
           portfolioCount={portfolioLeads.length}
@@ -4882,6 +4970,8 @@ export default function LeadsRadarMainPage() {
               : null
           }
           isClaiming={isClaimingLead}
+          isProUnlocked={isProUnlocked}
+          onRequirePro={requireProAccess}
         />
 
       </div>
@@ -4939,10 +5029,29 @@ export default function LeadsRadarMainPage() {
               <div className="p-4 rounded-2xl backdrop-blur-xl bg-slate-950/80 border border-white/10 text-xs space-y-2 text-slate-300 shadow-inner">
                 <p><strong className="text-slate-400">ที่อยู่:</strong> {activeLeadModal.address}</p>
                 {activeLeadModal.phone && (
-                  <p><strong className="text-slate-400">เบอร์โทร:</strong> <a href={`tel:${activeLeadModal.phone}`} className="text-cyan-400 font-mono">{activeLeadModal.phone}</a></p>
+                  <p>
+                    <strong className="text-slate-400">เบอร์โทร:</strong>{' '}
+                    {isProUnlocked ? (
+                      <a href={`tel:${activeLeadModal.phone}`} className="text-cyan-400 font-mono">
+                        {activeLeadModal.phone}
+                      </a>
+                    ) : (
+                      <button
+                        onClick={() => requireProAccess('ดูเบอร์โทรศัพท์และติดต่อโรงงาน')}
+                        className="text-cyan-400/80 hover:text-cyan-300 font-mono inline-flex items-center gap-1 cursor-pointer"
+                        title="แตะเพื่อปลดล็อกเบอร์โทรศัพท์"
+                      >
+                        <Lock className="w-3 h-3 text-amber-400" />
+                        <span>{maskPhoneNumber(activeLeadModal.phone)}</span>
+                      </button>
+                    )}
+                  </p>
                 )}
                 {activeLeadModal.email && (
-                  <p><strong className="text-slate-400">อีเมล:</strong> <span className="text-slate-200">{activeLeadModal.email}</span></p>
+                  <p>
+                    <strong className="text-slate-400">อีเมล:</strong>{' '}
+                    <span className="text-slate-200 font-mono">{maskEmail(activeLeadModal.email)}</span>
+                  </p>
                 )}
               </div>
 
@@ -4983,13 +5092,23 @@ export default function LeadsRadarMainPage() {
               {/* Actions */}
               <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-800">
                 {activeLeadModal.phone ? (
-                  <a
-                    href={`tel:${activeLeadModal.phone.replace(/[^0-9]/g, '')}`}
-                    className="h-11 px-4 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-sm"
-                  >
-                    <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>โทร {activeLeadModal.phone}</span>
-                  </a>
+                  isProUnlocked ? (
+                    <a
+                      href={`tel:${activeLeadModal.phone.replace(/[^0-9]/g, '')}`}
+                      className="h-11 px-4 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-sm"
+                    >
+                      <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>โทร {activeLeadModal.phone}</span>
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() => requireProAccess('ดูเบอร์โทรศัพท์และติดต่อโรงงาน')}
+                      className="h-11 px-4 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-teal-500/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-500/40 text-emerald-300 font-black text-xs flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer shadow-sm"
+                    >
+                      <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>ปลดล็อกเบอร์โทร</span>
+                    </button>
+                  )
                 ) : (
                   <button
                     onClick={() => setActiveLeadModal(null)}
@@ -5140,6 +5259,13 @@ export default function LeadsRadarMainPage() {
         lead={releaseModalLead}
         onClose={() => setReleaseModalLead(null)}
         onConfirmRelease={handleConfirmReleaseLead}
+      />
+
+      {/* 10. Access Lock & Freemium Preview Gate Modal */}
+      <AccessLockModal
+        isOpen={isAccessLockModalOpen}
+        onClose={() => setIsAccessLockModalOpen(false)}
+        featureName={accessLockFeatureName}
       />
 
     </div>

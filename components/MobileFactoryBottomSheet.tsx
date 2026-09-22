@@ -23,6 +23,17 @@ interface MobileFactoryBottomSheetProps {
   isClaimedByMe?: boolean;
   claimedByOtherName?: string | null;
   isClaiming?: boolean;
+  isProUnlocked?: boolean;
+  onRequirePro?: (featureName: string) => void;
+}
+
+function maskPhoneNumber(phone?: string | null): string {
+  if (!phone || phone === '-') return '-';
+  const cleaned = phone.replace(/[^0-9]/g, '');
+  if (cleaned.length >= 9) {
+    return `${cleaned.slice(0, 3)}-***-${cleaned.slice(-4)}`;
+  }
+  return phone.slice(0, 3) + '***' + (phone.length > 5 ? phone.slice(-2) : '');
 }
 
 export function MobileFactoryBottomSheet({
@@ -33,16 +44,19 @@ export function MobileFactoryBottomSheet({
   isClaimedByMe = false,
   claimedByOtherName = null,
   isClaiming = false,
+  isProUnlocked = false,
+  onRequirePro,
 }: MobileFactoryBottomSheetProps) {
   if (!factory) return null;
 
   const factoryName = factory.name || factory.factory_name || 'โรงงานอุตสาหกรรม';
   const factoryAddress = factory.address || 'จ.สมุทรปราการ';
-  const factoryPhone = factory.phone || '';
+  const rawPhone = factory.phone || '';
+  const factoryPhone = isProUnlocked ? rawPhone : maskPhoneNumber(rawPhone);
   const factoryDistrict = factory.district || 'สมุทรปราการ';
 
   const googleMapsUrl = factory.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${factory.lat},${factory.lng}`;
-  const cleanPhone = factoryPhone ? factoryPhone.replace(/[^0-9+]/g, '') : '';
+  const cleanPhone = rawPhone ? rawPhone.replace(/[^0-9+]/g, '') : '';
 
   return (
     <div className="sm:hidden fixed inset-0 z-[1100] flex flex-col justify-end">
@@ -131,13 +145,23 @@ export function MobileFactoryBottomSheet({
         <div className="grid grid-cols-2 gap-2.5 my-4">
           {/* Call Button */}
           {cleanPhone ? (
-            <a
-              href={`tel:${cleanPhone}`}
-              className="py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-95 transition"
-            >
-              <Phone className="w-4 h-4" />
-              <span>โทรออกทันที</span>
-            </a>
+            isProUnlocked ? (
+              <a
+                href={`tel:${cleanPhone}`}
+                className="py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-95 transition"
+              >
+                <Phone className="w-4 h-4" />
+                <span>โทรออกทันที</span>
+              </a>
+            ) : (
+              <button
+                onClick={() => onRequirePro?.('ดูเบอร์โทรศัพท์และติดต่อโรงงาน')}
+                className="py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-teal-500/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-500/40 text-emerald-300 font-black text-xs flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer"
+              >
+                <Lock className="w-4 h-4 text-amber-400" />
+                <span>ปลดล็อกเบอร์โทร</span>
+              </button>
+            )
           ) : (
             <button
               disabled

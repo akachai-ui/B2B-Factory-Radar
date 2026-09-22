@@ -42,6 +42,21 @@ export async function POST(request: NextRequest) {
       try {
         const client = await pool.connect();
         try {
+          // Check user profile access status
+          const userRes = await client.query(
+            `SELECT id, role, email, access_status FROM public.profiles WHERE id = $1;`,
+            [user_id]
+          );
+          if (userRes.rows.length > 0) {
+            const userProfile = userRes.rows[0];
+            if (userProfile.access_status === 'SUSPENDED') {
+              return NextResponse.json(
+                { success: false, error: 'บัญชีของคุณถูกระงับการใช้งานชั่วคราว กรุณาติดต่อผู้ดูแลระบบ' },
+                { status: 403 }
+              );
+            }
+          }
+
           // 1. Check if already claimed in this company
           if (dbd_id) {
             const checkRes = await client.query(

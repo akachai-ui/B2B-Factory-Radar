@@ -82,6 +82,9 @@ export interface UserProfile {
   onboarded?: boolean;
   role: UserRole;
   status?: 'active' | 'inactive';
+  access_status?: 'PENDING_APPROVAL' | 'PRO_UNLOCKED' | 'SUSPENDED';
+  approved_at?: string | null;
+  approved_by?: string | null;
   company_id?: string | null;
   company?: Company | null;
   company_address?: string | null;

@@ -117,12 +117,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ? data.avatar_url 
           : (googleAvatar || cachedAvatar || null);
 
+        const isOwnerAccount = data.role === 'owner' || cleanEmail === 'akachaiha@gmail.com';
+        const resolvedAccessStatus = data.access_status || (isOwnerAccount ? 'PRO_UNLOCKED' : 'PENDING_APPROVAL');
+
         setProfile({
           ...(data as UserProfile),
+          role: (data.role || (isOwnerAccount ? 'owner' : 'sales')) as any,
+          access_status: resolvedAccessStatus as any,
           avatar_url: resolvedAvatar,
         });
       } else if (!data) {
         // If profile row doesn't exist yet, insert a clean default
+        const isMaster = cleanEmail === 'akachaiha@gmail.com';
         const initialAvatar = currentUser.user_metadata?.avatar_url 
           || currentUser.user_metadata?.picture 
           || (currentUser.identities?.[0]?.identity_data as any)?.avatar_url 
@@ -133,10 +139,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: cleanEmail,
           full_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || cleanEmail.split('@')[0] || 'ผู้ใช้งาน',
           avatar_url: initialAvatar,
-          account_type: 'individual',
-          company_name: null,
-          onboarded: false,
-          role: 'owner',
+          account_type: isMaster ? 'company' : 'individual',
+          company_name: isMaster ? 'RouteHunter HQ' : null,
+          onboarded: isMaster,
+          role: isMaster ? 'owner' : 'sales',
+          access_status: isMaster ? 'PRO_UNLOCKED' : 'PENDING_APPROVAL',
         };
         const { data: inserted } = await supabase
           .from('profiles')
@@ -145,6 +152,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .maybeSingle();
         if (inserted) {
           setProfile(inserted as UserProfile);
+        } else {
+          setProfile(newProfile as UserProfile);
         }
       }
     } catch (e) {
