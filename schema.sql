@@ -75,6 +75,27 @@ CREATE POLICY "Allow update companies"
   USING (true)
   WITH CHECK (true);
 
+-- 3.1 Table: system_admins (ตารางผู้ดูแลระบบสูงสุด Super Admin ระดับแพลตฟอร์ม)
+CREATE TABLE IF NOT EXISTS public.system_admins (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID,
+  email TEXT NOT NULL UNIQUE,
+  role TEXT DEFAULT 'super_admin', -- 'super_admin', 'support', 'billing'
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.system_admins ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow read system_admins" ON public.system_admins;
+CREATE POLICY "Allow read system_admins"
+  ON public.system_admins FOR SELECT
+  TO authenticated, anon
+  USING (true);
+
+-- Pre-seed Super Admin
+INSERT INTO public.system_admins (email, role)
+VALUES ('akachaiha@gmail.com', 'super_admin')
+ON CONFLICT (email) DO NOTHING;
+
 -- 4. Table: profiles (ตารางเก็บข้อมูลโปรไฟล์ผู้ใช้ เชื่อมโยง company_id)
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -136,20 +157,38 @@ CREATE POLICY "Allow delete profile"
   TO authenticated, anon
   USING (true);
 
--- 4. Database Trigger: สร้าง Profile อัตโนมัติทันทีที่ User ลงทะเบียนสำเร็จ (Google หรือ Email)
+-- 4. Database Trigger: สร้าง Company & Profile อัตโนมัติทันทีที่ User ลงทะเบียนสำเร็จ (Company-First Architecture)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  v_full_name TEXT;
+  v_company_name TEXT;
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name, company_name)
+  v_full_name := COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1));
+  v_company_name := 'ทีมของ ' || v_full_name;
+
+  -- 1. Create company record in public.companies
+  INSERT INTO public.companies (id, name, branch, owner_id)
+  VALUES (NEW.id, v_company_name, 'สำนักงานใหญ่', NEW.id)
+  ON CONFLICT (id) DO NOTHING;
+
+  -- 2. Create profile linked to this company
+  INSERT INTO public.profiles (id, email, full_name, company_name, company_id, account_type, role, onboarded)
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)),
-    'บริษัทของฉัน'
+    v_full_name,
+    v_company_name,
+    NEW.id,
+    'company',
+    'owner',
+    TRUE
   )
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
-    full_name = COALESCE(EXCLUDED.full_name, public.profiles.full_name);
+    full_name = COALESCE(EXCLUDED.full_name, public.profiles.full_name),
+    company_id = COALESCE(public.profiles.company_id, EXCLUDED.company_id),
+    company_name = COALESCE(public.profiles.company_name, EXCLUDED.company_name);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -449,6 +488,17 @@ CREATE POLICY "Allow members to update their trip checkins"
 DROP POLICY IF EXISTS "Allow members to delete their trip checkins" ON public.trip_checkins;
 CREATE POLICY "Allow members to delete their trip checkins"
   ON public.trip_checkins FOR DELETE TO authenticated, anon USING (true);
+
+-- Enable Supabase Realtime for Trips & Checkins
+DO $$
+BEGIN
+  BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.vehicle_trips, public.trip_checkins;
+  EXCEPTION
+    WHEN duplicate_object THEN NULL;
+    WHEN others THEN NULL;
+  END;
+END $$;
 
 -- 12. Storage Bucket: trip-photos (สำหรับจัดเก็บรูปถ่ายหน้าปัดไมล์และรูปถ่ายเช็คอิน)
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

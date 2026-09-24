@@ -10,6 +10,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   session: Session | null;
   loading: boolean;
+  isSuperAdmin: boolean;
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
   signInWithFacebook: () => Promise<{ error: AuthError | null }>;
   signInWithPassword: (email: string, password: string) => Promise<{ error: AuthError | null }>;
@@ -26,6 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
 
   // Fetch live profile from public.profiles in Supabase with auto-merge for invited users
   const fetchLiveProfile = useCallback(async (currentUser: User) => {
@@ -117,35 +119,126 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ? data.avatar_url 
           : (googleAvatar || cachedAvatar || null);
 
-        const isMaster = cleanEmail === 'akachaiha@gmail.com';
-        const resolvedAccessStatus = (isMaster || data.access_status === 'PRO_UNLOCKED') 
+        // 1. Query system_admins table in Supabase
+        let adminGranted = false;
+        try {
+          const { data: adminRow } = await supabase
+            .from('system_admins')
+            .select('*')
+            .or(`email.ilike.${cleanEmail},user_id.eq.${currentUser.id}`)
+            .maybeSingle();
+
+          if (adminRow) {
+            adminGranted = true;
+          }
+        } catch (adminErr) {
+          console.warn('System admin lookup warning:', adminErr);
+        }
+
+        const effectiveSuperAdmin = adminGranted;
+        setIsSuperAdmin(effectiveSuperAdmin);
+
+        const resolvedAccessStatus = (effectiveSuperAdmin || data.access_status === 'PRO_UNLOCKED') 
           ? 'PRO_UNLOCKED' 
           : (data.access_status || 'PENDING_APPROVAL');
 
+        const effectiveCompId = data.company_id || currentUser.id;
+        const defaultCompName = data.company_name || `ทีมของ ${data.full_name || cleanEmail.split('@')[0]}`;
+
+        // Ensure company record exists in public.companies table
+        try {
+          await supabase.from('companies').upsert({
+            id: effectiveCompId,
+            name: defaultCompName,
+            branch: data.branch || 'สำนักงานใหญ่',
+            tax_id: data.tax_id || null,
+            phone: data.phone || null,
+            owner_id: currentUser.id,
+          }, { onConflict: 'id' });
+        } catch (compErr) {
+          console.warn('Auto ensure company error:', compErr);
+        }
+
+        // If profile was missing company_id or marked as individual, update profile to Company-First
+        if (!data.company_id || data.account_type !== 'company') {
+          try {
+            await supabase.from('profiles').update({
+              company_id: effectiveCompId,
+              company_name: defaultCompName,
+              account_type: 'company',
+              role: data.role || 'owner',
+              updated_at: new Date().toISOString(),
+            }).eq('id', currentUser.id);
+            data.company_id = effectiveCompId;
+            data.company_name = defaultCompName;
+            data.account_type = 'company';
+            data.role = data.role || 'owner';
+          } catch (upErr) {
+            console.warn('Update profile company-first error:', upErr);
+          }
+        }
+
         setProfile({
           ...(data as UserProfile),
-          role: (data.role || (isMaster ? 'owner' : 'sales')) as any,
+          company_id: effectiveCompId,
+          company_name: defaultCompName,
+          account_type: 'company',
+          role: (data.role || 'owner') as any,
           access_status: resolvedAccessStatus as any,
           avatar_url: resolvedAvatar,
         });
       } else if (!data) {
-        // If profile row doesn't exist yet, insert a clean default
-        const isMaster = cleanEmail === 'akachaiha@gmail.com';
+        // If profile row doesn't exist yet, insert a clean default with Company-First
+        let adminGranted = false;
+        try {
+          const { data: adminRow } = await supabase
+            .from('system_admins')
+            .select('*')
+            .or(`email.ilike.${cleanEmail},user_id.eq.${currentUser.id}`)
+            .maybeSingle();
+
+          if (adminRow) {
+            adminGranted = true;
+          }
+        } catch (adminErr) {
+          console.warn('System admin lookup on signup warning:', adminErr);
+        }
+
+        const effectiveSuperAdmin = adminGranted;
+        setIsSuperAdmin(effectiveSuperAdmin);
+
         const initialAvatar = currentUser.user_metadata?.avatar_url 
           || currentUser.user_metadata?.picture 
           || (currentUser.identities?.[0]?.identity_data as any)?.avatar_url 
           || (currentUser.identities?.[0]?.identity_data as any)?.picture 
           || null;
+        const userName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || cleanEmail.split('@')[0] || 'ผู้ใช้งาน';
+        const companyName = effectiveSuperAdmin ? 'RouteHunter HQ' : `ทีมของ ${userName}`;
+
+        // Create company record first
+        try {
+          await supabase.from('companies').upsert({
+            id: currentUser.id,
+            name: companyName,
+            branch: 'สำนักงานใหญ่',
+            owner_id: currentUser.id,
+          }, { onConflict: 'id' });
+        } catch (cErr) {
+          console.warn('Create initial company error:', cErr);
+        }
+
         const newProfile: Partial<UserProfile> = {
           id: currentUser.id,
           email: cleanEmail,
-          full_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || cleanEmail.split('@')[0] || 'ผู้ใช้งาน',
+          full_name: userName,
           avatar_url: initialAvatar,
-          account_type: isMaster ? 'company' : 'individual',
-          company_name: isMaster ? 'RouteHunter HQ' : null,
-          onboarded: isMaster,
-          role: isMaster ? 'owner' : 'sales',
-          access_status: isMaster ? 'PRO_UNLOCKED' : 'PENDING_APPROVAL',
+          account_type: 'company',
+          company_id: currentUser.id,
+          company_name: companyName,
+          branch: 'สำนักงานใหญ่',
+          onboarded: true,
+          role: 'owner',
+          access_status: effectiveSuperAdmin ? 'PRO_UNLOCKED' : 'PENDING_APPROVAL',
         };
         const { data: inserted } = await supabase
           .from('profiles')
@@ -382,6 +475,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         profile,
         session,
         loading,
+        isSuperAdmin,
         signInWithGoogle,
         signInWithFacebook,
         signInWithPassword,

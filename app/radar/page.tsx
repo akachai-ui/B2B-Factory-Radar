@@ -20,7 +20,7 @@ import { VehicleTripModal } from '@/components/VehicleTripModal';
 import { MileageFuelReportModal } from '@/components/MileageFuelReportModal';
 import { AccessLockModal } from '@/components/AccessLockModal';
 import { PlasticMarketIntelligence } from '@/components/PlasticMarketIntelligence';
-import { calculateContactHealth, getLeadLastContactDate } from '@/lib/leadUtils';
+import { calculateContactHealth, getLeadLastContactDate, maskCompanyName, maskAddress } from '@/lib/leadUtils';
 import defaultLeadsData from '@/public/leads_data.json';
 import * as XLSX from 'xlsx';
 import {
@@ -136,6 +136,7 @@ export default function LeadsRadarMainPage() {
     user,
     profile,
     loading: authLoading,
+    isSuperAdmin,
     signInWithGoogle,
     signInWithFacebook,
     signInWithPassword,
@@ -187,21 +188,20 @@ export default function LeadsRadarMainPage() {
 
   // Effective Company ID & Role flags
   const effectiveCompanyId = profile?.company_id || currentCompany?.id || profile?.id || user?.id;
-  const isCompany = profile?.account_type === 'company';
-  const isOwner = profile?.role === 'owner' || (user?.id && currentCompany?.owner_id && user.id === currentCompany.owner_id) || (!profile?.role && profile?.account_type !== 'company');
+  const isCompany = true;
+  const isOwner = profile?.role === 'owner' || (user?.id && currentCompany?.owner_id && user.id === currentCompany.owner_id) || !profile?.role;
   const isManager = profile?.role === 'manager';
   const canViewAllTeamLeads = isOwner || isManager;
-  const displayTeamName = currentCompany?.name || profile?.company_name || (isCompany ? 'บริษัทของฉัน' : `ทีมของ ${profile?.full_name || 'ฉัน'}`);
+  const displayTeamName = currentCompany?.name || profile?.company_name || `ทีมของ ${profile?.full_name || 'ฉัน'}`;
   const currentUserAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
 
   // Team Data States
   const [teamMembers, setTeamMembers] = useState<UserProfile[]>([]);
 
-  // Pro / Freemium Access Control & Preview Mode Gate (Inherits from Company Owner if approved)
-  const isMasterOwner = user?.email?.toLowerCase() === 'akachaiha@gmail.com';
+  // Pro / Freemium Access Control & Preview Mode Gate (Inherits from Super Admin or Company Owner if approved)
   const companyOwnerMember = teamMembers.find((m) => m.role === 'owner' || (currentCompany?.owner_id && m.id === currentCompany.owner_id));
   const isCompanyOwnerUnlocked = companyOwnerMember?.access_status === 'PRO_UNLOCKED';
-  const isProUnlocked = isMasterOwner || profile?.access_status === 'PRO_UNLOCKED' || !!isCompanyOwnerUnlocked;
+  const isProUnlocked = isSuperAdmin || profile?.access_status === 'PRO_UNLOCKED' || !!isCompanyOwnerUnlocked;
   const isPreviewMode = !isProUnlocked;
   const [isAccessLockModalOpen, setIsAccessLockModalOpen] = useState(false);
   const [accessLockFeatureName, setAccessLockFeatureName] = useState('ฟังก์ชันพิเศษ Pro');
@@ -293,9 +293,40 @@ export default function LeadsRadarMainPage() {
   }, [user?.id]);
 
   useEffect(() => {
-    if (user) {
-      fetchActiveTrip();
-    }
+    if (!user) return;
+
+    fetchActiveTrip();
+
+    // Setup Supabase Realtime Subscription for instant status updates (Approvals, Stops, Trips)
+    const tripChannel = supabase
+      .channel('radar_trips_realtime_feed')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'vehicle_trips',
+        },
+        () => {
+          fetchActiveTrip();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'trip_checkins',
+        },
+        () => {
+          fetchActiveTrip();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(tripChannel);
+    };
   }, [user, fetchActiveTrip]);
 
   // Monthly Trip & Mileage Stats calculation
@@ -1108,47 +1139,40 @@ export default function LeadsRadarMainPage() {
         return;
       }
 
-      // 1. Insert Invitation into team_invitations
-      const { data: newInvite, error: insertError } = await supabase
-        .from('team_invitations')
-        .insert([
-          {
-            company_id: effectiveCompanyId,
-            company_name: currentCompany?.name || profile?.company_name || displayTeamName,
-            email: cleanEmail,
-            role: newRole,
-            invited_by: user?.id,
-            status: 'pending',
-          },
-        ])
-        .select()
-        .maybeSingle();
-
-      if (insertError) throw insertError;
-
-      // 2. Dispatch Email via Server API Route (Single Dispatch)
-      let isEmailDispatched = false;
+      // 1. Ensure company row exists in public.companies to satisfy foreign key constraint
       try {
-        const mailRes = await fetch('/api/team/invite', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: cleanEmail,
-            role: newRole,
-            companyId: effectiveCompanyId,
-            companyName: currentCompany?.name || profile?.company_name || displayTeamName,
-            inviterName: profile?.full_name || user?.email,
-            inviterEmail: user?.email,
-            inviteId: newInvite.id,
-          }),
-        });
-        const mailJson = await mailRes.json();
-        if (mailJson?.emailSent) {
-          isEmailDispatched = true;
-        }
-      } catch (e) {
-        console.warn('Dispatch email warning:', e);
+        await supabase.from('companies').upsert({
+          id: effectiveCompanyId,
+          name: currentCompany?.name || profile?.company_name || displayTeamName || 'บริษัทของฉัน',
+          tax_id: profile?.tax_id || null,
+          branch: profile?.branch || 'สำนักงานใหญ่',
+          owner_id: user?.id,
+        }, { onConflict: 'id' });
+      } catch (compErr) {
+        console.warn('Upsert company error:', compErr);
       }
+
+      // 2. Create Invite and Dispatch Email via Server API Route
+      const mailRes = await fetch('/api/team/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: cleanEmail,
+          role: newRole,
+          companyId: effectiveCompanyId,
+          companyName: currentCompany?.name || profile?.company_name || displayTeamName,
+          inviterName: profile?.full_name || user?.email,
+          inviterEmail: user?.email,
+          inviterUserId: user?.id,
+        }),
+      });
+
+      const mailJson = await mailRes.json();
+      if (!mailRes.ok || !mailJson.success) {
+        throw new Error(mailJson.error || 'เกิดข้อผิดพลาดในการสร้างคำเชิญ');
+      }
+
+      const isEmailDispatched = Boolean(mailJson?.emailSent);
 
       setFeedback({
         type: 'success',
@@ -1203,13 +1227,25 @@ export default function LeadsRadarMainPage() {
       return;
     }
     if (!confirm(`คุณต้องการนำ "${memberName}" ออกจากสังกัดบริษัทใช่หรือไม่?`)) return;
+
     try {
+      const defaultNewTeamName = `ทีมของ ${memberName || 'ฉัน'}`;
+      try {
+        await supabase.from('companies').upsert({
+          id: memberId,
+          name: defaultNewTeamName,
+          branch: 'สำนักงานใหญ่',
+          owner_id: memberId,
+        }, { onConflict: 'id' });
+      } catch (cErr) {}
+
       await supabase
         .from('profiles')
         .update({
-          company_id: null,
+          company_id: memberId,
+          company_name: defaultNewTeamName,
           role: 'owner',
-          account_type: 'individual',
+          account_type: 'company',
           updated_at: new Date().toISOString(),
         })
         .eq('id', memberId);
@@ -2068,6 +2104,8 @@ export default function LeadsRadarMainPage() {
                   totalLeadCount={filteredPortfolioLeads.length}
                   userName={profile?.full_name || user?.user_metadata?.full_name || user?.email || 'ทีมงานขาย'}
                   userAvatar={currentUserAvatar}
+                  isProUnlocked={isProUnlocked}
+                  onRequirePro={requireProAccess}
                 />
               </div>
             )}
@@ -2228,15 +2266,25 @@ export default function LeadsRadarMainPage() {
                                 </button>
 
                                 {lead.lat && lead.lng && (
-                                  <a
-                                    href={`https://www.google.com/maps/dir/?api=1&destination=${lead.lat},${lead.lng}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition inline-flex items-center cursor-pointer"
-                                    title="นำทาง Google Maps"
-                                  >
-                                    <Navigation className="w-3.5 h-3.5" />
-                                  </a>
+                                  isProUnlocked ? (
+                                    <a
+                                      href={`https://www.google.com/maps/dir/?api=1&destination=${lead.lat},${lead.lng}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition inline-flex items-center cursor-pointer"
+                                      title="นำทาง Google Maps"
+                                    >
+                                      <Navigation className="w-3.5 h-3.5" />
+                                    </a>
+                                  ) : (
+                                    <button
+                                      onClick={() => requireProAccess('เปิดแผนที่ GPS นำทางโรงงาน')}
+                                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400/70 hover:text-amber-300 border border-slate-700 transition inline-flex items-center cursor-pointer"
+                                      title="ปลดล็อกแผนที่นำทาง Google Maps"
+                                    >
+                                      <Lock className="w-3.5 h-3.5" />
+                                    </button>
+                                  )
                                 )}
 
                                 <button
@@ -2370,6 +2418,8 @@ export default function LeadsRadarMainPage() {
                     totalLeadCount={leads.length}
                     userName={profile?.full_name || user?.user_metadata?.full_name || user?.email || 'ทีมงานขาย'}
                     userAvatar={currentUserAvatar}
+                    isProUnlocked={isProUnlocked}
+                    onRequirePro={requireProAccess}
                   />
                 </div>
 
@@ -2406,11 +2456,18 @@ export default function LeadsRadarMainPage() {
                             
                             {/* Name & Address */}
                             <td className="p-3.5 max-w-[260px]">
-                              <div className="font-bold text-white text-xs truncate" title={lead.name}>
-                                {lead.name}
+                              <div className="font-bold text-white text-xs truncate flex items-center gap-1.5" title={isProUnlocked ? lead.name : undefined}>
+                                <span className={!isProUnlocked ? "text-amber-300/90 font-black" : ""}>
+                                  {isProUnlocked ? lead.name : maskCompanyName(lead.name, false)}
+                                </span>
+                                {!isProUnlocked && (
+                                  <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                    Pro
+                                  </span>
+                                )}
                               </div>
-                              <div className="text-[11px] text-slate-400 truncate mt-0.5" title={lead.address}>
-                                {lead.address}
+                              <div className="text-[11px] text-slate-400 truncate mt-0.5" title={isProUnlocked ? lead.address : undefined}>
+                                {isProUnlocked ? lead.address : maskAddress(lead.address, lead.district, lead.province, false)}
                               </div>
                             </td>
 
@@ -2511,7 +2568,13 @@ export default function LeadsRadarMainPage() {
                                 }
                                 return (
                                   <button
-                                    onClick={() => handleClaimFactoryLead(lead)}
+                                    onClick={() => {
+                                      if (!isProUnlocked) {
+                                        requireProAccess('หยิบโรงงานเข้าพอร์ตลูกค้า');
+                                        return;
+                                      }
+                                      handleClaimFactoryLead(lead);
+                                    }}
                                     disabled={isClaimingLead}
                                     className="p-1.5 px-2 rounded-lg bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500 hover:to-blue-500 border border-cyan-500/30 text-cyan-300 hover:text-white transition inline-flex items-center gap-1 text-[11px] font-bold cursor-pointer active:scale-95"
                                     title="หยิบใส่พอร์ตของฉัน"
@@ -2530,15 +2593,25 @@ export default function LeadsRadarMainPage() {
                                 <Edit3 className="w-3.5 h-3.5" />
                               </button>
 
-                              <a
-                                href={lead.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${lead.lat},${lead.lng}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="p-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 transition inline-flex items-center cursor-pointer"
-                                title="นำทาง Google Maps"
-                              >
-                                <Navigation className="w-3.5 h-3.5" />
-                              </a>
+                              {isProUnlocked ? (
+                                <a
+                                  href={lead.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${lead.lat},${lead.lng}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="p-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 transition inline-flex items-center cursor-pointer"
+                                  title="นำทาง Google Maps"
+                                >
+                                  <Navigation className="w-3.5 h-3.5" />
+                                </a>
+                              ) : (
+                                <button
+                                  onClick={() => requireProAccess('เปิดแผนที่ GPS นำทางโรงงาน')}
+                                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400/70 hover:text-amber-300 border border-slate-700 transition inline-flex items-center cursor-pointer"
+                                  title="ปลดล็อกแผนที่นำทาง Google Maps"
+                                >
+                                  <Lock className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                             </td>
                           </tr>
                         );
@@ -3614,7 +3687,7 @@ export default function LeadsRadarMainPage() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span>{profile?.account_type === 'company' ? '🏢' : profile?.full_name?.charAt(0) || '👤'}</span>
+                <span>{profile?.full_name?.charAt(0)?.toUpperCase() || '🏢'}</span>
               )}
             </button>
           </div>
@@ -3894,6 +3967,8 @@ export default function LeadsRadarMainPage() {
                   totalLeadCount={filteredPortfolioLeads.length}
                   userName={profile?.full_name || user?.user_metadata?.full_name || user?.email || 'ทีมงานขาย'}
                   userAvatar={currentUserAvatar}
+                  isProUnlocked={isProUnlocked}
+                  onRequirePro={requireProAccess}
                 />
               </div>
             )}
@@ -3979,15 +4054,26 @@ export default function LeadsRadarMainPage() {
                         )}
 
                         {lead.lat && lead.lng ? (
-                          <a
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${lead.lat},${lead.lng}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="py-2 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-300 text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition"
-                          >
-                            <Navigation className="w-3.5 h-3.5" />
-                            <span>นำทาง</span>
-                          </a>
+                          isProUnlocked ? (
+                            <a
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${lead.lat},${lead.lng}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="py-2 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-300 text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition"
+                            >
+                              <Navigation className="w-3.5 h-3.5" />
+                              <span>นำทาง</span>
+                            </a>
+                          ) : (
+                            <button
+                              onClick={() => requireProAccess('เปิดแผนที่ GPS นำทางโรงงาน')}
+                              className="py-2 rounded-xl bg-slate-950 border border-slate-800 text-amber-400/80 hover:text-amber-300 text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition cursor-pointer"
+                              title="ปลดล็อกแผนที่นำทาง GPS"
+                            >
+                              <Lock className="w-3.5 h-3.5 text-amber-400" />
+                              <span>นำทาง</span>
+                            </button>
+                          )
                         ) : (
                           <button disabled className="py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-600 text-xs font-bold flex items-center justify-center gap-1">
                             <span>-</span>
@@ -4111,6 +4197,8 @@ export default function LeadsRadarMainPage() {
                   totalLeadCount={leads.length}
                   userName={profile?.full_name || user?.user_metadata?.full_name || user?.email || 'ทีมงานขาย'}
                   userAvatar={currentUserAvatar}
+                  isProUnlocked={isProUnlocked}
+                  onRequirePro={requireProAccess}
                 />
               </div>
             ) : (
@@ -4147,8 +4235,19 @@ export default function LeadsRadarMainPage() {
                                 📍 {dist < 1 ? `${Math.round(dist * 1000)} ม.` : `${dist.toFixed(1)} กม.`}
                               </span>
                             </div>
-                            <h4 className="font-bold text-white text-xs mt-1.5">{lead.name || lead.company_name}</h4>
-                            <p className="text-[10px] text-slate-400 line-clamp-1">{lead.address}</p>
+                            <h4 className="font-bold text-white text-xs mt-1.5 flex items-center gap-1.5">
+                              <span className={!isProUnlocked ? "text-amber-300 font-black" : ""}>
+                                {isProUnlocked ? (lead.name || lead.company_name) : maskCompanyName(lead.name || lead.company_name, false)}
+                              </span>
+                              {!isProUnlocked && (
+                                <span className="px-1 py-0.2 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                  Pro
+                                </span>
+                              )}
+                            </h4>
+                            <p className="text-[10px] text-slate-400 line-clamp-1">
+                              {isProUnlocked ? lead.address : maskAddress(lead.address, lead.district, lead.province, false)}
+                            </p>
                           </div>
                         </div>
 
@@ -4166,7 +4265,13 @@ export default function LeadsRadarMainPage() {
                             </div>
                           ) : (
                             <button
-                              onClick={() => handleClaimFactoryLead(lead)}
+                              onClick={() => {
+                                if (!isProUnlocked) {
+                                  requireProAccess('หยิบโรงงานเข้าพอร์ตลูกค้า');
+                                  return;
+                                }
+                                handleClaimFactoryLead(lead);
+                              }}
                               disabled={isClaimingLead}
                               className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-indigo-500/20 hover:from-cyan-500 hover:to-indigo-500 border border-cyan-500/30 text-cyan-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition cursor-pointer"
                             >
@@ -4883,7 +4988,7 @@ export default function LeadsRadarMainPage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    profile?.account_type === 'company' ? '🏢' : profile?.full_name?.charAt(0) || '👤'
+                    profile?.full_name?.charAt(0)?.toUpperCase() || '🏢'
                   )}
                 </div>
                 <div className="min-w-0">
@@ -4997,6 +5102,8 @@ export default function LeadsRadarMainPage() {
             loadClaimedFactoryIds();
           }}
           onReleaseLead={handleReleasePortfolioLead}
+          isProUnlocked={isProUnlocked}
+          onRequirePro={requireProAccess}
         />
       )}
 
@@ -5018,8 +5125,15 @@ export default function LeadsRadarMainPage() {
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-md bg-amber-500/20 text-amber-300 border border-amber-400/30 shadow-sm">
                     {activeLeadModal.district}
                   </span>
-                  <h3 className="text-base sm:text-lg font-black text-white mt-1.5">
-                    {activeLeadModal.name}
+                  <h3 className="text-base sm:text-lg font-black text-white mt-1.5 flex items-center gap-2">
+                    {isProUnlocked ? (
+                      <span>{activeLeadModal.name}</span>
+                    ) : (
+                      <span className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-amber-300 font-black">{maskCompanyName(activeLeadModal.name, false)}</span>
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Pro Feature</span>
+                      </span>
+                    )}
                   </h3>
                 </div>
                 <button
@@ -5031,7 +5145,16 @@ export default function LeadsRadarMainPage() {
               </div>
 
               <div className="p-4 rounded-2xl backdrop-blur-xl bg-slate-950/80 border border-white/10 text-xs space-y-2 text-slate-300 shadow-inner">
-                <p><strong className="text-slate-400">ที่อยู่:</strong> {activeLeadModal.address}</p>
+                <p>
+                  <strong className="text-slate-400">ที่อยู่:</strong>{' '}
+                  {isProUnlocked ? (
+                    <span>{activeLeadModal.address}</span>
+                  ) : (
+                    <span className="text-slate-300 italic">
+                      {maskAddress(activeLeadModal.address, activeLeadModal.district, activeLeadModal.province, false)}
+                    </span>
+                  )}
+                </p>
                 {activeLeadModal.phone && (
                   <p>
                     <strong className="text-slate-400">เบอร์โทร:</strong>{' '}
@@ -5074,7 +5197,13 @@ export default function LeadsRadarMainPage() {
                   </div>
                 ) : (
                   <button
-                    onClick={() => handleClaimFactoryLead(activeLeadModal)}
+                    onClick={() => {
+                      if (!isProUnlocked) {
+                        requireProAccess('หยิบโรงงานเข้าพอร์ตลูกค้า');
+                        return;
+                      }
+                      handleClaimFactoryLead(activeLeadModal);
+                    }}
                     disabled={isClaimingLead}
                     className="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-95 transition cursor-pointer"
                   >
@@ -5122,15 +5251,25 @@ export default function LeadsRadarMainPage() {
                   </button>
                 )}
 
-                <a
-                  href={activeLeadModal.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${activeLeadModal.lat},${activeLeadModal.lng}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="h-11 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer"
-                >
-                  <Navigation className="w-4 h-4 fill-slate-950 shrink-0" />
-                  <span>เปิด GPS นำทาง</span>
-                </a>
+                {isProUnlocked ? (
+                  <a
+                    href={activeLeadModal.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${activeLeadModal.lat},${activeLeadModal.lng}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="h-11 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer"
+                  >
+                    <Navigation className="w-4 h-4 fill-slate-950 shrink-0" />
+                    <span>เปิด GPS นำทาง</span>
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => requireProAccess('เปิดแผนที่ GPS นำทางโรงงาน')}
+                    className="h-11 px-4 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 border border-amber-500/40 text-amber-300 font-black text-xs flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer shadow-sm"
+                  >
+                    <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>ปลดล็อก GPS นำทาง</span>
+                  </button>
+                )}
               </div>
 
             </div>

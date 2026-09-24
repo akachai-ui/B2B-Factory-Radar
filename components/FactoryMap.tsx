@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { FactoryLead } from '@/lib/types';
+import { maskCompanyName, maskAddress } from '@/lib/leadUtils';
 import districtsGeoJson from '@/lib/geojson/samutprakan_districts.json';
 import {
   MapPin,
@@ -14,6 +15,7 @@ import {
   Building2,
   Radio,
   ChevronDown,
+  Lock,
 } from 'lucide-react';
 
 export interface FactoryMapProps {
@@ -29,6 +31,8 @@ export interface FactoryMapProps {
   totalLeadCount?: number;
   userName?: string;
   userAvatar?: string | null;
+  isProUnlocked?: boolean;
+  onRequirePro?: (featureName: string) => void;
 }
 
 function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -58,6 +62,8 @@ export function FactoryMap({
   totalLeadCount,
   userName,
   userAvatar,
+  isProUnlocked = true,
+  onRequirePro,
 }: FactoryMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -619,8 +625,13 @@ export function FactoryMap({
                 <Building2 className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <h4 className="text-sm font-black text-white truncate leading-tight">
-                  {selectedLead.name}
+                <h4 className="text-sm font-black text-white truncate leading-tight flex items-center gap-1.5">
+                  <span>{isProUnlocked ? selectedLead.name : maskCompanyName(selectedLead.name, false)}</span>
+                  {!isProUnlocked && (
+                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      Pro
+                    </span>
+                  )}
                 </h4>
                 <p className="text-xs text-amber-300/90 font-medium mt-0.5">
                   📍 อ.{selectedLead.district || '-'} {selectedLead.subdistrict ? `• ต.${selectedLead.subdistrict}` : ''}
@@ -639,8 +650,16 @@ export function FactoryMap({
             <div className="flex items-start gap-2">
               <span className="text-slate-400 shrink-0">ที่อยู่:</span>
               <span className="text-slate-200 line-clamp-2">
-                {selectedLead.road ? `ถ.${selectedLead.road} ` : ''}
-                {selectedLead.address || '-'}
+                {isProUnlocked ? (
+                  <>
+                    {selectedLead.road ? `ถ.${selectedLead.road} ` : ''}
+                    {selectedLead.address || '-'}
+                  </>
+                ) : (
+                  <span className="text-slate-400 italic">
+                    {maskAddress(selectedLead.address, selectedLead.district, selectedLead.province, false)}
+                  </span>
+                )}
               </span>
             </div>
 
@@ -656,13 +675,24 @@ export function FactoryMap({
           <div className="space-y-2 pt-1">
             <div className="grid grid-cols-2 gap-2">
               {selectedLead.phone ? (
-                <a
-                  href={`tel:${selectedLead.phone.replace(/[^0-9]/g, '')}`}
-                  className="h-11 px-3 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-sm"
-                >
-                  <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span className="truncate">โทรออก</span>
-                </a>
+                isProUnlocked ? (
+                  <a
+                    href={`tel:${selectedLead.phone.replace(/[^0-9]/g, '')}`}
+                    className="h-11 px-3 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-sm"
+                  >
+                    <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="truncate">โทรออก</span>
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onRequirePro?.('ดูเบอร์โทรศัพท์และติดต่อโรงงาน')}
+                    className="h-11 px-3 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-sm"
+                  >
+                    <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="truncate">ดูเบอร์โทร</span>
+                  </button>
+                )
               ) : (
                 <button
                   disabled
@@ -673,15 +703,26 @@ export function FactoryMap({
                 </button>
               )}
 
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${selectedLead.lat},${selectedLead.lng}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="h-11 px-3 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer"
-              >
-                <Navigation className="w-4 h-4 fill-slate-950 shrink-0" />
-                <span className="truncate">นำทาง GPS</span>
-              </a>
+              {isProUnlocked ? (
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${selectedLead.lat},${selectedLead.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-11 px-3 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer"
+                >
+                  <Navigation className="w-4 h-4 fill-slate-950 shrink-0" />
+                  <span className="truncate">นำทาง GPS</span>
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onRequirePro?.('เปิดแผนที่ GPS นำทางโรงงาน')}
+                  className="h-11 px-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-amber-400 font-black text-xs flex items-center justify-center gap-2 transition shadow-lg active:scale-95 cursor-pointer"
+                >
+                  <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span className="truncate">นำทาง GPS</span>
+                </button>
+              )}
             </div>
 
             {selectedLead.website && (

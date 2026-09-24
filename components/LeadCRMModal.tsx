@@ -23,7 +23,8 @@ import {
   CheckCircle2,
   MapPin,
   Car,
-  Inbox
+  Inbox,
+  Lock
 } from 'lucide-react';
 
 import { calculateContactHealth, getLeadLastContactDate } from '@/lib/leadUtils';
@@ -61,6 +62,8 @@ interface LeadCRMModalProps {
   } | null;
   onLeadUpdated?: () => void;
   onReleaseLead?: (id: string, name: string) => void;
+  isProUnlocked?: boolean;
+  onRequirePro?: (featureName: string) => void;
 }
 
 const STATUS_LIST = [
@@ -97,12 +100,12 @@ const STATUS_LIST = [
     emoji: '🟣', 
     step: 4,
     color: 'text-purple-400',
-    activeBg: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25 ring-2 ring-purple-400/80',
+    activeBg: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black shadow-lg shadow-purple-500/25 ring-2 ring-purple-400/90',
     badgeBg: 'bg-purple-500/15 text-purple-300 border-purple-500/30'
   },
   { 
-    value: 'WON', 
-    label: 'ปิดการขาย', 
+    value: 'CLOSING', 
+    label: 'ปิดการขายสำเร็จ', 
     emoji: '🟢', 
     step: 5,
     color: 'text-emerald-400',
@@ -126,6 +129,8 @@ export const LeadCRMModal: React.FC<LeadCRMModalProps> = ({
   currentUser,
   onLeadUpdated,
   onReleaseLead,
+  isProUnlocked = true,
+  onRequirePro,
 }) => {
   const [activities, setActivities] = useState<LeadActivity[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState<boolean>(false);
@@ -436,13 +441,24 @@ export const LeadCRMModal: React.FC<LeadCRMModalProps> = ({
           {/* Quick Contact & Trip Checkin Action Bar */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {lead.phone ? (
-              <a
-                href={`tel:${lead.phone.replace(/[^0-9]/g, '')}`}
-                className="py-2.5 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm"
-              >
-                <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="truncate">โทร {lead.phone}</span>
-              </a>
+              isProUnlocked ? (
+                <a
+                  href={`tel:${lead.phone.replace(/[^0-9]/g, '')}`}
+                  className="py-2.5 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm"
+                >
+                  <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="truncate">โทร {lead.phone}</span>
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onRequirePro?.('ดูเบอร์โทรศัพท์และติดต่อลูกค้า')}
+                  className="py-2.5 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="truncate">โทร {lead.phone.replace(/(\d{3})\d{4}(\d{3})/, '$1-xxxx-$2')}</span>
+                </button>
+              )
             ) : (
               <div className="py-2.5 px-3 rounded-xl bg-slate-800/40 border border-slate-800 text-slate-500 font-medium text-xs flex items-center justify-center">
                 ไม่มีเบอร์โทร
@@ -450,15 +466,26 @@ export const LeadCRMModal: React.FC<LeadCRMModalProps> = ({
             )}
 
             {lead.lat && lead.lng ? (
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${lead.lat},${lead.lng}`}
-                target="_blank"
-                rel="noreferrer"
-                className="py-2.5 px-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm"
-              >
-                <Navigation className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                <span>เปิด Google Maps</span>
-              </a>
+              isProUnlocked ? (
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${lead.lat},${lead.lng}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="py-2.5 px-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm"
+                >
+                  <Navigation className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                  <span>เปิด Google Maps</span>
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onRequirePro?.('เปิดแผนที่ GPS นำทางโรงงาน')}
+                  className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-400/90 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>เปิด Google Maps</span>
+                </button>
+              )
             ) : (
               <div className="py-2.5 px-3 rounded-xl bg-slate-800/40 border border-slate-800 text-slate-500 font-medium text-xs flex items-center justify-center">
                 ไม่มีพิกัด GPS

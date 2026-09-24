@@ -67,6 +67,14 @@ export interface TeamInvitation {
   updated_at?: string;
 }
 
+export interface SystemAdmin {
+  id: string;
+  user_id?: string;
+  email: string;
+  role: 'super_admin' | 'support' | 'billing';
+  created_at?: string;
+}
+
 export type CompanyProfile = Company;
 
 export interface UserProfile {

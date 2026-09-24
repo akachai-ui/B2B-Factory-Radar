@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { VehicleTrip } from '@/lib/types';
 import { FuelPolicySettingsModal } from '@/components/FuelPolicySettingsModal';
@@ -67,9 +68,27 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
   };
 
   useEffect(() => {
-    if (isOpen) {
-      loadTrips();
-    }
+    if (!isOpen) return;
+    loadTrips();
+
+    const channel = supabase
+      .channel('fuel_report_realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'vehicle_trips',
+        },
+        () => {
+          loadTrips();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [isOpen, statusFilter]);
 
   // Handle Approve / Reject

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { pool } from '@/lib/db';
 import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -6,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, role, companyId, companyName, inviterName, inviterEmail, inviteId } = body;
+    const { email, role, companyId, companyName, inviterName, inviterEmail, inviterUserId, inviteId } = body;
 
     if (!email || !companyId) {
       return NextResponse.json({ success: false, error: 'กรุณาระบุอีเมลและรหัสบริษัท' }, { status: 400 });
@@ -15,6 +16,31 @@ export async function POST(request: Request) {
     const cleanEmail = email.toLowerCase().trim();
     let finalInviteId = inviteId;
     let newInvite = null;
+
+    // 0. Ensure Company Record exists in public.companies to satisfy foreign key constraint
+    if (pool) {
+      try {
+        await pool.query(
+          `INSERT INTO public.companies (id, name, branch, owner_id)
+           VALUES ($1, $2, 'สำนักงานใหญ่', $3)
+           ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name`,
+          [companyId, companyName || 'บริษัทของฉัน', inviterUserId || null]
+        );
+      } catch (poolCompanyErr) {
+        console.warn('Ensure company via pool error:', poolCompanyErr);
+      }
+    }
+
+    try {
+      await supabase.from('companies').upsert({
+        id: companyId,
+        name: companyName || 'บริษัทของฉัน',
+        branch: 'สำนักงานใหญ่',
+        owner_id: inviterUserId || null,
+      }, { onConflict: 'id' });
+    } catch (sbCompanyErr) {
+      console.warn('Ensure company via Supabase error:', sbCompanyErr);
+    }
 
     // 1. Insert Invitation into team_invitations table if not already inserted
     if (!finalInviteId) {
@@ -26,6 +52,7 @@ export async function POST(request: Request) {
             company_name: companyName || 'บริษัทของฉัน',
             email: cleanEmail,
             role: role || 'sales',
+            invited_by: inviterUserId || null,
             status: 'pending',
           },
         ])

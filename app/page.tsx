@@ -1,7 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Users,
   Navigation,
@@ -18,10 +20,45 @@ import {
   UserCheck,
   ExternalLink,
   LogIn,
+  Loader2,
 } from 'lucide-react';
 
 export default function HomePage() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
   const [billingCycle, setBillingCycle] = React.useState<'monthly' | 'yearly'>('yearly');
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // 1. If OAuth hash or code landed on root page ('/'), forward to /auth/callback immediately
+    if (window.location.hash.includes('access_token=') || window.location.search.includes('code=')) {
+      window.location.href = `/auth/callback${window.location.search}${window.location.hash}`;
+      return;
+    }
+
+    // 2. If already logged in, redirect directly to /radar
+    if (!loading && user) {
+      router.replace('/radar');
+    }
+  }, [user, loading, router]);
+
+  // If user is already authenticated or checking auth on initial mount with token, show sleek transit screen
+  if (!loading && user) {
+    return (
+      <div className="min-h-screen w-full bg-slate-950 flex flex-col items-center justify-center p-4 text-slate-100 select-none">
+        <div className="flex flex-col items-center gap-4 text-center animate-in fade-in zoom-in-95 duration-300">
+          <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(245,158,11,0.35)] animate-pulse">
+            <Image src="/apple-touch-icon.png" alt="RouteHunter" fill className="object-contain" priority />
+          </div>
+          <div className="flex items-center gap-2">
+            <Loader2 className="w-5 h-5 text-amber-400 animate-spin" />
+            <span className="text-sm font-bold text-slate-200">กำลังเข้าสู่ระบบ RouteHunter Radar...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans relative overflow-x-hidden pb-16 sm:pb-0">

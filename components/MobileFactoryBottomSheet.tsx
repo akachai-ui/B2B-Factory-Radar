@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { FactoryLead } from '@/lib/types';
+import { maskCompanyName, maskAddress } from '@/lib/leadUtils';
 import {
   X,
   Phone,
@@ -44,35 +45,34 @@ export function MobileFactoryBottomSheet({
   isClaimedByMe = false,
   claimedByOtherName = null,
   isClaiming = false,
-  isProUnlocked = false,
+  isProUnlocked = true,
   onRequirePro,
 }: MobileFactoryBottomSheetProps) {
   if (!factory) return null;
 
-  const factoryName = factory.name || factory.factory_name || 'โรงงานอุตสาหกรรม';
-  const factoryAddress = factory.address || 'จ.สมุทรปราการ';
+  const rawFactoryName = factory.name || factory.company_name || factory.factory_name_th || 'โรงงานอุตสาหกรรม';
+  const displayFactoryName = isProUnlocked ? rawFactoryName : maskCompanyName(rawFactoryName, false);
+  const rawFactoryAddress = factory.address || 'จ.สมุทรปราการ';
+  const displayFactoryAddress = isProUnlocked ? rawFactoryAddress : maskAddress(rawFactoryAddress);
   const rawPhone = factory.phone || '';
   const factoryPhone = isProUnlocked ? rawPhone : maskPhoneNumber(rawPhone);
-  const factoryDistrict = factory.district || 'สมุทรปราการ';
-
-  const googleMapsUrl = factory.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${factory.lat},${factory.lng}`;
   const cleanPhone = rawPhone ? rawPhone.replace(/[^0-9+]/g, '') : '';
 
+  const googleMapsUrl = factory.maps_url || `https://www.google.com/maps/dir/?api=1&destination=${factory.lat},${factory.lng}`;
+
   return (
-    <div className="sm:hidden fixed inset-0 z-[1100] flex flex-col justify-end">
+    <div className="fixed inset-0 z-[1100] flex flex-col justify-end bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200"
+        className="fixed inset-0"
       />
 
       {/* Slide-Up Bottom Sheet Card (3D Glass Sheet) */}
-      <div className="relative z-10 w-full max-h-[85vh] backdrop-blur-2xl bg-gradient-to-b from-slate-900/95 via-slate-950/98 to-slate-950 border-t border-white/20 rounded-t-[36px] p-5 sm:p-6 shadow-[0_-20px_50px_rgba(0,0,0,0.9)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] flex flex-col overflow-y-auto no-scrollbar animate-in slide-in-from-bottom duration-300 pb-safe">
+      <div className="relative z-10 w-full max-h-[85vh] bg-slate-900 border-t border-slate-700/80 rounded-t-[2rem] p-5 shadow-2xl overflow-y-auto animate-in slide-in-from-bottom duration-250 pb-safe">
         
         {/* Drag Handle Bar */}
-        <div className="flex justify-center -mt-2 mb-3.5">
-          <div className="w-14 h-1.5 rounded-full bg-white/20 shadow-sm" />
-        </div>
+        <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-4" />
 
         {/* Header Title & Close Button */}
         <div className="flex items-start justify-between gap-3">
@@ -86,12 +86,17 @@ export function MobileFactoryBottomSheet({
                   📍 {userDistanceKm < 1 ? `${Math.round(userDistanceKm * 1000)} ม.` : `${userDistanceKm.toFixed(1)} กม.`}
                 </span>
               )}
+              {!isProUnlocked && (
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                  🔒 Preview Mode
+                </span>
+              )}
             </div>
 
             <h3 className="text-base font-black text-white leading-tight">
-              {factoryName}
+              {displayFactoryName}
             </h3>
-            {(factory.factory_name_en || factory.company_name) && (
+            {isProUnlocked && (factory.factory_name_en || factory.company_name) && (
               <p className="text-[11px] text-slate-400 font-mono truncate">
                 {factory.factory_name_en || factory.company_name}
               </p>
@@ -122,7 +127,13 @@ export function MobileFactoryBottomSheet({
             </div>
           ) : onClaim ? (
             <button
-              onClick={() => onClaim(factory)}
+              onClick={() => {
+                if (!isProUnlocked) {
+                  onRequirePro?.('หยิบโรงงานเข้าพอร์ตลูกค้า');
+                  return;
+                }
+                onClaim(factory);
+              }}
               disabled={isClaiming}
               className="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-95 transition cursor-pointer"
             >
@@ -173,15 +184,25 @@ export function MobileFactoryBottomSheet({
           )}
 
           {/* Navigate GPS Button */}
-          <a
-            href={googleMapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 transition"
-          >
-            <Navigation className="w-4 h-4" />
-            <span>เปิด GPS นำทาง</span>
-          </a>
+          {isProUnlocked ? (
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 transition"
+            >
+              <Navigation className="w-4 h-4" />
+              <span>เปิด GPS นำทาง</span>
+            </a>
+          ) : (
+            <button
+              onClick={() => onRequirePro?.('เปิดแผนที่ GPS นำทางโรงงาน')}
+              className="py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 border border-amber-500/40 text-amber-300 font-black text-xs flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer"
+            >
+              <Lock className="w-4 h-4 text-amber-400" />
+              <span>ปลดล็อก GPS นำทาง</span>
+            </button>
+          )}
         </div>
 
         {/* Factory Details Box */}

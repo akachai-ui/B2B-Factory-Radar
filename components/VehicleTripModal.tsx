@@ -113,13 +113,38 @@ export function VehicleTripModal({
         // Load default license plate from localStorage if available
         const savedPlate = localStorage.getItem('last_license_plate');
         if (savedPlate) setLicensePlate(savedPlate);
+        setStartOdometer('');
+        setStartPhotoUrl('');
       }
 
-      if (currentTab === 'history' || initialMode === 'history') {
-        loadHistory();
-      }
+      loadHistory();
     }
-  }, [isOpen, activeTrip, initialMode]);
+  }, [isOpen, activeTrip, initialMode, currentTab]);
+
+  // Realtime subscription for VehicleTripModal
+  useEffect(() => {
+    if (!isOpen || !user?.id) return;
+
+    const channel = supabase
+      .channel('vehicle_modal_realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'vehicle_trips',
+        },
+        () => {
+          loadHistory();
+          onTripUpdated();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isOpen, user?.id, onTripUpdated]);
 
   const loadPortfolioLeads = async () => {
     const compId = profile?.company_id || user?.id;
@@ -285,11 +310,14 @@ export function VehicleTripModal({
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Failed to start trip');
 
+      setStartOdometer('');
+      setStartPhotoUrl('');
       setSuccessMsg('🚀 เริ่มบันทึกรอบการเดินทางประจำวันเรียบร้อยแล้ว!');
       onTripUpdated();
       setTimeout(() => {
         setSuccessMsg(null);
-      }, 2000);
+        onClose();
+      }, 600);
     } catch (err: any) {
       setErrorMsg(err.message || 'เกิดข้อผิดพลาดในการเริ่มทริป');
     } finally {
@@ -337,12 +365,16 @@ export function VehicleTripModal({
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Failed to end trip');
 
+      setEndOdometer('');
+      setEndPhotoUrl('');
+      setPersonalDeductKm('0');
+      setTripNotes('');
       setSuccessMsg('🎉 ปิดรอบการเดินทางและส่งคำขอเบิกค่าน้ำมันสำเร็จแล้ว!');
       onTripUpdated();
       setTimeout(() => {
         setSuccessMsg(null);
         onClose();
-      }, 2000);
+      }, 600);
     } catch (err: any) {
       setErrorMsg(err.message || 'เกิดข้อผิดพลาดในการปิดทริป');
     } finally {

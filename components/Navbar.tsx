@@ -33,9 +33,6 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   // Form State for Profile Editing
-  const [accountType, setAccountType] = useState<'individual' | 'company'>(
-    profile?.account_type || (profile?.company_name && profile.company_name !== 'บริษัทของฉัน' ? 'company' : 'individual')
-  );
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [companyName, setCompanyName] = useState(profile?.company_name || '');
   const [taxId, setTaxId] = useState(profile?.tax_id || '');
@@ -47,7 +44,6 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const isInvitedMember = Boolean(profile?.company_id && (profile?.role === 'sales' || profile?.role === 'manager'));
-  const currentAccountType = isInvitedMember ? 'company' : (profile?.account_type || (profile?.company_name && profile.company_name !== 'บริษัทของฉัน' ? 'company' : 'individual'));
   const displayCompanyName = profile?.company_name || 'บริษัทของฉัน';
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'ผู้ใช้งาน';
   const googleAvatar = user?.user_metadata?.avatar_url 
@@ -58,9 +54,8 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
   const currentAvatar = (profile?.avatar_url && profile.avatar_url.trim() !== '') ? profile.avatar_url : (googleAvatar || null);
 
   const handleOpenProfileModal = () => {
-    setAccountType(currentAccountType);
     setFullName(profile?.full_name || '');
-    setCompanyName(profile?.company_name || '');
+    setCompanyName(profile?.company_name || `ทีมของ ${displayName}`);
     setTaxId(profile?.tax_id || '');
     setBranch(profile?.branch || 'สำนักงานใหญ่');
     setPhone(profile?.phone || '');
@@ -106,11 +101,29 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
     const handleOpen = () => handleOpenProfileModal();
     window.addEventListener('open-profile-modal', handleOpen);
     return () => window.removeEventListener('open-profile-modal', handleOpen);
-  }, [currentAccountType, profile, user]);
+  }, [profile, user]);
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
     setSaveSuccess(false);
+
+    const targetCompId = profile?.company_id || user?.id;
+    const finalCompName = companyName.trim() || `ทีมของ ${fullName.trim() || displayName}`;
+
+    if (!isInvitedMember && user && targetCompId) {
+      try {
+        await supabase.from('companies').upsert({
+          id: targetCompId,
+          name: finalCompName,
+          tax_id: taxId.trim() || null,
+          branch: branch.trim() || 'สำนักงานใหญ่',
+          phone: phone.trim() || null,
+          owner_id: user.id,
+        }, { onConflict: 'id' });
+      } catch (cErr) {
+        console.warn('Upsert company on save error:', cErr);
+      }
+    }
 
     if (isInvitedMember) {
       // Invited members can only update their personal name, phone and avatar
@@ -120,14 +133,15 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
         avatar_url: avatarUrl.trim() || null,
       });
     } else {
-      // Owners / Individuals can update their account type, company details, and avatar
+      // Owners can update company details, tax id, branch, name, phone, and avatar
       await updateProfile({
-        account_type: accountType,
+        account_type: 'company',
         full_name: fullName.trim() || displayName,
         avatar_url: avatarUrl.trim() || null,
-        company_name: accountType === 'company' ? (companyName.trim() || 'บริษัทของฉัน') : (profile?.company_name || null),
-        tax_id: accountType === 'company' ? taxId.trim() : (profile?.tax_id || null),
-        branch: accountType === 'company' ? branch.trim() : (profile?.branch || 'สำนักงานใหญ่'),
+        company_id: targetCompId,
+        company_name: finalCompName,
+        tax_id: taxId.trim() || null,
+        branch: branch.trim() || 'สำนักงานใหญ่',
         phone: phone.trim(),
       });
     }
@@ -189,7 +203,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      currentAccountType === 'company' ? '🏢' : '👤'
+                      '🏢'
                     )}
                   </div>
 
@@ -198,19 +212,13 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                       <span className="text-xs font-bold text-white truncate group-hover:text-amber-300 transition">
                         {displayName}
                       </span>
-                      <span className={`px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase backdrop-blur-md border ${
-                        currentAccountType === 'company'
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                          : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
-                      }`}>
-                        {currentAccountType === 'company' ? 'บริษัท' : 'บุคคล'}
+                      <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase backdrop-blur-md border bg-amber-500/20 text-amber-300 border-amber-500/30">
+                        {profile?.role === 'owner' ? 'Owner' : profile?.role === 'manager' ? 'Manager' : 'Sales'}
                       </span>
                     </div>
-                    {currentAccountType === 'company' && (
-                      <span className="text-[10px] text-amber-400/90 truncate flex items-center gap-1">
-                        <span>{displayCompanyName}</span>
-                      </span>
-                    )}
+                    <span className="text-[10px] text-amber-400/90 truncate flex items-center gap-1">
+                      <span>{displayCompanyName}</span>
+                    </span>
                   </div>
 
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition shrink-0" />
@@ -237,29 +245,23 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              currentAccountType === 'company' ? '🏢' : '👤'
+                              '🏢'
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-1">
                               <span className="text-xs font-bold text-white truncate">{displayName}</span>
-                              <span className={`px-1.5 py-0.2 rounded text-[8px] font-black uppercase ${
-                                currentAccountType === 'company'
-                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                  : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                              }`}>
-                                {currentAccountType === 'company' ? 'บริษัท' : 'บุคคล'}
+                              <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                {profile?.role === 'owner' ? 'Owner' : profile?.role === 'manager' ? 'Manager' : 'Sales'}
                               </span>
                             </div>
                             <p className="text-[11px] text-slate-400 truncate mt-0.5">{user.email}</p>
                           </div>
                         </div>
-                        {currentAccountType === 'company' && (
-                          <div className="pt-2 text-[11px] text-amber-300/90 font-medium truncate flex items-center gap-1.5 border-t border-slate-900">
-                            <Building2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                            <span>{displayCompanyName}</span>
-                          </div>
-                        )}
+                        <div className="pt-2 text-[11px] text-amber-300/90 font-medium truncate flex items-center gap-1.5 border-t border-slate-900">
+                          <Building2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span>{displayCompanyName}</span>
+                        </div>
                       </div>
 
                       {/* Edit Profile Action */}
@@ -268,10 +270,8 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                         className="w-full p-2.5 rounded-xl hover:bg-slate-800 text-slate-200 text-xs font-medium flex items-center gap-2.5 transition cursor-pointer"
                       >
                         <Edit3 className="w-4 h-4 text-amber-400" />
-                        <span>ตั้งค่าโปรไฟล์ & ประเภทบัญชี</span>
+                        <span>ตั้งค่าโปรไฟล์ & ข้อมูลบริษัท</span>
                       </button>
-
-
 
                       {/* Divider */}
                       <div className="h-px bg-slate-800 my-1" />
@@ -314,7 +314,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
         </div>
       </header>
 
-      {/* Profile & Account Type Modal */}
+      {/* Profile & Company Settings Modal */}
       {isProfileModalOpen && (
         <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
           <div
@@ -326,8 +326,8 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-base sm:text-lg font-black text-white">ตั้งค่าโปรไฟล์ & ประเภทผู้ใช้</h4>
-                <p className="text-xs text-slate-400 mt-0.5">จัดการรูปภาพและข้อมูลการใช้งานของคุณ</p>
+                <h4 className="text-base sm:text-lg font-black text-white">ตั้งค่าโปรไฟล์ & ข้อมูลบริษัท/ทีม</h4>
+                <p className="text-xs text-slate-400 mt-0.5">จัดการข้อมูลองค์กร ข้อมูลติดต่อ และรูปภาพของคุณ</p>
               </div>
               <button
                 onClick={() => setIsProfileModalOpen(false)}
@@ -351,7 +351,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-xl font-black text-amber-300 bg-slate-900 rounded-[14px]">
-                      {fullName ? fullName.charAt(0).toUpperCase() : '👤'}
+                      {fullName ? fullName.charAt(0).toUpperCase() : '🏢'}
                     </div>
                   )}
                 </div>
@@ -406,8 +406,8 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
               </div>
             </div>
 
-            {/* Account Type Selector or Invited Member Banner */}
-            {isInvitedMember ? (
+            {/* Invited Member Banner (if invited) */}
+            {isInvitedMember && (
               <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
                 <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
                   <Building2 className="w-5 h-5" />
@@ -420,39 +420,8 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                    บัญชีของคุณได้รับการเชิญเข้าสู่ทีม ข้อมูลบริษัทและสิทธิ์การใช้งานได้รับการดูแลและกำหนดโดย Owner
+                    บัญชีของคุณได้รับการเชิญเข้าสู่ทีม ข้อมูลองค์กรและสิทธิ์การใช้งานได้รับการดูแลโดย Owner
                   </p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300">ประเภทผู้ใช้งาน (Account Type)</label>
-                <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-slate-950 border border-slate-800">
-                  <button
-                    type="button"
-                    onClick={() => setAccountType('individual')}
-                    className={`py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                      accountType === 'individual'
-                        ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 shadow-md'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <User className="w-4 h-4" />
-                    <span>บุคคลธรรมดา</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setAccountType('company')}
-                    className={`py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                      accountType === 'company'
-                        ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-md font-black'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <Building2 className="w-4 h-4" />
-                    <span>นิติบุคคล / บริษัท</span>
-                  </button>
                 </div>
               </div>
             )}
@@ -484,18 +453,18 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                 />
               </div>
 
-              {/* Company Specific Fields (Only for Owner / Individual setting up Company) */}
-              {!isInvitedMember && accountType === 'company' && (
+              {/* Company Specific Fields (Only for Workspace Owner) */}
+              {!isInvitedMember && (
                 <div className="p-3.5 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-3 animate-in fade-in">
                   
-                  {/* Company Name */}
+                  {/* Company / Workspace Name */}
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-amber-300">ชื่อบริษัท / องค์กร (White-label)</label>
+                    <label className="text-[11px] font-bold text-amber-300">ชื่อบริษัท / องค์กร / ทีม (White-label)</label>
                     <input
                       type="text"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
-                      placeholder="เช่น บจก. สยามอินดัสเตรียล ซัพพลาย"
+                      placeholder="เช่น บจก. สยามอินดัสเตรียล ซัพพลาย หรือ ทีมของฉัน"
                       className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition font-medium"
                     />
                   </div>
@@ -503,7 +472,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                   <div className="grid grid-cols-2 gap-2">
                     {/* Tax ID */}
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold text-slate-400">เลขผู้เสียภาษี 13 หลัก</label>
+                      <label className="text-[11px] font-bold text-slate-400">เลขผู้เสียภาษี 13 หลัก <span className="text-[10px] text-slate-500">(ไม่บังคับ)</span></label>
                       <input
                         type="text"
                         value={taxId}

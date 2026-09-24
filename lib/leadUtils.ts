@@ -127,3 +127,40 @@ export function calculateContactHealth(dateStr?: string | null): ContactHealth {
     };
   }
 }
+
+/**
+ * Obfuscates company name for Preview Mode (PENDING_APPROVAL)
+ * Keeps first ~6-8 characters, appends asterisk mask and (Pro) tag.
+ * E.g., "บริษัท แหลมฟ้าผ่า โลจิสติก จำกัด" -> "บริษัท แหลมฟ้า*** (Pro)"
+ */
+export function maskCompanyName(name?: string | null, isPro: boolean = false): string {
+  if (!name) return '-';
+  if (isPro) return name;
+
+  const trimmed = name.trim();
+  if (trimmed.length <= 8) {
+    return `${trimmed.slice(0, 3)}*** (Pro)`;
+  }
+  return `${trimmed.slice(0, 8)}*** (Pro)`;
+}
+
+/**
+ * Obfuscates factory detailed address for Preview Mode (PENDING_APPROVAL)
+ * Hides house numbers, moo, sois, roads and only displays district & province.
+ * E.g., "เลขที่ 327/3 หมู่ 13 ต. สุขสวัสดิ์..." -> "อำเภอเมืองสมุทรปราการ สมุทรปราการ (ที่อยู่ละเอียดสงวนสิทธิ์ Pro)"
+ */
+export function maskAddress(
+  address?: string | null,
+  district?: string | null,
+  province?: string | null,
+  isPro: boolean = false
+): string {
+  if (isPro) return address || '-';
+
+  const parts = [];
+  if (district) parts.push(district.startsWith('อ.') || district.startsWith('อำเภอ') ? district : `อ.${district}`);
+  if (province) parts.push(province.startsWith('จ.') || province.startsWith('จังหวัด') ? province : `จ.${province}`);
+
+  const areaStr = parts.length > 0 ? parts.join(' ') : 'สมุทรปราการ';
+  return `${areaStr} (ที่อยู่ละเอียดสงวนสิทธิ์ Pro)`;
+}
