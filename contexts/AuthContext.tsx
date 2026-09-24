@@ -342,12 +342,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
+    // 4. Realtime subscription for Profile and Access Status changes
+    const realtimeChannel = supabase
+      .channel('realtime-auth-profile-sync')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'profiles' },
+        async (payload: any) => {
+          const { data: { user: liveUser } } = await supabase.auth.getUser();
+          if (liveUser && payload.new && payload.new.id === liveUser.id) {
+            await fetchLiveProfile(liveUser);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'system_admins' },
+        async () => {
+          const { data: { user: liveUser } } = await supabase.auth.getUser();
+          if (liveUser) {
+            await fetchLiveProfile(liveUser);
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
       mounted = false;
       clearTimeout(failsafeTimer);
       subscription.unsubscribe();
+      supabase.removeChannel(realtimeChannel);
     };
-  }, [fetchLiveProfile]);
+  }, [fetchLiveProfile, user?.id]);
 
   // 1-Click Google Login with Dynamic Origin
   const signInWithGoogle = async () => {

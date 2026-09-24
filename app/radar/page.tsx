@@ -208,6 +208,7 @@ export default function LeadsRadarMainPage() {
 
   const requireProAccess = (featureName: string): boolean => {
     if (isProUnlocked) return true;
+    setActiveLeadModal(null);
     setAccessLockFeatureName(featureName);
     setIsAccessLockModalOpen(true);
     return false;
