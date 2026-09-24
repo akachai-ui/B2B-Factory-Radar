@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
+import { supabase } from '@/lib/supabase';
 
 export async function POST(request: Request) {
   try {
@@ -72,14 +73,33 @@ export async function POST(request: Request) {
         values.push(tax_id);
       }
 
-      await pool.query(
-        `
-        UPDATE public.target_factory_leads
-        SET lat = $1, lng = $2, updated_at = NOW()
-        WHERE ${whereClause}
-      `,
-        values
-      );
+      if (pool) {
+        try {
+          await pool.query(
+            `
+            UPDATE public.target_factory_leads
+            SET lat = $1, lng = $2, updated_at = NOW()
+            WHERE ${whereClause}
+          `,
+            values
+          );
+        } catch (poolErr) {
+          console.warn('Resolve map pool failed, fallback to Supabase:', poolErr);
+        }
+      }
+
+      try {
+        let sbQuery = supabase.from('target_factory_leads').update({
+          lat: resolvedLat,
+          lng: resolvedLng,
+          updated_at: new Date().toISOString(),
+        });
+        if (lead_id) sbQuery = sbQuery.eq('id', lead_id);
+        else sbQuery = sbQuery.eq('tax_id', tax_id);
+        await sbQuery;
+      } catch (sbErr) {
+        console.warn('Resolve map Supabase fallback error:', sbErr);
+      }
     }
 
     return NextResponse.json({

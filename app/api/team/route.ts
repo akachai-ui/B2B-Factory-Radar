@@ -52,67 +52,135 @@ export async function POST(request: Request) {
 
     const cleanEmail = email.toLowerCase().trim();
 
-    // Check if user already exists
-    const existing = await pool.query(
-      `SELECT * FROM public.profiles WHERE LOWER(email) = LOWER($1) LIMIT 1`,
-      [cleanEmail]
-    );
+    if (pool) {
+      try {
+        // Check if user already exists
+        const existing = await pool.query(
+          `SELECT * FROM public.profiles WHERE LOWER(email) = LOWER($1) LIMIT 1`,
+          [cleanEmail]
+        );
 
-    if (existing.rows.length > 0) {
-      const existingProfile = existing.rows[0];
-      const updated = await pool.query(
-        `UPDATE public.profiles
-         SET company_id = $1,
-             role = $2,
-             company_name = COALESCE($3, company_name),
-             tax_id = COALESCE($4, tax_id),
-             branch = COALESCE($5, branch),
-             account_type = 'company',
-             onboarded = true,
-             status = 'active',
-             updated_at = NOW()
-         WHERE id = $6
-         RETURNING *`,
-        [
-          companyId,
-          role || 'sales',
-          companyName || existingProfile.company_name,
-          taxId || existingProfile.tax_id,
-          branch || existingProfile.branch,
-          existingProfile.id,
-        ]
-      );
+        if (existing.rows.length > 0) {
+          const existingProfile = existing.rows[0];
+          const updated = await pool.query(
+            `UPDATE public.profiles
+             SET company_id = $1,
+                 role = $2,
+                 company_name = COALESCE($3, company_name),
+                 tax_id = COALESCE($4, tax_id),
+                 branch = COALESCE($5, branch),
+                 account_type = 'company',
+                 onboarded = true,
+                 status = 'active',
+                 updated_at = NOW()
+             WHERE id = $6
+             RETURNING *`,
+            [
+              companyId,
+              role || 'sales',
+              companyName || existingProfile.company_name,
+              taxId || existingProfile.tax_id,
+              branch || existingProfile.branch,
+              existingProfile.id,
+            ]
+          );
+
+          return NextResponse.json({
+            success: true,
+            message: `เพิ่มคุณ ${existingProfile.full_name || cleanEmail} เข้าสู่ทีมเรียบร้อยแล้ว`,
+            member: updated.rows[0],
+          });
+        } else {
+          // Insert new invited member with a new UUID
+          const tempId = crypto.randomUUID();
+          const inserted = await pool.query(
+            `INSERT INTO public.profiles (
+               id, email, full_name, role, company_id, company_name, tax_id, branch, phone, account_type, onboarded, status, created_at, updated_at
+             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'company', true, 'active', NOW(), NOW())
+             RETURNING *`,
+            [
+              tempId,
+              cleanEmail,
+              fullName || cleanEmail.split('@')[0],
+              role || 'sales',
+              companyId,
+              companyName || 'ทีมของฉัน',
+              taxId || null,
+              branch || 'สำนักงานใหญ่',
+              phone || null,
+            ]
+          );
+
+          return NextResponse.json({
+            success: true,
+            message: `เชิญ ${cleanEmail} เข้าสู่ทีมเรียบร้อย!`,
+            member: inserted.rows[0],
+          });
+        }
+      } catch (poolErr) {
+        console.warn('Team POST pool failed, fallback to Supabase:', poolErr);
+      }
+    }
+
+    // Supabase REST Client fallback
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('*')
+      .ilike('email', cleanEmail)
+      .maybeSingle();
+
+    if (existingProfile) {
+      const { data: updatedProfile, error: upErr } = await supabase
+        .from('profiles')
+        .update({
+          company_id: companyId,
+          role: role || 'sales',
+          company_name: companyName || existingProfile.company_name,
+          tax_id: taxId || existingProfile.tax_id,
+          branch: branch || existingProfile.branch,
+          account_type: 'company',
+          onboarded: true,
+          status: 'active',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existingProfile.id)
+        .select()
+        .single();
+
+      if (upErr) throw upErr;
 
       return NextResponse.json({
         success: true,
         message: `เพิ่มคุณ ${existingProfile.full_name || cleanEmail} เข้าสู่ทีมเรียบร้อยแล้ว`,
-        member: updated.rows[0],
+        member: updatedProfile,
       });
     } else {
-      // Insert new invited member with a new UUID
       const tempId = crypto.randomUUID();
-      const inserted = await pool.query(
-        `INSERT INTO public.profiles (
-           id, email, full_name, role, company_id, company_name, tax_id, branch, phone, account_type, onboarded, status, created_at, updated_at
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'company', true, 'active', NOW(), NOW())
-         RETURNING *`,
-        [
-          tempId,
-          cleanEmail,
-          fullName || cleanEmail.split('@')[0],
-          role || 'sales',
-          companyId,
-          companyName || 'ทีมของฉัน',
-          taxId || null,
-          branch || 'สำนักงานใหญ่',
-          phone || null,
-        ]
-      );
+      const { data: insertedProfile, error: insErr } = await supabase
+        .from('profiles')
+        .insert({
+          id: tempId,
+          email: cleanEmail,
+          full_name: fullName || cleanEmail.split('@')[0],
+          role: role || 'sales',
+          company_id: companyId,
+          company_name: companyName || 'ทีมของฉัน',
+          tax_id: taxId || null,
+          branch: branch || 'สำนักงานใหญ่',
+          phone: phone || null,
+          account_type: 'company',
+          onboarded: true,
+          status: 'active',
+        })
+        .select()
+        .single();
+
+      if (insErr) throw insErr;
 
       return NextResponse.json({
         success: true,
         message: `เชิญ ${cleanEmail} เข้าสู่ทีมเรียบร้อย!`,
-        member: inserted.rows[0],
+        member: insertedProfile,
       });
     }
   } catch (err: any) {
@@ -130,12 +198,33 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, error: 'Missing memberId' }, { status: 400 });
     }
 
-    await pool.query(
-      `UPDATE public.profiles
-       SET company_id = NULL, role = 'owner', account_type = 'individual', updated_at = NOW()
-       WHERE id = $1`,
-      [memberId]
-    );
+    if (pool) {
+      try {
+        await pool.query(
+          `UPDATE public.profiles
+           SET company_id = NULL, role = 'owner', account_type = 'company', updated_at = NOW()
+           WHERE id = $1`,
+          [memberId]
+        );
+
+        return NextResponse.json({ success: true, message: 'นำสมาชิกออกจากทีมเรียบร้อย' });
+      } catch (poolErr) {
+        console.warn('Team DELETE pool failed, fallback to Supabase:', poolErr);
+      }
+    }
+
+    // Supabase fallback
+    const { error: upErr } = await supabase
+      .from('profiles')
+      .update({
+        company_id: null,
+        role: 'owner',
+        account_type: 'company',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', memberId);
+
+    if (upErr) throw upErr;
 
     return NextResponse.json({ success: true, message: 'นำสมาชิกออกจากทีมเรียบร้อย' });
   } catch (err: any) {
@@ -156,28 +245,60 @@ export async function PATCH(request: Request) {
     if (action === 'toggle_status') {
       const newStatus = status === 'inactive' ? 'inactive' : 'active';
 
-      // 1. Update Profile status
-      const updatedProfileRes = await pool.query(
-        `UPDATE public.profiles SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
-        [newStatus, memberId]
-      );
+      if (pool) {
+        try {
+          const updatedProfileRes = await pool.query(
+            `UPDATE public.profiles SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+            [newStatus, memberId]
+          );
 
-      if (updatedProfileRes.rows.length === 0) {
-        return NextResponse.json({ success: false, error: 'Profile not found' }, { status: 404 });
+          if (updatedProfileRes.rows.length > 0) {
+            let releasedCount = 0;
+            if (newStatus === 'inactive') {
+              const updatedLeadsRes = await pool.query(
+                `UPDATE public.company_leads
+                 SET user_id = NULL, updated_at = NOW()
+                 WHERE company_id = $1 AND user_id = $2
+                 RETURNING id`,
+                [companyId, memberId]
+              );
+              releasedCount = updatedLeadsRes.rows.length;
+            }
+
+            return NextResponse.json({
+              success: true,
+              message:
+                newStatus === 'inactive'
+                  ? `ปรับสถานะเป็น Inactive เรียบร้อย และย้ายลูกค้า ${releasedCount} แห่งเข้าคลังลูกค้ารอจัดสรร`
+                  : `เปิดใช้งานบัญชี (Active) เรียบร้อยแล้ว`,
+              member: updatedProfileRes.rows[0],
+              releasedCount,
+            });
+          }
+        } catch (poolErr) {
+          console.warn('Team PATCH toggle status pool failed, fallback to Supabase:', poolErr);
+        }
       }
 
-      let releasedCount = 0;
+      // Supabase fallback
+      const { data: updatedProfile, error: upErr } = await supabase
+        .from('profiles')
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq('id', memberId)
+        .select()
+        .single();
 
-      // 2. If deactivated / inactive, release all their leads to the company unassigned pool (user_id = null)
+      if (upErr) throw upErr;
+
+      let releasedCount = 0;
       if (newStatus === 'inactive') {
-        const updatedLeadsRes = await pool.query(
-          `UPDATE public.company_leads
-           SET user_id = NULL, updated_at = NOW()
-           WHERE company_id = $1 AND user_id = $2
-           RETURNING id`,
-          [companyId, memberId]
-        );
-        releasedCount = updatedLeadsRes.rows.length;
+        const { data: releasedLeads } = await supabase
+          .from('company_leads')
+          .update({ user_id: null, updated_at: new Date().toISOString() })
+          .eq('company_id', companyId)
+          .eq('user_id', memberId)
+          .select('id');
+        releasedCount = (releasedLeads || []).length;
       }
 
       return NextResponse.json({
@@ -186,25 +307,46 @@ export async function PATCH(request: Request) {
           newStatus === 'inactive'
             ? `ปรับสถานะเป็น Inactive เรียบร้อย และย้ายลูกค้า ${releasedCount} แห่งเข้าคลังลูกค้ารอจัดสรร`
             : `เปิดใช้งานบัญชี (Active) เรียบร้อยแล้ว`,
-        member: updatedProfileRes.rows[0],
+        member: updatedProfile,
         releasedCount,
       });
     }
 
     if (action === 'release_leads') {
-      // Release leads of a specific member directly to pool without changing profile status
-      const updatedLeadsRes = await pool.query(
-        `UPDATE public.company_leads
-         SET user_id = NULL, updated_at = NOW()
-         WHERE company_id = $1 AND user_id = $2
-         RETURNING id`,
-        [companyId, memberId]
-      );
+      if (pool) {
+        try {
+          const updatedLeadsRes = await pool.query(
+            `UPDATE public.company_leads
+             SET user_id = NULL, updated_at = NOW()
+             WHERE company_id = $1 AND user_id = $2
+             RETURNING id`,
+            [companyId, memberId]
+          );
+
+          return NextResponse.json({
+            success: true,
+            message: `ย้ายลูกค้า ${updatedLeadsRes.rows.length} แห่งเข้าคลังลูกค้ารอจัดสรรเรียบร้อย`,
+            releasedCount: updatedLeadsRes.rows.length,
+          });
+        } catch (poolErr) {
+          console.warn('Team PATCH release leads pool failed, fallback to Supabase:', poolErr);
+        }
+      }
+
+      // Supabase fallback
+      const { data: releasedLeads, error: relErr } = await supabase
+        .from('company_leads')
+        .update({ user_id: null, updated_at: new Date().toISOString() })
+        .eq('company_id', companyId)
+        .eq('user_id', memberId)
+        .select('id');
+
+      if (relErr) throw relErr;
 
       return NextResponse.json({
         success: true,
-        message: `ย้ายลูกค้า ${updatedLeadsRes.rows.length} แห่งเข้าคลังลูกค้ารอจัดสรรเรียบร้อย`,
-        releasedCount: updatedLeadsRes.rows.length,
+        message: `ย้ายลูกค้า ${(releasedLeads || []).length} แห่งเข้าคลังลูกค้ารอจัดสรรเรียบร้อย`,
+        releasedCount: (releasedLeads || []).length,
       });
     }
 
