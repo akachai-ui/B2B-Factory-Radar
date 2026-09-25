@@ -772,15 +772,27 @@ export default function LeadsRadarMainPage() {
       const [teamRes, compRes, invitesRes] = await Promise.all([
         fetch(`/api/team?companyId=${activeCompId}`).then((r) => r.json()).catch(() => null),
         Promise.resolve(supabase.from('companies').select('*').eq('id', activeCompId).maybeSingle()).catch(() => ({ data: null })),
-        Promise.resolve(supabase.from('team_invitations').select('*').eq('company_id', activeCompId).eq('status', 'pending').order('created_at', { ascending: false })).catch(() => ({ data: null })),
+        Promise.resolve(
+          supabase
+            .from('team_invitations')
+            .select('*')
+            .or(`company_id.eq.${activeCompId},invited_by.eq.${activeCompId}`)
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false })
+        ).catch(() => ({ data: null })),
       ]);
 
       if (compRes?.data) {
         setCurrentCompany(compRes.data);
       }
 
-      if (teamRes?.success && Array.isArray(teamRes.members) && teamRes.members.length > 0) {
-        setTeamMembers(teamRes.members as UserProfile[]);
+      if (teamRes?.success) {
+        if (Array.isArray(teamRes.members) && teamRes.members.length > 0) {
+          setTeamMembers(teamRes.members as UserProfile[]);
+        }
+        if (Array.isArray(teamRes.invitations)) {
+          setPendingInvitations(teamRes.invitations as TeamInvitation[]);
+        }
       } else {
         const { data: membersData } = await supabase
           .from('profiles')
@@ -792,7 +804,8 @@ export default function LeadsRadarMainPage() {
         }
       }
 
-      if (invitesRes?.data) {
+      // Fallback or additional pending invitations check
+      if (invitesRes?.data && (!teamRes?.invitations || teamRes.invitations.length === 0)) {
         setPendingInvitations(invitesRes.data as TeamInvitation[]);
       }
     } catch (err: any) {

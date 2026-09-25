@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
-// GET: Fetch team members
+// GET: Fetch team members and pending invitations
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -16,25 +16,46 @@ export async function GET(request: Request) {
 
     if (pool) {
       try {
-        const res = await pool.query(
-          `SELECT * FROM public.profiles WHERE company_id = $1 OR id = $1 ORDER BY created_at ASC`,
-          [companyId]
-        );
-        return NextResponse.json({ success: true, members: res.rows || [] });
+        const [membersRes, invRes] = await Promise.all([
+          pool.query(
+            `SELECT * FROM public.profiles WHERE company_id = $1 OR id = $1 ORDER BY created_at ASC`,
+            [companyId]
+          ),
+          pool.query(
+            `SELECT * FROM public.team_invitations WHERE (company_id = $1 OR invited_by = $1) AND status = 'pending' ORDER BY created_at DESC`,
+            [companyId]
+          )
+        ]);
+        return NextResponse.json({
+          success: true,
+          members: membersRes.rows || [],
+          invitations: invRes.rows || [],
+        });
       } catch (poolErr) {
         console.warn('Team pool query failed, using Supabase client fallback:', poolErr);
       }
     }
 
     // Supabase REST Client fallback
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .or(`company_id.eq.${companyId},id.eq.${companyId}`)
-      .order('created_at', { ascending: true });
+    const [membersRes, invRes] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('*')
+        .or(`company_id.eq.${companyId},id.eq.${companyId}`)
+        .order('created_at', { ascending: true }),
+      supabase
+        .from('team_invitations')
+        .select('*')
+        .or(`company_id.eq.${companyId},invited_by.eq.${companyId}`)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+    ]);
 
-    if (error) throw error;
-    return NextResponse.json({ success: true, members: data || [] });
+    return NextResponse.json({
+      success: true,
+      members: membersRes.data || [],
+      invitations: invRes.data || [],
+    });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
