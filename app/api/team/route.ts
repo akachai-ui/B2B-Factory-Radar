@@ -70,6 +70,7 @@ export async function POST(request: Request) {
                  tax_id = COALESCE($4, tax_id),
                  branch = COALESCE($5, branch),
                  account_type = 'company',
+                 access_status = 'PRO_UNLOCKED',
                  onboarded = true,
                  status = 'active',
                  updated_at = NOW()
@@ -91,12 +92,12 @@ export async function POST(request: Request) {
             member: updated.rows[0],
           });
         } else {
-          // Insert new invited member with a new UUID
+          // Insert new invited member with a new UUID and PRO_UNLOCKED
           const tempId = crypto.randomUUID();
           const inserted = await pool.query(
             `INSERT INTO public.profiles (
-               id, email, full_name, role, company_id, company_name, tax_id, branch, phone, account_type, onboarded, status, created_at, updated_at
-             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'company', true, 'active', NOW(), NOW())
+               id, email, full_name, role, company_id, company_name, tax_id, branch, phone, account_type, access_status, onboarded, status, created_at, updated_at
+             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'company', 'PRO_UNLOCKED', true, 'active', NOW(), NOW())
              RETURNING *`,
             [
               tempId,
@@ -139,6 +140,7 @@ export async function POST(request: Request) {
           tax_id: taxId || existingProfile.tax_id,
           branch: branch || existingProfile.branch,
           account_type: 'company',
+          access_status: 'PRO_UNLOCKED',
           onboarded: true,
           status: 'active',
           updated_at: new Date().toISOString(),
@@ -169,6 +171,7 @@ export async function POST(request: Request) {
           branch: branch || 'สำนักงานใหญ่',
           phone: phone || null,
           account_type: 'company',
+          access_status: 'PRO_UNLOCKED',
           onboarded: true,
           status: 'active',
         })

@@ -138,23 +138,96 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const effectiveSuperAdmin = adminGranted;
         setIsSuperAdmin(effectiveSuperAdmin);
 
-        const resolvedAccessStatus = (effectiveSuperAdmin || data.access_status === 'PRO_UNLOCKED') 
+        // 2. Check if Company / Workspace Owner is PRO_UNLOCKED or Super Admin
+        let isCompanyUnlocked = false;
+        const compIdToCheck = data.company_id;
+        if (compIdToCheck) {
+          try {
+            // Find the workspace owner
+            const { data: ownerProf } = await supabase
+              .from('profiles')
+              .select('id, email, access_status, role')
+              .eq('company_id', compIdToCheck)
+              .eq('role', 'owner')
+              .maybeSingle();
+
+            if (ownerProf) {
+              if (ownerProf.access_status === 'PRO_UNLOCKED') {
+                isCompanyUnlocked = true;
+              } else if (ownerProf.email) {
+                const { data: ownerAdmin } = await supabase
+                  .from('system_admins')
+                  .select('id')
+                  .ilike('email', ownerProf.email.toLowerCase().trim())
+                  .maybeSingle();
+                if (ownerAdmin) {
+                  isCompanyUnlocked = true;
+                }
+              }
+            } else {
+              // Also check company table directly
+              const { data: compRow } = await supabase
+                .from('companies')
+                .select('owner_id')
+                .eq('id', compIdToCheck)
+                .maybeSingle();
+              if (compRow?.owner_id) {
+                const { data: directOwner } = await supabase
+                  .from('profiles')
+                  .select('access_status, email')
+                  .eq('id', compRow.owner_id)
+                  .maybeSingle();
+                if (directOwner?.access_status === 'PRO_UNLOCKED') {
+                  isCompanyUnlocked = true;
+                } else if (directOwner?.email) {
+                  const { data: directAdmin } = await supabase
+                    .from('system_admins')
+                    .select('id')
+                    .ilike('email', directOwner.email.toLowerCase().trim())
+                    .maybeSingle();
+                  if (directAdmin) isCompanyUnlocked = true;
+                }
+              }
+            }
+          } catch (cLockErr) {
+            console.warn('Check company owner lock status error:', cLockErr);
+          }
+        }
+
+        const resolvedAccessStatus = (effectiveSuperAdmin || data.access_status === 'PRO_UNLOCKED' || isCompanyUnlocked) 
           ? 'PRO_UNLOCKED' 
           : (data.access_status || 'PENDING_APPROVAL');
 
+        // If the status is resolved to PRO_UNLOCKED, sync it to the profile row in DB
+        if (resolvedAccessStatus === 'PRO_UNLOCKED' && data.access_status !== 'PRO_UNLOCKED') {
+          try {
+            await supabase.from('profiles').update({
+              access_status: 'PRO_UNLOCKED',
+              updated_at: new Date().toISOString(),
+            }).eq('id', currentUser.id);
+            data.access_status = 'PRO_UNLOCKED';
+          } catch (syncErr) {
+            console.warn('Auto sync access_status to DB warning:', syncErr);
+          }
+        }
+
         const effectiveCompId = data.company_id || currentUser.id;
         const defaultCompName = data.company_name || `ทีมของ ${data.full_name || cleanEmail.split('@')[0]}`;
+        const isUserOwner = data.role === 'owner' || !data.company_id || data.company_id === currentUser.id;
 
-        // Ensure company record exists in public.companies table
+        // Ensure company record exists in public.companies table (only set owner_id if user is owner)
         try {
-          await supabase.from('companies').upsert({
+          const compPayload: any = {
             id: effectiveCompId,
             name: defaultCompName,
             branch: data.branch || 'สำนักงานใหญ่',
             tax_id: data.tax_id || null,
             phone: data.phone || null,
-            owner_id: currentUser.id,
-          }, { onConflict: 'id' });
+          };
+          if (isUserOwner) {
+            compPayload.owner_id = currentUser.id;
+          }
+          await supabase.from('companies').upsert(compPayload, { onConflict: 'id' });
         } catch (compErr) {
           console.warn('Auto ensure company error:', compErr);
         }
@@ -183,7 +256,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           company_id: effectiveCompId,
           company_name: defaultCompName,
           account_type: 'company',
-          role: (data.role || 'owner') as any,
+          role: (data.role || (isUserOwner ? 'owner' : 'sales')) as any,
           access_status: resolvedAccessStatus as any,
           avatar_url: resolvedAvatar,
         });

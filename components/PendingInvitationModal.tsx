@@ -69,7 +69,7 @@ export function PendingInvitationModal() {
         .eq('id', pendingInvite.company_id)
         .maybeSingle();
 
-      // 2. Update user profile in profiles table
+      // 2. Update user profile in profiles table with PRO_UNLOCKED
       await updateProfile({
         company_id: pendingInvite.company_id,
         company_name: comp?.name || pendingInvite.company_name || 'บริษัทของฉัน',
@@ -77,6 +77,7 @@ export function PendingInvitationModal() {
         branch: comp?.branch || 'สำนักงานใหญ่',
         role: pendingInvite.role || 'sales',
         account_type: 'company',
+        access_status: 'PRO_UNLOCKED',
         onboarded: true,
       });
 

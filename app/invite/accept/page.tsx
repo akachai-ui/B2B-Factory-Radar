@@ -92,7 +92,7 @@ function InviteAcceptContent() {
         .eq('id', invitation.company_id)
         .maybeSingle();
 
-      // 2. Update Profile
+      // 2. Update Profile with PRO_UNLOCKED
       await updateProfile({
         company_id: invitation.company_id,
         company_name: comp?.name || invitation.company_name || 'บริษัทของฉัน',
@@ -100,6 +100,7 @@ function InviteAcceptContent() {
         branch: comp?.branch || 'สำนักงานใหญ่',
         role: invitation.role || 'sales',
         account_type: 'company',
+        access_status: 'PRO_UNLOCKED',
         onboarded: true,
       });
 

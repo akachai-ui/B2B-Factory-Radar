@@ -200,7 +200,7 @@ export default function LeadsRadarMainPage() {
 
   // Pro / Freemium Access Control & Preview Mode Gate (Inherits from Super Admin or Company Owner if approved)
   const companyOwnerMember = teamMembers.find((m) => m.role === 'owner' || (currentCompany?.owner_id && m.id === currentCompany.owner_id));
-  const isCompanyOwnerUnlocked = companyOwnerMember?.access_status === 'PRO_UNLOCKED';
+  const isCompanyOwnerUnlocked = companyOwnerMember?.access_status === 'PRO_UNLOCKED' || teamMembers.some((m) => m.access_status === 'PRO_UNLOCKED');
   const isProUnlocked = isSuperAdmin || profile?.access_status === 'PRO_UNLOCKED' || !!isCompanyOwnerUnlocked;
   const isPreviewMode = !isProUnlocked;
   const [isAccessLockModalOpen, setIsAccessLockModalOpen] = useState(false);
