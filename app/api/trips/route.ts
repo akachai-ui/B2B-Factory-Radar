@@ -273,14 +273,18 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const {
       id,
-      action = 'end', // 'end' | 'approve' | 'reject'
+      action = 'end', // 'end' | 'approve' | 'reject' | 'edit'
+      start_odometer,
+      start_photo_url,
       end_odometer,
       end_photo_url,
       end_lat,
       end_lng,
       end_location_name = 'จุดสิ้นสุดเดินทาง',
-      personal_deduct_km = 0,
+      personal_deduct_km,
       fuel_rate_per_km,
+      license_plate,
+      vehicle_type,
       approved_by,
       rejection_reason,
       notes,
@@ -298,6 +302,77 @@ export async function PATCH(request: NextRequest) {
           return NextResponse.json({ success: false, error: 'Trip not found' }, { status: 404 });
         }
         const currentTrip = existingRes.rows[0];
+
+        if (action === 'edit') {
+          if (currentTrip.status === 'approved') {
+            return NextResponse.json({
+              success: false,
+              error: 'ทริปนี้ได้รับการอนุมัติเบิกจ่ายแล้ว ไม่สามารถแก้ไขข้อมูลหรือเลขไมล์ได้',
+            }, { status: 400 });
+          }
+
+          const startOdo = start_odometer !== undefined && start_odometer !== null && start_odometer !== ''
+            ? Number(start_odometer)
+            : Number(currentTrip.start_odometer);
+          const endOdo = end_odometer !== undefined && end_odometer !== null && end_odometer !== ''
+            ? Number(end_odometer)
+            : (currentTrip.end_odometer !== null && currentTrip.end_odometer !== undefined ? Number(currentTrip.end_odometer) : null);
+          const deductKm = personal_deduct_km !== undefined && personal_deduct_km !== null
+            ? Number(personal_deduct_km)
+            : (Number(currentTrip.personal_deduct_km) || 0);
+          const rate = Number(fuel_rate_per_km || currentTrip.fuel_rate_per_km || 5.0);
+
+          let totalOdoKm = currentTrip.total_odometer_km;
+          let netClaimableKm = currentTrip.net_claimable_km;
+          let totalFuelAmount = currentTrip.total_fuel_amount;
+
+          if (endOdo !== null && !isNaN(endOdo)) {
+            totalOdoKm = Math.max(0, endOdo - startOdo);
+            netClaimableKm = Math.max(0, totalOdoKm - deductKm);
+            totalFuelAmount = Math.round(netClaimableKm * rate * 100) / 100;
+          }
+
+          const editQuery = `
+            UPDATE public.vehicle_trips SET
+              start_odometer = $1,
+              start_photo_url = COALESCE($2, start_photo_url),
+              end_odometer = $3,
+              end_photo_url = COALESCE($4, end_photo_url),
+              total_odometer_km = $5,
+              personal_deduct_km = $6,
+              net_claimable_km = $7,
+              fuel_rate_per_km = $8,
+              total_fuel_amount = $9,
+              license_plate = COALESCE($10, license_plate),
+              vehicle_type = COALESCE($11, vehicle_type),
+              notes = COALESCE($12, notes),
+              updated_at = NOW()
+            WHERE id = $13
+            RETURNING *;
+          `;
+
+          const res = await pool.query(editQuery, [
+            startOdo,
+            start_photo_url !== undefined ? start_photo_url : null,
+            endOdo,
+            end_photo_url !== undefined ? end_photo_url : null,
+            totalOdoKm,
+            deductKm,
+            netClaimableKm,
+            rate,
+            totalFuelAmount,
+            license_plate || null,
+            vehicle_type || null,
+            notes !== undefined ? notes : null,
+            id,
+          ]);
+
+          return NextResponse.json({
+            success: true,
+            message: 'แก้ไขข้อมูลและคำนวณเลขไมล์ใหม่เรียบร้อยแล้ว',
+            trip: res.rows[0],
+          });
+        }
 
         if (action === 'end') {
           const endOdo = Number(end_odometer);
@@ -410,6 +485,68 @@ export async function PATCH(request: NextRequest) {
 
     if (fetchErr || !currentTrip) {
       return NextResponse.json({ success: false, error: 'Trip not found' }, { status: 404 });
+    }
+
+    if (action === 'edit') {
+      if (currentTrip.status === 'approved') {
+        return NextResponse.json({
+          success: false,
+          error: 'ทริปนี้ได้รับการอนุมัติเบิกจ่ายแล้ว ไม่สามารถแก้ไขข้อมูลหรือเลขไมล์ได้',
+        }, { status: 400 });
+      }
+
+      const startOdo = start_odometer !== undefined && start_odometer !== null && start_odometer !== ''
+        ? Number(start_odometer)
+        : Number(currentTrip.start_odometer);
+      const endOdo = end_odometer !== undefined && end_odometer !== null && end_odometer !== ''
+        ? Number(end_odometer)
+        : (currentTrip.end_odometer !== null && currentTrip.end_odometer !== undefined ? Number(currentTrip.end_odometer) : null);
+      const deductKm = personal_deduct_km !== undefined && personal_deduct_km !== null
+        ? Number(personal_deduct_km)
+        : (Number(currentTrip.personal_deduct_km) || 0);
+      const rate = Number(fuel_rate_per_km || currentTrip.fuel_rate_per_km || 5.0);
+
+      let totalOdoKm = currentTrip.total_odometer_km;
+      let netClaimableKm = currentTrip.net_claimable_km;
+      let totalFuelAmount = currentTrip.total_fuel_amount;
+
+      if (endOdo !== null && !isNaN(endOdo)) {
+        totalOdoKm = Math.max(0, endOdo - startOdo);
+        netClaimableKm = Math.max(0, totalOdoKm - deductKm);
+        totalFuelAmount = Math.round(netClaimableKm * rate * 100) / 100;
+      }
+
+      const updatePayload: any = {
+        start_odometer: startOdo,
+        end_odometer: endOdo,
+        total_odometer_km: totalOdoKm,
+        personal_deduct_km: deductKm,
+        net_claimable_km: netClaimableKm,
+        fuel_rate_per_km: rate,
+        total_fuel_amount: totalFuelAmount,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (start_photo_url !== undefined) updatePayload.start_photo_url = start_photo_url;
+      if (end_photo_url !== undefined) updatePayload.end_photo_url = end_photo_url;
+      if (license_plate) updatePayload.license_plate = license_plate;
+      if (vehicle_type) updatePayload.vehicle_type = vehicle_type;
+      if (notes !== undefined) updatePayload.notes = notes;
+
+      const { data: updatedTrip, error: updateErr } = await supabase
+        .from('vehicle_trips')
+        .update(updatePayload)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (updateErr) throw updateErr;
+
+      return NextResponse.json({
+        success: true,
+        message: 'แก้ไขข้อมูลและคำนวณเลขไมล์ใหม่เรียบร้อยแล้ว',
+        trip: updatedTrip,
+      });
     }
 
     if (action === 'end') {
