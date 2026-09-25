@@ -794,7 +794,20 @@ export default function LeadsRadarMainPage() {
       }
 
       if (membersRes?.data && Array.isArray(membersRes.data)) {
-        setTeamMembers(membersRes.data as UserProfile[]);
+        // Deduplicate by email (prioritize member with avatar or most recently updated)
+        const uniqueMap = new Map<string, UserProfile>();
+        for (const m of (membersRes.data as UserProfile[])) {
+          const key = (m.email || m.id).toLowerCase().trim();
+          const existing = uniqueMap.get(key);
+          if (!existing) {
+            uniqueMap.set(key, m);
+          } else {
+            if ((!existing.avatar_url && m.avatar_url) || (new Date(m.updated_at || 0) > new Date(existing.updated_at || 0))) {
+              uniqueMap.set(key, m);
+            }
+          }
+        }
+        setTeamMembers(Array.from(uniqueMap.values()));
       }
 
       if (invitesRes?.data && Array.isArray(invitesRes.data)) {
