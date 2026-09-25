@@ -25,6 +25,7 @@ import {
   TrendingUp,
   FileSpreadsheet,
   Settings,
+  RefreshCw,
 } from 'lucide-react';
 
 
@@ -224,47 +225,51 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
   );
 
   return (
-    <div className="fixed inset-0 z-[1300] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-700/90 rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-[1300] flex items-center justify-center p-0 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-slate-900 border-0 sm:border border-slate-700/90 rounded-none sm:rounded-2xl w-full max-w-5xl h-full sm:h-auto sm:max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="px-4 py-3.5 sm:px-6 sm:py-4 border-b border-slate-800 bg-slate-900 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="px-3.5 py-3 sm:px-6 sm:py-4 border-b border-slate-800 bg-slate-900/95 shrink-0 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
               <Fuel className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <h2 className="text-sm sm:text-base font-bold text-white truncate">
-                  รายงานตรวจสอบไมล์ & อนุมัติเบิกจ่าย
+                <h2 className="text-xs sm:text-base font-bold text-white truncate">
+                  รายงานตรวจสอบไมล์ & เบิกจ่าย
                 </h2>
-                <span className="text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/20 px-1.5 py-0.5 rounded font-medium shrink-0">
-                  ผู้บริหาร / บัญชี
+                <span className="text-[9px] sm:text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/20 px-1.5 py-0.5 rounded font-medium shrink-0">
+                  ผู้บริหาร/บัญชี
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 truncate">
+              <p className="text-[10px] sm:text-[11px] text-slate-400 truncate hidden sm:block">
                 ตรวจสอบไมล์จริง vs GPS พร้อมภาพถ่ายหน้าปัดไมล์
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 justify-end shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={() => setIsPolicyModalOpen(true)}
-              className="px-2.5 py-1.5 bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 text-xs font-semibold rounded-xl border border-purple-500/30 flex items-center gap-1.5 transition-colors"
+              className="px-2 sm:px-2.5 py-1.5 bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl border border-purple-500/30 flex items-center gap-1 sm:gap-1.5 transition-colors"
+              title="ตั้งค่านโยบายค่าน้ำมัน"
             >
               <Settings className="w-3.5 h-3.5 text-purple-400" />
-              <span>⚙️ นโยบาย</span>
+              <span className="hidden sm:inline">นโยบาย</span>
             </button>
             <button
               onClick={exportToCSV}
               disabled={filteredTrips.length === 0}
-              className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-2 sm:px-2.5 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-[11px] sm:text-xs font-semibold rounded-lg sm:rounded-xl border border-emerald-500/30 flex items-center gap-1 sm:gap-1.5 transition-colors disabled:opacity-50"
+              title="ส่งออกรายงานเป็น CSV สำหรับฝ่ายบัญชี"
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Export CSV</span>
+              <span className="hidden sm:inline">Export CSV</span>
+              <span className="sm:hidden">CSV</span>
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors ml-0.5"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
@@ -272,51 +277,51 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
         </div>
 
         {/* Aggregate KPI Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-5 bg-slate-950/50 border-b border-slate-800">
-          <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800/80">
-            <span className="text-[11px] text-slate-400 font-medium">รวมระยะทางเบิกจ่าย</span>
-            <div className="text-lg font-bold text-white font-mono mt-1">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 p-3 sm:p-4 bg-slate-950/70 border-b border-slate-800 shrink-0">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900/90 border border-slate-800/80">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium">รวมระยะทางเบิกจ่าย</span>
+            <div className="text-sm sm:text-lg font-bold text-white font-mono mt-0.5 sm:mt-1">
               {totalKmClaimed.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}{' '}
-              <span className="text-xs font-normal text-slate-400">กม.</span>
+              <span className="text-[10px] sm:text-xs font-normal text-slate-400">กม.</span>
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800/80">
-            <span className="text-[11px] text-slate-400 font-medium">ยอดเงินค่าน้ำมันรวม</span>
-            <div className="text-lg font-bold text-emerald-400 font-mono mt-1">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900/90 border border-slate-800/80">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium">ยอดเงินค่าน้ำมันรวม</span>
+            <div className="text-sm sm:text-lg font-bold text-emerald-400 font-mono mt-0.5 sm:mt-1">
               ฿{totalFuelAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800/80">
-            <span className="text-[11px] text-slate-400 font-medium">รอการอนุมัติ</span>
-            <div className="text-lg font-bold text-blue-400 font-mono mt-1 flex items-center gap-2">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900/90 border border-slate-800/80">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium">รอการอนุมัติ</span>
+            <div className="text-sm sm:text-lg font-bold text-blue-400 font-mono mt-0.5 sm:mt-1 flex items-center gap-1.5">
               {pendingCount}{' '}
-              <span className="text-xs font-normal text-slate-400">รายการ</span>
+              <span className="text-[10px] sm:text-xs font-normal text-slate-400">รายการ</span>
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800/80">
-            <span className="text-[11px] text-slate-400 font-medium">อนุมัติแล้ว</span>
-            <div className="text-lg font-bold text-emerald-400 font-mono mt-1 flex items-center gap-2">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900/90 border border-slate-800/80">
+            <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium">อนุมัติแล้ว</span>
+            <div className="text-sm sm:text-lg font-bold text-emerald-400 font-mono mt-0.5 sm:mt-1 flex items-center gap-1.5">
               {approvedCount}{' '}
-              <span className="text-xs font-normal text-slate-400">รายการ</span>
+              <span className="text-[10px] sm:text-xs font-normal text-slate-400">รายการ</span>
             </div>
           </div>
         </div>
 
         {/* Filter Toolbar */}
-        <div className="px-5 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 text-xs">
-          <div className="flex flex-wrap items-center gap-2 flex-1 min-w-[280px]">
+        <div className="px-3 sm:px-5 py-2.5 sm:py-3 border-b border-slate-800 bg-slate-900/80 text-xs shrink-0 space-y-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             {/* Search */}
-            <div className="relative flex-1 min-w-[160px] max-w-xs">
+            <div className="relative flex-1">
               <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="ค้นหาชื่อเซลล์, ทะเบียน, วันที่..."
-                className="w-full pl-8 pr-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                className="w-full pl-8 pr-3 py-1.5 bg-slate-800/90 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 text-xs"
               />
             </div>
 
@@ -325,7 +330,7 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
               <select
                 value={selectedRep}
                 onChange={(e) => setSelectedRep(e.target.value)}
-                className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-amber-500"
+                className="bg-slate-800/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-amber-500 text-xs"
               >
                 <option value="ALL">👤 เซลล์ทุกคน ({uniqueReps.length})</option>
                 {uniqueReps.map((r) => (
@@ -335,9 +340,11 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                 ))}
               </select>
             )}
+          </div>
 
-            {/* Status Filter */}
-            <div className="flex items-center gap-1 bg-slate-800/80 p-1 rounded-lg border border-slate-700">
+          {/* Status Filter Tabs (Horizontal Scrollable on Mobile) */}
+          <div className="flex items-center justify-between gap-2 pt-0.5">
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 max-w-full scrollbar-none">
               {[
                 { id: 'ALL', label: 'ทั้งหมด' },
                 { id: 'completed', label: '⏳ รออนุมัติ' },
@@ -348,28 +355,30 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                 <button
                   key={s.id}
                   onClick={() => setStatusFilter(s.id)}
-                  className={`px-2.5 py-1 rounded-md font-medium transition-colors ${
+                  className={`px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
                     statusFilter === s.id
-                      ? 'bg-amber-500 text-slate-950 font-bold'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-amber-500 text-slate-950 font-bold shadow-sm shadow-amber-500/20'
+                      : 'bg-slate-800/70 text-slate-400 hover:text-slate-200 border border-slate-700/60'
                   }`}
                 >
                   {s.label}
                 </button>
               ))}
             </div>
-          </div>
 
-          <button
-            onClick={loadTrips}
-            className="text-amber-400 hover:text-amber-300 font-medium flex items-center gap-1"
-          >
-            รีเฟรช
-          </button>
+            <button
+              onClick={loadTrips}
+              className="text-amber-400 hover:text-amber-300 font-medium flex items-center gap-1 text-[11px] sm:text-xs shrink-0 px-2 py-1 bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700/60 transition-colors"
+              title="รีเฟรชข้อมูล"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">รีเฟรช</span>
+            </button>
+          </div>
         </div>
 
         {/* Trips Table / List */}
-        <div className="p-5 overflow-y-auto flex-1 space-y-4">
+        <div className="p-3 sm:p-5 overflow-y-auto flex-1 space-y-3 sm:space-y-4">
           {isLoading ? (
             <div className="py-20 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
               <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
@@ -393,20 +402,20 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
               return (
                 <div
                   key={trip.id}
-                  className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+                  className={`p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border transition-all ${
                     isPending
-                      ? 'bg-slate-800/80 border-blue-500/40 shadow-md'
+                      ? 'bg-slate-800/90 border-blue-500/40 shadow-md shadow-blue-500/5'
                       : isApproved
-                      ? 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
+                      ? 'bg-slate-900/90 border-slate-800 hover:border-slate-700'
                       : isRejected
                       ? 'bg-slate-900/60 border-red-500/20'
                       : 'bg-slate-900/60 border-amber-500/20'
                   }`}
                 >
                   {/* Top Bar: User info, Date, Status Badge */}
-                  <div className="flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-slate-800">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center font-bold text-amber-400 text-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2.5 pb-3 border-b border-slate-800">
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center font-bold text-amber-400 text-xs sm:text-sm shrink-0">
                         {trip.user_avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
@@ -418,17 +427,17 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                           (trip.user_name || 'U').charAt(0)
                         )}
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-white text-sm">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-bold text-white text-xs sm:text-sm truncate">
                             {trip.user_name || trip.user_email}
                           </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono border border-slate-700">
+                          <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono border border-slate-700 shrink-0">
                             {trip.license_plate || 'ทะเบียน -'}
                           </span>
                         </div>
-                        <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                          <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                        <div className="text-[10px] sm:text-xs text-slate-400 flex items-center gap-1.5 sm:gap-2 mt-0.5 flex-wrap">
+                          <Calendar className="w-3 h-3 text-slate-500 shrink-0" />
                           <span>วันที่ {trip.trip_date}</span>
                           <span>•</span>
                           <span>{trip.vehicle_type === 'motorcycle' ? '🛵 มอเตอร์ไซค์' : '🚗 รถยนต์'}</span>
@@ -437,21 +446,21 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                     </div>
 
                     {/* Status & Approver Badge */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       {isPending ? (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full animate-pulse">
+                        <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full animate-pulse">
                           รออนุมัติเบิกจ่าย
                         </span>
                       ) : isApproved ? (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full">
                           <CheckCircle2 className="w-3.5 h-3.5" /> อนุมัติแล้ว ({trip.approver_name || 'ผู้จัดการ'})
                         </span>
                       ) : isRejected ? (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/30 px-3 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/30 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full">
                           <XCircle className="w-3.5 h-3.5" /> ปฏิเสธ: {trip.rejection_reason}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full">
                           กำลังเดินทาง
                         </span>
                       )}
@@ -459,36 +468,36 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                   </div>
 
                   {/* Body Grid: Metric Comparison & Photos */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 pt-3">
                     {/* Column 1 & 2: Route & Mileage Analytics */}
-                    <div className="md:col-span-2 space-y-3">
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
-                        <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
-                          <div className="text-[10px] text-slate-400">ไมล์เริ่มต้น → สิ้นสุด</div>
-                          <div className="font-bold text-white font-mono mt-0.5">
+                    <div className="lg:col-span-2 space-y-2.5">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 text-center text-xs">
+                        <div className="p-2 sm:p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
+                          <div className="text-[9px] sm:text-[10px] text-slate-400">ไมล์เริ่ม → สิ้นสุด</div>
+                          <div className="font-bold text-white font-mono text-[11px] sm:text-xs mt-0.5 truncate">
                             {Number(trip.start_odometer).toLocaleString()} →{' '}
                             {trip.end_odometer ? Number(trip.end_odometer).toLocaleString() : '—'}
                           </div>
                         </div>
 
-                        <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
-                          <div className="text-[10px] text-slate-400">ไมล์วิ่งจริง</div>
-                          <div className="font-bold text-white font-mono mt-0.5">
-                            {odoKm.toFixed(1)} กม.
+                        <div className="p-2 sm:p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
+                          <div className="text-[9px] sm:text-[10px] text-slate-400">ไมล์วิ่งจริง</div>
+                          <div className="font-bold text-white font-mono text-xs sm:text-sm mt-0.5">
+                            {odoKm.toFixed(1)} <span className="text-[10px] font-normal text-slate-400">กม.</span>
                           </div>
                         </div>
 
-                        <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
-                          <div className="text-[10px] text-slate-400">รูทลูกค้า GPS</div>
-                          <div className="font-bold text-amber-300 font-mono mt-0.5">
-                            {routeKm.toFixed(1)} กม.
+                        <div className="p-2 sm:p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
+                          <div className="text-[9px] sm:text-[10px] text-slate-400">รูทลูกค้า GPS</div>
+                          <div className="font-bold text-amber-300 font-mono text-xs sm:text-sm mt-0.5">
+                            {routeKm.toFixed(1)} <span className="text-[10px] font-normal text-slate-400">กม.</span>
                           </div>
                         </div>
 
-                        <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
-                          <div className="text-[10px] text-slate-400">ส่วนต่าง</div>
+                        <div className="p-2 sm:p-2.5 rounded-xl bg-slate-950/60 border border-slate-800">
+                          <div className="text-[9px] sm:text-[10px] text-slate-400">ส่วนต่าง</div>
                           <div
-                            className={`font-bold font-mono mt-0.5 ${
+                            className={`font-bold font-mono text-xs sm:text-sm mt-0.5 ${
                               isHighVariance
                                 ? 'text-red-400 font-black'
                                 : diffKm > 10
@@ -496,15 +505,15 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                                 : 'text-emerald-400'
                             }`}
                           >
-                            {diffKm >= 0 ? `+${diffKm.toFixed(1)}` : diffKm.toFixed(1)} กม.
+                            {diffKm >= 0 ? `+${diffKm.toFixed(1)}` : diffKm.toFixed(1)} <span className="text-[10px] font-normal text-slate-400">กม.</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Variance Warning Note if any */}
                       {isHighVariance && (
-                        <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-xs flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
+                        <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-[11px] sm:text-xs flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
                           <span>
                             <strong>แจ้งเตือน:</strong> ระยะทางไมล์รถวิ่งมากกว่ารูทเช็คอินลูกค้าเกิน {variancePct.toFixed(0)}% (+{diffKm.toFixed(1)} กม.) กรุณาตรวจสอบรูปถ่ายหน้าปัดไมล์
                           </span>
@@ -513,19 +522,19 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
 
                       {/* Stops Trail */}
                       {trip.checkins && trip.checkins.length > 0 && (
-                        <div className="text-xs bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80 space-y-1.5">
-                          <span className="font-semibold text-slate-300 flex items-center gap-1 text-[11px]">
+                        <div className="text-xs bg-slate-950/40 p-2 sm:p-2.5 rounded-xl border border-slate-800/80 space-y-1.5">
+                          <span className="font-semibold text-slate-300 flex items-center gap-1 text-[10px] sm:text-[11px]">
                             <MapPin className="w-3.5 h-3.5 text-emerald-400" />
                             จุดเช็คอิน ({trip.checkins.length} แห่ง):
                           </span>
-                          <div className="flex flex-wrap gap-1.5">
+                          <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
                             {trip.checkins.map((chk, idx) => (
                               <span
                                 key={chk.id || idx}
-                                className="inline-flex items-center gap-1 bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-[10px] border border-slate-700"
+                                className="inline-flex items-center gap-1 bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded text-[10px] border border-slate-700"
                               >
-                                <span>{idx + 1}.</span> {chk.location_name}{' '}
-                                <span className="text-amber-400 font-mono">
+                                <span className="font-semibold text-amber-400">{idx + 1}.</span> {chk.location_name}{' '}
+                                <span className="text-slate-400 font-mono">
                                   (+{Number(chk.distance_from_prev_km).toFixed(1)}k)
                                 </span>
                               </span>
@@ -536,24 +545,24 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
 
                       {/* Notes if any */}
                       {trip.notes && (
-                        <div className="text-xs text-slate-400 italic">
+                        <div className="text-[11px] text-slate-400 italic">
                           💬 บันทึกเซลล์: {trip.notes}
                         </div>
                       )}
                     </div>
 
                     {/* Column 3: Dashboard Photos & Actions */}
-                    <div className="flex flex-col justify-between bg-slate-950/40 p-3 rounded-xl border border-slate-800 space-y-3">
+                    <div className="flex flex-col justify-between bg-slate-950/50 p-2.5 sm:p-3 rounded-xl border border-slate-800 space-y-2.5">
                       <div>
-                        <span className="text-[11px] font-semibold text-slate-400 block mb-1.5">
-                          รูปถ่ายหน้าปัดไมล์
+                        <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 block mb-1.5">
+                          รูปถ่ายหน้าปัดไมล์ (แตะเพื่อขยาย)
                         </span>
                         <div className="grid grid-cols-2 gap-2">
                           {trip.start_photo_url ? (
                             <button
                               type="button"
                               onClick={() => setSelectedPhoto(trip.start_photo_url!)}
-                              className="relative h-20 rounded-lg overflow-hidden border border-slate-700 group hover:border-amber-500 transition-colors"
+                              className="relative h-18 sm:h-20 rounded-lg overflow-hidden border border-slate-700 group hover:border-amber-500 transition-colors"
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -561,12 +570,12 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                                 alt="Start Odo"
                                 className="w-full h-full object-cover"
                               />
-                              <span className="absolute bottom-0 inset-x-0 bg-black/70 text-[9px] text-white py-0.5 text-center">
-                                ไมล์เช้า
+                              <span className="absolute bottom-0 inset-x-0 bg-black/75 text-[9px] text-amber-300 py-0.5 text-center font-medium">
+                                ไมล์เช้า 🌅
                               </span>
                             </button>
                           ) : (
-                            <div className="h-20 rounded-lg border border-dashed border-slate-800 flex items-center justify-center text-[10px] text-slate-500">
+                            <div className="h-18 sm:h-20 rounded-lg border border-dashed border-slate-800 flex items-center justify-center text-[10px] text-slate-500 bg-slate-900/40">
                               ไม่มีรูปเช้า
                             </div>
                           )}
@@ -575,7 +584,7 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                             <button
                               type="button"
                               onClick={() => setSelectedPhoto(trip.end_photo_url!)}
-                              className="relative h-20 rounded-lg overflow-hidden border border-slate-700 group hover:border-emerald-500 transition-colors"
+                              className="relative h-18 sm:h-20 rounded-lg overflow-hidden border border-slate-700 group hover:border-emerald-500 transition-colors"
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -583,12 +592,12 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                                 alt="End Odo"
                                 className="w-full h-full object-cover"
                               />
-                              <span className="absolute bottom-0 inset-x-0 bg-black/70 text-[9px] text-white py-0.5 text-center">
-                                ไมล์เย็น
+                              <span className="absolute bottom-0 inset-x-0 bg-black/75 text-[9px] text-emerald-300 py-0.5 text-center font-medium">
+                                ไมล์เย็น 🌇
                               </span>
                             </button>
                           ) : (
-                            <div className="h-20 rounded-lg border border-dashed border-slate-800 flex items-center justify-center text-[10px] text-slate-500">
+                            <div className="h-18 sm:h-20 rounded-lg border border-dashed border-slate-800 flex items-center justify-center text-[10px] text-slate-500 bg-slate-900/40">
                               ไม่มีรูปเย็น
                             </div>
                           )}
@@ -596,10 +605,10 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                       </div>
 
                       {/* Financial Claim Total & Approval Buttons */}
-                      <div className="pt-2 border-t border-slate-800 space-y-2">
+                      <div className="pt-2 border-t border-slate-800/80 space-y-2">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-slate-400">ยอดเงินขอเบิก:</span>
-                          <span className="text-base font-bold text-emerald-400 font-mono">
+                          <span className="text-slate-400 text-[11px]">ยอดเงินขอเบิก:</span>
+                          <span className="text-sm sm:text-base font-bold text-emerald-400 font-mono">
                             ฿{Number(trip.total_fuel_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </span>
                         </div>
@@ -609,14 +618,14 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
                             <button
                               onClick={() => handleAction(trip.id, 'reject')}
                               disabled={processingTripId === trip.id}
-                              className="py-1.5 px-3 bg-red-500/20 hover:bg-red-500/30 text-red-300 font-semibold text-xs rounded-lg border border-red-500/30 flex items-center justify-center gap-1 transition-colors"
+                              className="py-2 px-2.5 bg-red-500/15 hover:bg-red-500/25 active:bg-red-500/30 text-red-300 font-semibold text-xs rounded-xl border border-red-500/30 flex items-center justify-center gap-1 transition-colors"
                             >
                               <XCircle className="w-3.5 h-3.5" /> ไม่อนุมัติ
                             </button>
                             <button
                               onClick={() => handleAction(trip.id, 'approve')}
                               disabled={processingTripId === trip.id}
-                              className="py-1.5 px-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg shadow-sm flex items-center justify-center gap-1 transition-colors"
+                              className="py-2 px-2.5 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-bold text-xs rounded-xl shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1 transition-colors"
                             >
                               <CheckCircle2 className="w-3.5 h-3.5" /> อนุมัติเบิกจ่าย
                             </button>
@@ -635,13 +644,23 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
         {selectedPhoto && (
           <div
             onClick={() => setSelectedPhoto(null)}
-            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-zoom-out"
+            className="fixed inset-0 z-[1400] bg-black/95 flex flex-col items-center justify-center p-3 sm:p-4 cursor-zoom-out animate-in fade-in duration-150"
           >
+            <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+              <span className="text-xs text-slate-400 bg-black/60 px-2.5 py-1 rounded-full">แตะที่ใดก็ได้เพื่อปิด</span>
+              <button
+                type="button"
+                onClick={() => setSelectedPhoto(null)}
+                className="p-2 rounded-full bg-slate-800/80 text-white hover:bg-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={selectedPhoto}
               alt="Zoomed Odometer"
-              className="max-w-full max-h-[90vh] rounded-xl object-contain shadow-2xl"
+              className="max-w-full max-h-[85vh] rounded-xl object-contain shadow-2xl"
             />
           </div>
         )}
