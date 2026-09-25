@@ -979,20 +979,43 @@ export default function LeadsRadarMainPage() {
         }
       }
 
-      // Search query
+      // Smart Search Query with Industry Synonyms & Fuzzy Match
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
-        const matchName = lead.name?.toLowerCase().includes(q) || lead.company_name?.toLowerCase().includes(q);
-        const matchAddr = lead.address?.toLowerCase().includes(q);
-        const matchPhone = lead.phone?.toLowerCase().includes(q);
-        const matchSub = lead.subdistrict?.toLowerCase().includes(q) || lead.district?.toLowerCase().includes(q) || lead.province?.toLowerCase().includes(q);
-        const matchMaterials = (lead as any).raw_materials_needed?.toLowerCase().includes(q);
-        const matchCategory = (lead as any).target_group_label?.toLowerCase().includes(q) || (lead as any).category?.toLowerCase().includes(q);
-        const matchTsic = (lead as any).tsic_code?.toLowerCase().includes(q);
-        const matchObj = (lead as any).objective?.toLowerCase().includes(q);
-        const matchNotes = lead.notes?.toLowerCase().includes(q);
-        const matchSales = lead.sales_rep?.toLowerCase().includes(q);
-        if (!matchName && !matchAddr && !matchPhone && !matchSub && !matchMaterials && !matchCategory && !matchTsic && !matchObj && !matchNotes && !matchSales) {
+        
+        // Define smart industry & product synonyms
+        const SYNONYMS: Record<string, string[]> = {
+          'บรรจุภัณฑ์': ['บรรจุภัณฑ์', 'แพค', 'ถุง', 'ฟิล์ม', 'ขวด', 'กระสอบ', 'ฝา', 'กล่อง', 'ซอง', 'พลาสติก', 'pack', 'bag', 'film', 'bottle', 'cap', 'container', 'sheet'],
+          'ยานยนต์': ['ยานยนต์', 'รถ', 'ออโต้', 'มอเตอร์', 'กันชน', 'ไฟหน้า', 'ชิ้นส่วน', 'auto', 'car', 'motor', 'vehicle', 'part', 'drive'],
+          'อิเล็กทรอนิกส์': ['ไฟฟ้า', 'อิเล็กทรอนิกส์', 'สวิตช์', 'แอร์', 'ตู้เย็น', 'ซักผ้า', 'สายไฟ', 'ฉนวน', 'electric', 'electronic', 'cable', 'switch', 'appliance'],
+          'ท่อ': ['ท่อ', 'สุขภัณฑ์', 'ก่อสร้าง', 'แผ่น', 'หลังคา', 'ฉนวน', 'ข้อต่อ', 'พีวีซี', 'pipe', 'tube', 'fitting', 'construct', 'pvc', 'hdpe'],
+          'ของใช้': ['ของใช้', 'กะละมัง', 'เก้าอี้', 'ถัง', 'ของเล่น', 'ตะกร้า', 'เครื่องครัว', 'พลาสติก', 'houseware', 'toy', 'bucket', 'chair'],
+        };
+
+        const targetKeywords = SYNONYMS[q] || [q];
+
+        const haystack = [
+          lead.name,
+          lead.company_name,
+          lead.address,
+          lead.phone,
+          lead.subdistrict,
+          lead.district,
+          lead.province,
+          (lead as any).raw_materials_needed,
+          (lead as any).target_group_label,
+          (lead as any).category,
+          (lead as any).tsic_code,
+          (lead as any).objective,
+          lead.notes,
+          lead.sales_rep,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+
+        const isMatched = targetKeywords.some((kw) => haystack.includes(kw.toLowerCase()));
+        if (!isMatched) {
           return false;
         }
       }
