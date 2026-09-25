@@ -131,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               phone: phone || data.phone || null,
               role: role,
               account_type: 'company',
-              access_status: 'PRO_UNLOCKED',
+              status: 'active',
               onboarded: true,
               updated_at: new Date().toISOString(),
             })
@@ -159,7 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             || null;
           const userName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || cleanEmail.split('@')[0] || 'ผู้ใช้งาน';
 
-          const newProfilePayload: Partial<UserProfile> = {
+          const newProfilePayload: any = {
             id: currentUser.id,
             email: cleanEmail,
             full_name: userName,
@@ -171,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             tax_id: taxId,
             phone: phone,
             role: role,
-            access_status: 'PRO_UNLOCKED',
+            status: 'active',
             onboarded: true,
           };
 
@@ -212,7 +212,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               tax_id: inviteRow.tax_id,
               branch: inviteRow.branch,
               account_type: inviteRow.account_type || 'company',
-              access_status: 'PRO_UNLOCKED',
+              status: 'active',
               onboarded: true,
               updated_at: new Date().toISOString(),
             })
@@ -321,16 +321,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ? 'PRO_UNLOCKED' 
           : (data.access_status || 'PENDING_APPROVAL');
 
-        // If the status is resolved to PRO_UNLOCKED, sync it to the profile row in DB
-        if (resolvedAccessStatus === 'PRO_UNLOCKED' && data.access_status !== 'PRO_UNLOCKED') {
+        // If the status is resolved to PRO_UNLOCKED, sync status to active in profile row
+        if (resolvedAccessStatus === 'PRO_UNLOCKED' && data.status !== 'active') {
           try {
             await supabase.from('profiles').update({
-              access_status: 'PRO_UNLOCKED',
+              status: 'active',
               updated_at: new Date().toISOString(),
             }).eq('id', currentUser.id);
-            data.access_status = 'PRO_UNLOCKED';
+            data.status = 'active';
           } catch (syncErr) {
-            console.warn('Auto sync access_status to DB warning:', syncErr);
+            console.warn('Auto sync status to DB warning:', syncErr);
           }
         }
 
@@ -658,10 +658,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
+      // Strip non-DB / client-only fields before sending to Supabase profiles table
+      const { access_status, ...dbUpdates } = updates as any;
+
       const { data, error } = await supabase
         .from('profiles')
         .update({
-          ...updates,
+          ...dbUpdates,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id)
@@ -671,6 +674,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data && !error) {
         setProfile((prev) => ({
           ...(data as UserProfile),
+          access_status: updates.access_status || prev?.access_status || 'PRO_UNLOCKED',
           avatar_url: updates.avatar_url !== undefined ? updates.avatar_url : (data.avatar_url || prev?.avatar_url || null),
         }));
       } else {
