@@ -27,6 +27,7 @@ import {
   Upload,
   ArrowRight,
   Info,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 interface VehicleTripModalProps {
@@ -90,7 +91,9 @@ export function VehicleTripModal({
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const startFileInputRef = useRef<HTMLInputElement>(null);
+  const startCameraInputRef = useRef<HTMLInputElement>(null);
   const endFileInputRef = useRef<HTMLInputElement>(null);
+  const endCameraInputRef = useRef<HTMLInputElement>(null);
 
   // Company Policy State
   const [companyPolicy, setCompanyPolicy] = useState<any>(null);
@@ -793,13 +796,25 @@ export function VehicleTripModal({
                   </span>
                 </div>
 
-                {/* Upload Photo of Odometer */}
+                {/* Upload Photo of Odometer (Camera or Gallery) */}
                 <div>
+                  {/* Camera Input (Direct) */}
+                  <input
+                    type="file"
+                    ref={startCameraInputRef}
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleUploadPhoto(file, 'start');
+                    }}
+                  />
+                  {/* Gallery / File Picker Input */}
                   <input
                     type="file"
                     ref={startFileInputRef}
                     accept="image/*"
-                    capture="environment"
                     className="hidden"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
@@ -818,32 +833,60 @@ export function VehicleTripModal({
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                         <button
                           type="button"
-                          onClick={() => startFileInputRef.current?.click()}
-                          className="px-3 py-1.5 bg-amber-500 text-slate-950 text-xs font-semibold rounded-lg flex items-center gap-1.5"
+                          onClick={() => startCameraInputRef.current?.click()}
+                          className="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold rounded-lg flex items-center gap-1 cursor-pointer transition"
                         >
                           <Camera className="w-3.5 h-3.5" /> ถ่ายใหม่
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => startFileInputRef.current?.click()}
+                          className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center gap-1 border border-slate-600 cursor-pointer transition"
+                        >
+                          <ImageIcon className="w-3.5 h-3.5 text-cyan-400" /> เลือกใหม่
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setStartPhotoUrl('')}
+                          className="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-semibold rounded-lg flex items-center gap-1 cursor-pointer transition"
+                        >
+                          <X className="w-3.5 h-3.5" /> ลบ
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      disabled={isUploadingPhoto}
-                      onClick={() => startFileInputRef.current?.click()}
-                      className="w-full py-3 px-3 border border-dashed border-slate-700 hover:border-amber-500/60 rounded-xl bg-slate-900/50 hover:bg-slate-900 transition-all text-xs text-slate-300 flex items-center justify-center gap-2"
-                    >
+                    <div className="space-y-1.5">
                       {isUploadingPhoto ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin text-amber-400 shrink-0" />
+                        <div className="w-full py-3 px-3 border border-slate-700 rounded-xl bg-slate-900/50 text-xs text-amber-400 flex items-center justify-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin shrink-0" />
                           <span>กำลังอัปโหลดรูปภาพ...</span>
-                        </>
+                        </div>
                       ) : (
-                        <>
-                          <Camera className="w-4 h-4 text-amber-400 shrink-0" />
-                          <span>ถ่ายรูปหน้าปัดไมล์ตอนเช้า (แนะนำ)</span>
-                        </>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            disabled={isUploadingPhoto}
+                            onClick={() => startCameraInputRef.current?.click()}
+                            className="py-2.5 px-3 border border-dashed border-amber-500/40 hover:border-amber-400 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 transition-all text-xs font-bold text-amber-300 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                          >
+                            <Camera className="w-4 h-4 text-amber-400 shrink-0" />
+                            <span>📷 ถ่ายรูปสด</span>
+                          </button>
+                          <button
+                            type="button"
+                            disabled={isUploadingPhoto}
+                            onClick={() => startFileInputRef.current?.click()}
+                            className="py-2.5 px-3 border border-dashed border-cyan-500/40 hover:border-cyan-400 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 transition-all text-xs font-bold text-cyan-300 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                          >
+                            <ImageIcon className="w-4 h-4 text-cyan-400 shrink-0" />
+                            <span>🖼️ แนบจากอัลบั้ม</span>
+                          </button>
+                        </div>
                       )}
-                    </button>
+                      <p className="text-[10px] text-slate-500 text-center">
+                        ถ่ายรูปหน้าปัดไมล์เช้า หรือเลือกภาพจากคลังรูปภาพในมือถือ
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -1108,13 +1151,25 @@ export function VehicleTripModal({
                     </span>
                   </div>
 
-                  {/* Photo Upload End Odometer */}
+                  {/* Photo Upload End Odometer (Camera or Gallery) */}
                   <div>
+                    {/* Camera Input (Direct) */}
+                    <input
+                      type="file"
+                      ref={endCameraInputRef}
+                      accept="image/*"
+                      capture="environment"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleUploadPhoto(file, 'end');
+                      }}
+                    />
+                    {/* Gallery / File Picker Input */}
                     <input
                       type="file"
                       ref={endFileInputRef}
                       accept="image/*"
-                      capture="environment"
                       className="hidden"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
@@ -1130,35 +1185,63 @@ export function VehicleTripModal({
                           alt="End Odometer"
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => endCameraInputRef.current?.click()}
+                            className="px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-semibold rounded-lg flex items-center gap-1 cursor-pointer transition"
+                          >
+                            <Camera className="w-3.5 h-3.5" /> ถ่ายใหม่
+                          </button>
                           <button
                             type="button"
                             onClick={() => endFileInputRef.current?.click()}
-                            className="px-3 py-1.5 bg-emerald-500 text-slate-950 text-xs font-semibold rounded-lg flex items-center gap-1.5"
+                            className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center gap-1 border border-slate-600 cursor-pointer transition"
                           >
-                            <Camera className="w-3.5 h-3.5" /> ถ่ายใหม่
+                            <ImageIcon className="w-3.5 h-3.5 text-cyan-400" /> เลือกใหม่
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEndPhotoUrl('')}
+                            className="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-semibold rounded-lg flex items-center gap-1 cursor-pointer transition"
+                          >
+                            <X className="w-3.5 h-3.5" /> ลบ
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <button
-                        type="button"
-                        disabled={isUploadingPhoto}
-                        onClick={() => endFileInputRef.current?.click()}
-                        className="w-full py-2.5 px-4 border border-dashed border-slate-700 hover:border-emerald-500/60 rounded-xl bg-slate-900/50 hover:bg-slate-900 transition-all text-xs text-slate-300 flex items-center justify-center gap-2"
-                      >
+                      <div className="space-y-1.5">
                         {isUploadingPhoto ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
-                            กำลังอัปโหลดรูปภาพ...
-                          </>
+                          <div className="w-full py-2.5 px-4 border border-slate-700 rounded-xl bg-slate-900/50 text-xs text-emerald-400 flex items-center justify-center gap-2">
+                            <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                            <span>กำลังอัปโหลดรูปภาพ...</span>
+                          </div>
                         ) : (
-                          <>
-                            <Camera className="w-4 h-4 text-emerald-400" />
-                            ถ่ายรูปหน้าปัดไมล์รถตอนเย็น (ยืนยันระยะทางจริง)
-                          </>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              disabled={isUploadingPhoto}
+                              onClick={() => endCameraInputRef.current?.click()}
+                              className="py-2.5 px-3 border border-dashed border-emerald-500/40 hover:border-emerald-400 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 transition-all text-xs font-bold text-emerald-300 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                            >
+                              <Camera className="w-4 h-4 text-emerald-400 shrink-0" />
+                              <span>📷 ถ่ายรูปสด</span>
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isUploadingPhoto}
+                              onClick={() => endFileInputRef.current?.click()}
+                              className="py-2.5 px-3 border border-dashed border-cyan-500/40 hover:border-cyan-400 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 transition-all text-xs font-bold text-cyan-300 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                            >
+                              <ImageIcon className="w-4 h-4 text-cyan-400 shrink-0" />
+                              <span>🖼️ แนบจากอัลบั้ม</span>
+                            </button>
+                          </div>
                         )}
-                      </button>
+                        <p className="text-[10px] text-slate-500 text-center">
+                          ถ่ายรูปหน้าปัดไมล์เย็น หรือเลือกภาพจากคลังรูปภาพในมือถือ
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
