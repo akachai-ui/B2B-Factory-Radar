@@ -5064,7 +5064,7 @@ export default function LeadsRadarMainPage() {
           }}
           portfolioCount={portfolioLeads.length}
           hasActiveTrip={!!activeTrip}
-          canViewTeam={canViewAllTeamLeads}
+          canViewTeam={true}
           teamCount={teamMembers.length}
         />
 

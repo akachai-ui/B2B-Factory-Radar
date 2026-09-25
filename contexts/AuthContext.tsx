@@ -269,13 +269,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Find the workspace owner
             const { data: ownerProf } = await supabase
               .from('profiles')
-              .select('id, email, access_status, role')
+              .select('id, email, status, role')
               .eq('company_id', compIdToCheck)
               .eq('role', 'owner')
               .maybeSingle();
 
             if (ownerProf) {
-              if (ownerProf.access_status === 'PRO_UNLOCKED') {
+              if (ownerProf.status === 'active' || ownerProf.role === 'owner') {
                 isCompanyUnlocked = true;
               } else if (ownerProf.email) {
                 const { data: ownerAdmin } = await supabase
@@ -297,10 +297,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (compRow?.owner_id) {
                 const { data: directOwner } = await supabase
                   .from('profiles')
-                  .select('access_status, email')
+                  .select('id, email, status, role')
                   .eq('id', compRow.owner_id)
                   .maybeSingle();
-                if (directOwner?.access_status === 'PRO_UNLOCKED') {
+                if (directOwner?.status === 'active' || directOwner?.role === 'owner') {
                   isCompanyUnlocked = true;
                 } else if (directOwner?.email) {
                   const { data: directAdmin } = await supabase
