@@ -592,9 +592,15 @@ export function VehicleTripModal({
               ) : (
                 <div className="space-y-3">
                   {tripsHistory.map((trip) => {
-                    const odoKm = Number(trip.total_odometer_km) || 0;
+                    const odoKm = (trip.total_odometer_km !== undefined && trip.total_odometer_km !== null)
+                      ? Number(trip.total_odometer_km)
+                      : (trip.end_odometer && trip.start_odometer)
+                      ? Math.max(0, Number(trip.end_odometer) - Number(trip.start_odometer))
+                      : 0;
                     const rKm = Number(trip.total_route_km) || 0;
-                    const claimAmount = Number(trip.total_fuel_amount) || 0;
+                    const claimAmount = (trip.total_fuel_amount !== undefined && trip.total_fuel_amount !== null)
+                      ? Number(trip.total_fuel_amount)
+                      : (Number(trip.net_claimable_km) || odoKm || rKm) * Number(trip.fuel_rate_per_km || 5);
                     const isApproved = trip.status === 'approved';
                     const isRejected = trip.status === 'rejected';
                     const isInProgress = trip.status === 'in_progress';

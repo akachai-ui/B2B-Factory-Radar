@@ -341,9 +341,24 @@ export default function LeadsRadarMainPage() {
       return tripDate.getFullYear() === currentYear && tripDate.getMonth() === currentMonth;
     });
 
-    const totalKm = thisMonthTrips.reduce((acc, t) => acc + (Number(t.total_route_km) || 0), 0);
+    const totalKm = thisMonthTrips.reduce((acc, t) => {
+      const km = (t.net_claimable_km !== undefined && t.net_claimable_km !== null)
+        ? Number(t.net_claimable_km)
+        : (t.total_odometer_km !== undefined && t.total_odometer_km !== null)
+        ? Number(t.total_odometer_km)
+        : (t.end_odometer && t.start_odometer)
+        ? Math.max(0, Number(t.end_odometer) - Number(t.start_odometer))
+        : Number(t.total_route_km) || 0;
+      return acc + km;
+    }, 0);
     const totalClaim = thisMonthTrips.reduce((acc, t) => {
-      const km = Number(t.total_route_km) || 0;
+      const km = (t.net_claimable_km !== undefined && t.net_claimable_km !== null)
+        ? Number(t.net_claimable_km)
+        : (t.total_odometer_km !== undefined && t.total_odometer_km !== null)
+        ? Number(t.total_odometer_km)
+        : (t.end_odometer && t.start_odometer)
+        ? Math.max(0, Number(t.end_odometer) - Number(t.start_odometer))
+        : Number(t.total_route_km) || 0;
       const rate = Number(t.fuel_rate_per_km) || 5.0;
       const claim = (t.total_fuel_amount !== undefined && t.total_fuel_amount !== null) ? Number(t.total_fuel_amount) : km * rate;
       return acc + claim;
@@ -3525,7 +3540,13 @@ export default function LeadsRadarMainPage() {
                         </thead>
                         <tbody className="divide-y divide-slate-800/60">
                           {userTrips.map((trip) => {
-                            const tripKm = Number(trip.total_route_km) || 0;
+                            const tripKm = (trip.net_claimable_km !== undefined && trip.net_claimable_km !== null)
+                              ? Number(trip.net_claimable_km)
+                              : (trip.total_odometer_km !== undefined && trip.total_odometer_km !== null)
+                              ? Number(trip.total_odometer_km)
+                              : (trip.end_odometer && trip.start_odometer)
+                              ? Math.max(0, Number(trip.end_odometer) - Number(trip.start_odometer))
+                              : Number(trip.total_route_km) || 0;
                             const tripClaim = (trip.total_fuel_amount !== undefined && trip.total_fuel_amount !== null)
                               ? Number(trip.total_fuel_amount)
                               : tripKm * Number(trip.fuel_rate_per_km || 5);
@@ -4909,7 +4930,13 @@ export default function LeadsRadarMainPage() {
               ) : (
                 <div className="space-y-2">
                   {userTrips.slice(0, 3).map((trip) => {
-                    const tripKm = Number(trip.total_route_km) || 0;
+                    const tripKm = (trip.net_claimable_km !== undefined && trip.net_claimable_km !== null)
+                      ? Number(trip.net_claimable_km)
+                      : (trip.total_odometer_km !== undefined && trip.total_odometer_km !== null)
+                      ? Number(trip.total_odometer_km)
+                      : (trip.end_odometer && trip.start_odometer)
+                      ? Math.max(0, Number(trip.end_odometer) - Number(trip.start_odometer))
+                      : Number(trip.total_route_km) || 0;
                     const tripClaim = (trip.total_fuel_amount !== undefined && trip.total_fuel_amount !== null)
                       ? Number(trip.total_fuel_amount)
                       : tripKm * Number(trip.fuel_rate_per_km || 5);
