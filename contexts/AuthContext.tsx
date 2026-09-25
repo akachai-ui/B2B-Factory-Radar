@@ -34,6 +34,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const cleanEmail = currentUser.email?.toLowerCase().trim() || '';
       
+      // 0. Check if this email has a pending team invitation
+      let pendingInvite: any = null;
+      if (cleanEmail) {
+        try {
+          const { data: invData } = await supabase
+            .from('team_invitations')
+            .select('*')
+            .ilike('email', cleanEmail)
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (invData) {
+            pendingInvite = invData;
+          }
+        } catch (invErr) {
+          console.warn('Pending invitation lookup warning:', invErr);
+        }
+      }
+
       // 1. First check profile by ID
       let { data, error } = await supabase
         .from('profiles')
@@ -70,7 +90,104 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // 3. If profile exists by ID, but has no company_id, check if an invite existed for this email
+      // 3. If there is a pending invite in team_invitations, automatically link user to the inviting company
+      if (pendingInvite) {
+        let targetComp: any = null;
+        try {
+          const { data: cData } = await supabase
+            .from('companies')
+            .select('*')
+            .eq('id', pendingInvite.company_id)
+            .maybeSingle();
+          targetComp = cData;
+        } catch (cErr) {
+          console.warn('Fetch target invite company error:', cErr);
+        }
+
+        const compName = targetComp?.name || pendingInvite.company_name || 'บริษัทของฉัน';
+        const branch = targetComp?.branch || 'สำนักงานใหญ่';
+        const taxId = targetComp?.tax_id || null;
+        const phone = targetComp?.phone || null;
+        const role = pendingInvite.role || 'sales';
+
+        // Clean up any fallback dummy company created previously for this user
+        if (data?.company_id === currentUser.id) {
+          try {
+            await supabase.from('companies').delete().eq('id', currentUser.id);
+          } catch (delErr) {
+            console.warn('Clean up dummy company error:', delErr);
+          }
+        }
+
+        if (data) {
+          await supabase
+            .from('profiles')
+            .update({
+              company_id: pendingInvite.company_id,
+              company_name: compName,
+              branch: branch,
+              tax_id: taxId,
+              phone: phone || data.phone || null,
+              role: role,
+              account_type: 'company',
+              access_status: 'PRO_UNLOCKED',
+              onboarded: true,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', currentUser.id);
+
+          await supabase
+            .from('team_invitations')
+            .update({ status: 'accepted', updated_at: new Date().toISOString() })
+            .eq('id', pendingInvite.id);
+
+          const { data: updatedProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+
+          if (updatedProfile) data = updatedProfile;
+        } else {
+          const initialAvatar = currentUser.user_metadata?.avatar_url 
+            || currentUser.user_metadata?.picture 
+            || (currentUser.identities?.[0]?.identity_data as any)?.avatar_url 
+            || (currentUser.identities?.[0]?.identity_data as any)?.picture 
+            || null;
+          const userName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || cleanEmail.split('@')[0] || 'ผู้ใช้งาน';
+
+          const newProfilePayload: Partial<UserProfile> = {
+            id: currentUser.id,
+            email: cleanEmail,
+            full_name: userName,
+            avatar_url: initialAvatar,
+            account_type: 'company',
+            company_id: pendingInvite.company_id,
+            company_name: compName,
+            branch: branch,
+            tax_id: taxId,
+            phone: phone,
+            role: role,
+            access_status: 'PRO_UNLOCKED',
+            onboarded: true,
+          };
+
+          const { data: inserted } = await supabase
+            .from('profiles')
+            .insert([newProfilePayload])
+            .select()
+            .maybeSingle();
+
+          await supabase
+            .from('team_invitations')
+            .update({ status: 'accepted', updated_at: new Date().toISOString() })
+            .eq('id', pendingInvite.id);
+
+          data = inserted || (newProfilePayload as any);
+        }
+      }
+
+      // 4. If profile exists by ID, but has no company_id, check if legacy invite existed in profiles
       if (data && !data.company_id && cleanEmail) {
         const { data: inviteRow } = await supabase
           .from('profiles')
@@ -90,6 +207,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               tax_id: inviteRow.tax_id,
               branch: inviteRow.branch,
               account_type: inviteRow.account_type || 'company',
+              access_status: 'PRO_UNLOCKED',
               onboarded: true,
               updated_at: new Date().toISOString(),
             })
@@ -211,25 +329,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
 
+        const isUserOwner = data.role === 'owner' || !data.company_id || data.company_id === currentUser.id;
         const effectiveCompId = data.company_id || currentUser.id;
         const defaultCompName = data.company_name || `ทีมของ ${data.full_name || cleanEmail.split('@')[0]}`;
-        const isUserOwner = data.role === 'owner' || !data.company_id || data.company_id === currentUser.id;
 
-        // Ensure company record exists in public.companies table (only set owner_id if user is owner)
-        try {
-          const compPayload: any = {
-            id: effectiveCompId,
-            name: defaultCompName,
-            branch: data.branch || 'สำนักงานใหญ่',
-            tax_id: data.tax_id || null,
-            phone: data.phone || null,
-          };
-          if (isUserOwner) {
-            compPayload.owner_id = currentUser.id;
+        // Ensure company record exists in public.companies table ONLY for owner
+        if (isUserOwner) {
+          try {
+            const compPayload: any = {
+              id: effectiveCompId,
+              name: defaultCompName,
+              branch: data.branch || 'สำนักงานใหญ่',
+              tax_id: data.tax_id || null,
+              phone: data.phone || null,
+              owner_id: currentUser.id,
+            };
+            await supabase.from('companies').upsert(compPayload, { onConflict: 'id' });
+          } catch (compErr) {
+            console.warn('Auto ensure company error:', compErr);
           }
-          await supabase.from('companies').upsert(compPayload, { onConflict: 'id' });
-        } catch (compErr) {
-          console.warn('Auto ensure company error:', compErr);
         }
 
         // If profile was missing company_id or marked as individual, update profile to Company-First
@@ -239,13 +357,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               company_id: effectiveCompId,
               company_name: defaultCompName,
               account_type: 'company',
-              role: data.role || 'owner',
+              role: data.role || (isUserOwner ? 'owner' : 'sales'),
               updated_at: new Date().toISOString(),
             }).eq('id', currentUser.id);
             data.company_id = effectiveCompId;
             data.company_name = defaultCompName;
             data.account_type = 'company';
-            data.role = data.role || 'owner';
+            data.role = data.role || (isUserOwner ? 'owner' : 'sales');
           } catch (upErr) {
             console.warn('Update profile company-first error:', upErr);
           }
@@ -261,7 +379,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           avatar_url: resolvedAvatar,
         });
       } else if (!data) {
-        // If profile row doesn't exist yet, insert a clean default with Company-First
+        // If profile row doesn't exist yet and no pending invite was found, insert a clean default with Company-First
         let adminGranted = false;
         try {
           const { data: adminRow } = await supabase
@@ -288,7 +406,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || cleanEmail.split('@')[0] || 'ผู้ใช้งาน';
         const companyName = effectiveSuperAdmin ? 'RouteHunter HQ' : `ทีมของ ${userName}`;
 
-        // Create company record first
+        // Create company record for standalone owner
         try {
           await supabase.from('companies').upsert({
             id: currentUser.id,

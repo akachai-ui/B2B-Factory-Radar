@@ -92,6 +92,15 @@ function InviteAcceptContent() {
         .eq('id', invitation.company_id)
         .maybeSingle();
 
+      // Clean up fallback dummy company if user previously had one
+      if (profile?.company_id === user.id) {
+        try {
+          await supabase.from('companies').delete().eq('id', user.id);
+        } catch (delErr) {
+          console.warn('Clean up dummy company error:', delErr);
+        }
+      }
+
       // 2. Update Profile with PRO_UNLOCKED
       await updateProfile({
         company_id: invitation.company_id,
