@@ -765,7 +765,8 @@ export default function LeadsRadarMainPage() {
   // 2. Fetch Team & Company (Fast Parallel Query directly via Supabase)
   const fetchTeam = useCallback(async (targetCompId?: string) => {
     if (!user) return;
-    const activeCompId = targetCompId || profile?.company_id || user.id;
+    const activeCompId = targetCompId || profile?.company_id;
+    if (!activeCompId) return; // Wait until company_id is resolved so we never query dummy user.id
 
     setIsLoadingTeam(true);
     try {
@@ -836,8 +837,6 @@ export default function LeadsRadarMainPage() {
   useEffect(() => {
     if (user && profile?.company_id) {
       fetchTeam(profile.company_id);
-    } else if (user) {
-      fetchTeam();
     }
   }, [user, profile?.company_id, fetchTeam]);
 

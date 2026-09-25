@@ -374,7 +374,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
 
-        setProfile({
+        const finalProfileData: UserProfile = {
           ...(data as UserProfile),
           company_id: effectiveCompId,
           company_name: defaultCompName,
@@ -382,7 +382,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: (data.role || (isUserOwner ? 'owner' : 'sales')) as any,
           access_status: resolvedAccessStatus as any,
           avatar_url: resolvedAvatar,
-        });
+        };
+
+        if (typeof window !== 'undefined' && currentUser.id) {
+          try {
+            localStorage.setItem(`rh_cached_profile_${currentUser.id}`, JSON.stringify(finalProfileData));
+          } catch (e) {}
+        }
+
+        setProfile(finalProfileData);
       } else if (!data) {
         // If profile row doesn't exist yet and no pending invite was found, insert a clean default with Company-First
         let adminGranted = false;
@@ -475,6 +483,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (mounted) {
           setSession(cachedSession);
           setUser(cachedSession.user);
+
+          // Instant profile cache restoration (0ms)
+          if (typeof window !== 'undefined') {
+            const cachedProfJson = localStorage.getItem(`rh_cached_profile_${cachedSession.user.id}`);
+            if (cachedProfJson) {
+              try {
+                const parsedProf = JSON.parse(cachedProfJson);
+                if (parsedProf && parsedProf.company_id) {
+                  setProfile(parsedProf);
+                }
+              } catch (parseErr) {}
+            }
+          }
         }
 
         // 2. Background Revalidate against Server with safety timeout
