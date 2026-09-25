@@ -762,50 +762,41 @@ export default function LeadsRadarMainPage() {
     }
   };
 
-  // 2. Fetch Team & Company (Fast Parallel Query)
+  // 2. Fetch Team & Company (Fast Parallel Query directly via Supabase)
   const fetchTeam = useCallback(async (targetCompId?: string) => {
     if (!user) return;
     const activeCompId = targetCompId || profile?.company_id || user.id;
 
     setIsLoadingTeam(true);
     try {
-      const [teamRes, compRes, invitesRes] = await Promise.all([
-        fetch(`/api/team?companyId=${activeCompId}`).then((r) => r.json()).catch(() => null),
-        Promise.resolve(supabase.from('companies').select('*').eq('id', activeCompId).maybeSingle()).catch(() => ({ data: null })),
-        Promise.resolve(
-          supabase
-            .from('team_invitations')
-            .select('*')
-            .or(`company_id.eq.${activeCompId},invited_by.eq.${activeCompId}`)
-            .eq('status', 'pending')
-            .order('created_at', { ascending: false })
-        ).catch(() => ({ data: null })),
+      const [membersRes, compRes, invitesRes] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('*')
+          .or(`company_id.eq.${activeCompId},id.eq.${activeCompId}`)
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('companies')
+          .select('*')
+          .eq('id', activeCompId)
+          .maybeSingle(),
+        supabase
+          .from('team_invitations')
+          .select('*')
+          .or(`company_id.eq.${activeCompId},invited_by.eq.${activeCompId}`)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false }),
       ]);
 
       if (compRes?.data) {
         setCurrentCompany(compRes.data);
       }
 
-      if (teamRes?.success) {
-        if (Array.isArray(teamRes.members) && teamRes.members.length > 0) {
-          setTeamMembers(teamRes.members as UserProfile[]);
-        }
-        if (Array.isArray(teamRes.invitations)) {
-          setPendingInvitations(teamRes.invitations as TeamInvitation[]);
-        }
-      } else {
-        const { data: membersData } = await supabase
-          .from('profiles')
-          .select('*')
-          .or(`company_id.eq.${activeCompId},id.eq.${activeCompId}`)
-          .order('created_at', { ascending: true });
-        if (membersData && membersData.length > 0) {
-          setTeamMembers(membersData as UserProfile[]);
-        }
+      if (membersRes?.data && Array.isArray(membersRes.data)) {
+        setTeamMembers(membersRes.data as UserProfile[]);
       }
 
-      // Fallback or additional pending invitations check
-      if (invitesRes?.data && (!teamRes?.invitations || teamRes.invitations.length === 0)) {
+      if (invitesRes?.data && Array.isArray(invitesRes.data)) {
         setPendingInvitations(invitesRes.data as TeamInvitation[]);
       }
     } catch (err: any) {
