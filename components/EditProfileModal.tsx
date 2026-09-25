@@ -37,7 +37,10 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [companyName, setCompanyName] = useState('');
-  const [branch, setBranch] = useState('');
+  const [taxId, setTaxId] = useState('');
+  const [branch, setBranch] = useState('สำนักงานใหญ่');
+  const [companyPhone, setCompanyPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -49,8 +52,29 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
       setFullName(profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || '');
       setPhone(profile?.phone || '');
       setCompanyName(profile?.company_name || '');
+      setTaxId(profile?.tax_id || '');
       setBranch(profile?.branch || 'สำนักงานใหญ่');
+      setCompanyPhone(profile?.company_phone || '');
+      setAddress(profile?.company_address || '');
       setAvatarUrl(profile?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || '');
+
+      const targetCompId = profile?.company_id || user?.id;
+      if (targetCompId) {
+        supabase
+          .from('companies')
+          .select('*')
+          .eq('id', targetCompId)
+          .maybeSingle()
+          .then(({ data: comp }) => {
+            if (comp) {
+              if (comp.name) setCompanyName(comp.name);
+              if (comp.tax_id) setTaxId(comp.tax_id);
+              if (comp.branch) setBranch(comp.branch);
+              if (comp.phone) setCompanyPhone(comp.phone);
+              if (comp.address) setAddress(comp.address);
+            }
+          });
+      }
     }
   }, [profile, user, isOpen]);
 
@@ -109,17 +133,40 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
     setSuccessMsg(null);
 
     try {
+      const targetCompId = profile?.company_id || user?.id;
+      const finalCompName = companyName.trim() || `ทีมของ ${fullName.trim() || user?.email?.split('@')[0]}`;
+
+      if (user && targetCompId) {
+        try {
+          await supabase.from('companies').upsert({
+            id: targetCompId,
+            name: finalCompName,
+            tax_id: taxId.trim() || null,
+            branch: branch.trim() || 'สำนักงานใหญ่',
+            phone: companyPhone.trim() || null,
+            address: address.trim() || null,
+            owner_id: user.id,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'id' });
+        } catch (cErr) {
+          console.warn('Upsert company error:', cErr);
+        }
+      }
+
       const { error } = await updateProfile({
         full_name: fullName.trim(),
         phone: phone.trim() || null,
-        company_name: companyName.trim() || null,
+        company_name: finalCompName,
+        tax_id: taxId.trim() || null,
         branch: branch.trim() || 'สำนักงานใหญ่',
+        company_phone: companyPhone.trim() || null,
+        company_address: address.trim() || null,
         avatar_url: avatarUrl.trim() || null,
       });
 
       if (error) throw error;
 
-      setSuccessMsg('บันทึกข้อมูลโปรไฟล์เรียบร้อยแล้ว');
+      setSuccessMsg('บันทึกข้อมูลโปรไฟล์และบริษัทเรียบร้อยแล้ว');
       setTimeout(() => {
         onClose();
       }, 1000);
@@ -280,29 +327,66 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {/* Company Details (Companies Table) */}
+            <div className="p-3.5 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-3">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>ชื่อบริษัท / ทีม</span>
+                <label className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>ชื่อบริษัท / องค์กร / ทีม (White-label)</span>
                 </label>
                 <input
                   type="text"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                   placeholder="เช่น บจก. อินโนวาเทค"
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition font-medium"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-300">เลขผู้เสียภาษี 13 หลัก</label>
+                  <input
+                    type="text"
+                    value={taxId}
+                    onChange={(e) => setTaxId(e.target.value)}
+                    placeholder="010555xxxxxxx"
+                    maxLength={13}
+                    className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition font-mono"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-300">สาขา</label>
+                  <input
+                    type="text"
+                    value={branch}
+                    onChange={(e) => setBranch(e.target.value)}
+                    placeholder="สำนักงานใหญ่"
+                    className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-300">เบอร์โทรศัพท์บริษัท / สำนักงาน</label>
+                <input
+                  type="tel"
+                  value={companyPhone}
+                  onChange={(e) => setCompanyPhone(e.target.value)}
+                  placeholder="เช่น 02-123-4567"
+                  className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition font-mono"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-300">สาขา</label>
-                <input
-                  type="text"
-                  value={branch}
-                  onChange={(e) => setBranch(e.target.value)}
-                  placeholder="สำนักงานใหญ่"
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition"
+                <label className="text-xs font-bold text-slate-300">ที่อยู่สำนักงาน / บริษัท</label>
+                <textarea
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="เช่น 123/45 ถ.บางนา-ตราด ต.บางพลีใหญ่ อ.บางพลี จ.สมุทรปราการ 10540"
+                  rows={2}
+                  className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition resize-none leading-relaxed"
                 />
               </div>
             </div>

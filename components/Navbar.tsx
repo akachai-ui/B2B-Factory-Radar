@@ -32,12 +32,14 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-  // Form State for Profile Editing
+  // Form State for Profile & Company Editing
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [companyName, setCompanyName] = useState(profile?.company_name || '');
   const [taxId, setTaxId] = useState(profile?.tax_id || '');
   const [branch, setBranch] = useState(profile?.branch || 'สำนักงานใหญ่');
   const [phone, setPhone] = useState(profile?.phone || '');
+  const [companyPhone, setCompanyPhone] = useState(profile?.company_phone || '');
+  const [address, setAddress] = useState(profile?.company_address || '');
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -53,16 +55,39 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
     || null;
   const currentAvatar = (profile?.avatar_url && profile.avatar_url.trim() !== '') ? profile.avatar_url : (googleAvatar || null);
 
-  const handleOpenProfileModal = () => {
+  const handleOpenProfileModal = async () => {
     setFullName(profile?.full_name || '');
     setCompanyName(profile?.company_name || `ทีมของ ${displayName}`);
     setTaxId(profile?.tax_id || '');
     setBranch(profile?.branch || 'สำนักงานใหญ่');
     setPhone(profile?.phone || '');
+    setCompanyPhone(profile?.company_phone || '');
+    setAddress(profile?.company_address || '');
     setAvatarUrl(profile?.avatar_url || currentAvatar || '');
     setIsProfileModalOpen(true);
     setIsDropdownOpen(false);
     setSaveSuccess(false);
+
+    const targetCompId = profile?.company_id || user?.id;
+    if (targetCompId) {
+      try {
+        const { data: comp } = await supabase
+          .from('companies')
+          .select('*')
+          .eq('id', targetCompId)
+          .maybeSingle();
+
+        if (comp) {
+          if (comp.name) setCompanyName(comp.name);
+          if (comp.tax_id) setTaxId(comp.tax_id);
+          if (comp.branch) setBranch(comp.branch);
+          if (comp.phone) setCompanyPhone(comp.phone);
+          if (comp.address) setAddress(comp.address);
+        }
+      } catch (cErr) {
+        console.warn('Load company details error:', cErr);
+      }
+    }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,8 +142,10 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
           name: finalCompName,
           tax_id: taxId.trim() || null,
           branch: branch.trim() || 'สำนักงานใหญ่',
-          phone: phone.trim() || null,
+          phone: companyPhone.trim() || null,
+          address: address.trim() || null,
           owner_id: user.id,
+          updated_at: new Date().toISOString(),
         }, { onConflict: 'id' });
       } catch (cErr) {
         console.warn('Upsert company on save error:', cErr);
@@ -133,7 +160,7 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
         avatar_url: avatarUrl.trim() || null,
       });
     } else {
-      // Owners can update company details, tax id, branch, name, phone, and avatar
+      // Owners can update company details, tax id, branch, name, phone, address, and avatar
       await updateProfile({
         account_type: 'company',
         full_name: fullName.trim() || displayName,
@@ -143,6 +170,8 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
         tax_id: taxId.trim() || null,
         branch: branch.trim() || 'สำนักงานใหญ่',
         phone: phone.trim(),
+        company_phone: companyPhone.trim() || null,
+        company_address: address.trim() || null,
       });
     }
 
@@ -494,6 +523,30 @@ export function Navbar({ onOpenAuth }: NavbarProps) {
                         className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition"
                       />
                     </div>
+                  </div>
+
+                  {/* Company Phone */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-slate-400">เบอร์โทรศัพท์บริษัท / สำนักงาน <span className="text-[10px] text-slate-500">(ไม่บังคับ)</span></label>
+                    <input
+                      type="tel"
+                      value={companyPhone}
+                      onChange={(e) => setCompanyPhone(e.target.value)}
+                      placeholder="เช่น 02-123-4567"
+                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition font-mono"
+                    />
+                  </div>
+
+                  {/* Company Address */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-slate-400">ที่อยู่สำนักงาน / บริษัท <span className="text-[10px] text-slate-500">(ไม่บังคับ)</span></label>
+                    <textarea
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="เช่น 123/45 ถ.บางนา-ตราด ต.บางพลีใหญ่ อ.บางพลี จ.สมุทรปราการ 10540"
+                      rows={2}
+                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition resize-none leading-relaxed"
+                    />
                   </div>
 
                 </div>

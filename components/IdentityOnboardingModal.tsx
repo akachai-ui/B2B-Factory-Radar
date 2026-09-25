@@ -26,6 +26,8 @@ export function IdentityOnboardingModal({ isOpen, onComplete }: IdentityOnboardi
   const [taxId, setTaxId] = useState(profile?.tax_id || '');
   const [branch, setBranch] = useState(profile?.branch || 'สำนักงานใหญ่');
   const [phone, setPhone] = useState(profile?.phone || '');
+  const [companyPhone, setCompanyPhone] = useState(profile?.company_phone || '');
+  const [address, setAddress] = useState(profile?.company_address || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -53,8 +55,10 @@ export function IdentityOnboardingModal({ isOpen, onComplete }: IdentityOnboardi
           name: finalCompName,
           tax_id: taxId.trim() || null,
           branch: branch.trim() || 'สำนักงานใหญ่',
-          phone: phone.trim() || null,
+          phone: companyPhone.trim() || null,
+          address: address.trim() || null,
           owner_id: user.id,
+          updated_at: new Date().toISOString(),
         }, { onConflict: 'id' });
       } catch (cErr) {
         console.warn('Onboarding company upsert error:', cErr);
@@ -68,6 +72,8 @@ export function IdentityOnboardingModal({ isOpen, onComplete }: IdentityOnboardi
         tax_id: taxId.trim() || null,
         branch: branch.trim() || 'สำนักงานใหญ่',
         phone: phone.trim() || null,
+        company_phone: companyPhone.trim() || null,
+        company_address: address.trim() || null,
         company_id: linkedCompanyId,
         role: profile?.role || 'owner',
         onboarded: true,
@@ -146,13 +152,42 @@ export function IdentityOnboardingModal({ isOpen, onComplete }: IdentityOnboardi
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Phone */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400">เบอร์โทรศัพท์ติดต่อ</label>
+                <label className="text-[11px] font-bold text-slate-400">เบอร์โทรศัพท์ติดต่อ (เซลล์)</label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="เช่น 081-234-5678"
                   className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition"
+                />
+              </div>
+
+              {/* Company Phone */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-400">เบอร์โทรศัพท์บริษัท / สำนักงาน</label>
+                <input
+                  type="tel"
+                  value={companyPhone}
+                  onChange={(e) => setCompanyPhone(e.target.value)}
+                  placeholder="เช่น 02-123-4567"
+                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Tax ID */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-400">
+                  เลขประจำตัวผู้เสียภาษี 13 หลัก <span className="text-[10px] text-slate-500">(ไม่บังคับ)</span>
+                </label>
+                <input
+                  type="text"
+                  value={taxId}
+                  onChange={(e) => setTaxId(e.target.value)}
+                  placeholder="010555xxxxxxx"
+                  maxLength={13}
+                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition font-mono"
                 />
               </div>
 
@@ -169,18 +204,15 @@ export function IdentityOnboardingModal({ isOpen, onComplete }: IdentityOnboardi
               </div>
             </div>
 
-            {/* Tax ID */}
+            {/* Company Address */}
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-slate-400">
-                เลขประจำตัวผู้เสียภาษี 13 หลัก <span className="text-[10px] text-slate-500">(ไม่บังคับ)</span>
-              </label>
-              <input
-                type="text"
-                value={taxId}
-                onChange={(e) => setTaxId(e.target.value)}
-                placeholder="010555xxxxxxx"
-                maxLength={13}
-                className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition font-mono"
+              <label className="text-[11px] font-bold text-slate-400">ที่อยู่สำนักงาน / บริษัท <span className="text-[10px] text-slate-500">(ไม่บังคับ)</span></label>
+              <textarea
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="เช่น 123/45 ถ.บางนา-ตราด ต.บางพลีใหญ่ อ.บางพลี จ.สมุทรปราการ 10540"
+                rows={2}
+                className="w-full px-3.5 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 outline-none focus:border-amber-400 transition resize-none leading-relaxed"
               />
             </div>
 
