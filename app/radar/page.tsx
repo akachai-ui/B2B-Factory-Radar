@@ -2316,9 +2316,14 @@ export default function LeadsRadarMainPage() {
         )}
 
         {/* ---------------------------------------------------- */}
-        {/* TAB 2: PLASTIC RESIN MARKET INTELLIGENCE & SIZING     */}
-        {/* ---------------------------------------------------- */}
-        {mainTab === 'market' && <PlasticMarketIntelligence />}
+        {mainTab === 'market' && (
+          <PlasticMarketIntelligence
+            onNavigateToMarketplace={(keyword?: string) => {
+              if (keyword) setSearchQuery(keyword);
+              setMainTab('marketplace');
+            }}
+          />
+        )}
 
         {/* ---------------------------------------------------- */}
         {/* TAB 3: LEAD MARKETPLACE (SHOPPING MALL CATALOG)       */}
@@ -4615,7 +4620,12 @@ export default function LeadsRadarMainPage() {
         {/* ---------------------------------------------------- */}
         {mobileTab === 'market' && (
           <div className="flex-1 p-3.5 pb-8 space-y-4 animate-in fade-in duration-150">
-            <PlasticMarketIntelligence />
+            <PlasticMarketIntelligence
+              onNavigateToMarketplace={(keyword?: string) => {
+                if (keyword) setSearchQuery(keyword);
+                setMobileTab('marketplace');
+              }}
+            />
           </div>
         )}
 
