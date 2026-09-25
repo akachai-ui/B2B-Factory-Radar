@@ -152,12 +152,22 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
       const odoKm = Number(t.total_odometer_km) || 0;
       const rKm = Number(t.total_route_km) || 0;
       const diffKm = odoKm - rKm;
+      const statusLabel =
+        t.status === 'approved'
+          ? 'อนุมัติแล้ว'
+          : t.status === 'completed'
+          ? 'รออนุมัติ'
+          : t.status === 'rejected'
+          ? 'ไม่อนุมัติ'
+          : 'กำลังเดินทาง';
+      const vehicleLabel = t.vehicle_type === 'motorcycle' ? 'มอเตอร์ไซค์' : 'รถยนต์';
+
       return [
         `"${t.trip_date}"`,
-        `"${t.user_name || 'ไม่ระบุ'}"`,
+        `"${t.user_name || t.user_email || 'ไม่ระบุ'}"`,
         `"${t.user_email || ''}"`,
         `"${t.license_plate || ''}"`,
-        `"${t.vehicle_type || 'car'}"`,
+        `"${vehicleLabel}"`,
         t.start_odometer,
         t.end_odometer || '',
         odoKm.toFixed(1),
@@ -167,7 +177,7 @@ export function MileageFuelReportModal({ isOpen, onClose }: MileageFuelReportMod
         t.net_claimable_km || '',
         t.fuel_rate_per_km,
         t.total_fuel_amount || 0,
-        `"${t.status}"`,
+        `"${statusLabel}"`,
         `"${t.approver_name || ''}"`,
       ].join(',');
     });

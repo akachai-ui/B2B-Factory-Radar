@@ -47,10 +47,10 @@ export async function GET(request: NextRequest) {
         const query = `
           SELECT 
             vt.*,
-            p.full_name AS user_name,
+            COALESCE(NULLIF(p.full_name, ''), p.email, 'ไม่ระบุ') AS user_name,
             p.email AS user_email,
             p.avatar_url AS user_avatar,
-            ap.full_name AS approver_name
+            COALESCE(NULLIF(ap.full_name, ''), ap.email, NULL) AS approver_name
           FROM public.vehicle_trips vt
           LEFT JOIN public.profiles p ON vt.user_id = p.id
           LEFT JOIN public.profiles ap ON vt.approved_by = ap.id
@@ -113,10 +113,41 @@ export async function GET(request: NextRequest) {
     const { data: tripsData, error: tripsError } = await sb;
     if (tripsError) throw tripsError;
 
-    const formattedTrips = (tripsData || []).map((t: any) => ({
-      ...t,
-      checkins: t.trip_checkins || [],
-    }));
+    // Fetch user profiles for user_name, user_email, and approver_name
+    const profileIds = Array.from(
+      new Set(
+        [
+          ...(tripsData || []).map((t: any) => t.user_id),
+          ...(tripsData || []).map((t: any) => t.approved_by),
+        ].filter(Boolean)
+      )
+    );
+
+    const profileMap: Record<string, any> = {};
+    if (profileIds.length > 0) {
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, avatar_url')
+        .in('id', profileIds);
+
+      (profilesData || []).forEach((p: any) => {
+        profileMap[p.id] = p;
+      });
+    }
+
+    const formattedTrips = (tripsData || []).map((t: any) => {
+      const userProfile = profileMap[t.user_id];
+      const approverProfile = t.approved_by ? profileMap[t.approved_by] : null;
+
+      return {
+        ...t,
+        user_name: userProfile?.full_name || userProfile?.email || 'ไม่ระบุ',
+        user_email: userProfile?.email || null,
+        user_avatar: userProfile?.avatar_url || null,
+        approver_name: approverProfile?.full_name || approverProfile?.email || (t.approved_by ? 'ผู้อนุมัติ' : null),
+        checkins: t.trip_checkins || [],
+      };
+    });
 
     return NextResponse.json({
       success: true,
