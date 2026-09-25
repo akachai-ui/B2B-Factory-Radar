@@ -199,9 +199,15 @@ export default function LeadsRadarMainPage() {
   const [teamMembers, setTeamMembers] = useState<UserProfile[]>([]);
 
   // Pro / Freemium Access Control & Preview Mode Gate (Inherits from Super Admin or Company Owner if approved)
-  const companyOwnerMember = teamMembers.find((m) => m.role === 'owner' || (currentCompany?.owner_id && m.id === currentCompany.owner_id));
-  const isCompanyOwnerUnlocked = companyOwnerMember?.access_status === 'PRO_UNLOCKED' || teamMembers.some((m) => m.access_status === 'PRO_UNLOCKED');
-  const isProUnlocked = isSuperAdmin || profile?.access_status === 'PRO_UNLOCKED' || !!isCompanyOwnerUnlocked;
+  const isCompanyOwnerUnlocked = useMemo(() => {
+    if (profile?.company_id && profile.company_id !== profile.id && profile.role !== 'owner') {
+      return true; // Team members in company automatically inherit Pro
+    }
+    const companyOwnerMember = teamMembers.find((m) => m.role === 'owner' || (currentCompany?.owner_id && m.id === currentCompany.owner_id));
+    return companyOwnerMember?.access_status === 'PRO_UNLOCKED' || teamMembers.some((m) => m.access_status === 'PRO_UNLOCKED' || m.role === 'owner');
+  }, [profile?.company_id, profile?.id, profile?.role, teamMembers, currentCompany?.owner_id]);
+
+  const isProUnlocked = isSuperAdmin || profile?.access_status === 'PRO_UNLOCKED' || isCompanyOwnerUnlocked;
   const isPreviewMode = !isProUnlocked;
   const [isAccessLockModalOpen, setIsAccessLockModalOpen] = useState(false);
   const [accessLockFeatureName, setAccessLockFeatureName] = useState('ฟังก์ชันพิเศษ Pro');
@@ -756,77 +762,45 @@ export default function LeadsRadarMainPage() {
     }
   };
 
-  // 2. Fetch Team & Company
-  const fetchTeam = async () => {
+  // 2. Fetch Team & Company (Fast Parallel Query)
+  const fetchTeam = useCallback(async (targetCompId?: string) => {
     if (!user) return;
+    const activeCompId = targetCompId || profile?.company_id || user.id;
+
     setIsLoadingTeam(true);
     try {
-      let activeCompId = profile?.company_id;
-      if (!activeCompId) {
-        const { data: comp } = await supabase
-          .from('companies')
-          .select('*')
-          .eq('owner_id', user.id)
-          .maybeSingle();
+      const [teamRes, compRes, invitesRes] = await Promise.all([
+        fetch(`/api/team?companyId=${activeCompId}`).then((r) => r.json()).catch(() => null),
+        Promise.resolve(supabase.from('companies').select('*').eq('id', activeCompId).maybeSingle()).catch(() => ({ data: null })),
+        Promise.resolve(supabase.from('team_invitations').select('*').eq('company_id', activeCompId).eq('status', 'pending').order('created_at', { ascending: false })).catch(() => ({ data: null })),
+      ]);
 
-        if (comp) {
-          setCurrentCompany(comp);
-          activeCompId = comp.id;
-          if (!profile?.company_id) {
-            await updateProfile({ company_id: comp.id, company_name: comp.name, tax_id: comp.tax_id, branch: comp.branch });
-          }
-        }
-      } else {
-        const { data: comp } = await supabase
-          .from('companies')
-          .select('*')
-          .eq('id', activeCompId)
-          .maybeSingle();
-        if (comp) setCurrentCompany(comp);
+      if (compRes?.data) {
+        setCurrentCompany(compRes.data);
       }
 
-      const searchId = activeCompId || profile?.id || user.id;
-
-      // Active Team Members
-      try {
-        const teamRes = await fetch(`/api/team?companyId=${searchId}`);
-        const teamJson = await teamRes.json();
-        if (teamJson.success && teamJson.members) {
-          setTeamMembers(teamJson.members as UserProfile[]);
-        } else {
-          const { data: membersData } = await supabase
-            .from('profiles')
-            .select('*')
-            .or(`company_id.eq.${searchId},id.eq.${searchId}`)
-            .order('created_at', { ascending: true });
-          if (membersData) setTeamMembers(membersData as UserProfile[]);
-        }
-      } catch (e) {
+      if (teamRes?.success && Array.isArray(teamRes.members) && teamRes.members.length > 0) {
+        setTeamMembers(teamRes.members as UserProfile[]);
+      } else {
         const { data: membersData } = await supabase
           .from('profiles')
           .select('*')
-          .or(`company_id.eq.${searchId},id.eq.${searchId}`)
+          .or(`company_id.eq.${activeCompId},id.eq.${activeCompId}`)
           .order('created_at', { ascending: true });
-        if (membersData) setTeamMembers(membersData as UserProfile[]);
+        if (membersData && membersData.length > 0) {
+          setTeamMembers(membersData as UserProfile[]);
+        }
       }
 
-      // Pending Invitations
-      const { data: invitesData } = await supabase
-        .from('team_invitations')
-        .select('*')
-        .eq('company_id', searchId)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-
-      if (invitesData) {
-        setPendingInvitations(invitesData as TeamInvitation[]);
+      if (invitesRes?.data) {
+        setPendingInvitations(invitesRes.data as TeamInvitation[]);
       }
     } catch (err: any) {
       console.warn('Fetch team warning:', err);
     } finally {
       setIsLoadingTeam(false);
     }
-  };
+  }, [user, profile?.company_id]);
 
   // 3. Fetch Unassigned Leads Pool (Leads without assigned sales rep)
   const fetchUnassignedLeads = useCallback(async () => {
@@ -852,15 +826,16 @@ export default function LeadsRadarMainPage() {
   useEffect(() => {
     if (user) {
       fetchLeads();
-      fetchTeam();
     }
   }, [user]);
 
   useEffect(() => {
-    if (user && profile) {
+    if (user && profile?.company_id) {
+      fetchTeam(profile.company_id);
+    } else if (user) {
       fetchTeam();
     }
-  }, [user, profile]);
+  }, [user, profile?.company_id, fetchTeam]);
 
   useEffect(() => {
     if (user && effectiveCompanyId) {
