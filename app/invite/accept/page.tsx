@@ -74,11 +74,41 @@ function InviteAcceptContent() {
     loadInvite();
   }, [inviteId]);
 
+  // Auto-sync profile if user is logged in with matching invitation
+  useEffect(() => {
+    async function syncAcceptedUser() {
+      if (!user || !invitation) return;
+      const cleanUserEmail = user.email?.toLowerCase().trim() || '';
+      const cleanInviteEmail = invitation.email?.toLowerCase().trim() || '';
+
+      if (cleanUserEmail === cleanInviteEmail && profile?.company_id !== invitation.company_id) {
+        try {
+          if (profile?.company_id === user.id) {
+            await supabase.from('companies').delete().eq('id', user.id);
+          }
+          await updateProfile({
+            company_id: invitation.company_id,
+            company_name: invitation.company_name,
+            role: invitation.role || 'sales',
+            account_type: 'company',
+            access_status: 'PRO_UNLOCKED',
+            onboarded: true,
+          });
+          await refreshProfile();
+        } catch (e) {
+          console.warn('Auto-sync invite error:', e);
+        }
+      }
+    }
+
+    syncAcceptedUser();
+  }, [user, invitation, profile?.company_id]);
+
   // Handle Accept Invitation
   const handleAccept = async () => {
     if (!user || !invitation) return;
     if (invitation.status === 'accepted') {
-      router.replace('/');
+      await handleGoToDashboard();
       return;
     }
     setIsProcessing(true);
@@ -128,7 +158,7 @@ function InviteAcceptContent() {
       await refreshProfile();
 
       setTimeout(() => {
-        router.replace('/');
+        router.replace('/radar');
       }, 1200);
     } catch (err: any) {
       console.error('Accept invite error:', err);
@@ -136,6 +166,28 @@ function InviteAcceptContent() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleGoToDashboard = async () => {
+    if (user && invitation) {
+      if (profile?.company_id !== invitation.company_id) {
+        if (profile?.company_id === user.id) {
+          try {
+            await supabase.from('companies').delete().eq('id', user.id);
+          } catch (e) {}
+        }
+        await updateProfile({
+          company_id: invitation.company_id,
+          company_name: invitation.company_name,
+          role: invitation.role || 'sales',
+          account_type: 'company',
+          access_status: 'PRO_UNLOCKED',
+          onboarded: true,
+        });
+        await refreshProfile();
+      }
+    }
+    router.replace('/radar');
   };
 
   // Handle Decline Invitation
@@ -278,7 +330,7 @@ function InviteAcceptContent() {
             </div>
 
             <button
-              onClick={() => router.replace('/')}
+              onClick={handleGoToDashboard}
               className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 cursor-pointer active:scale-95 flex items-center justify-center gap-2"
             >
               <span>👉 เข้าสู่หน้าหลัก Dashboard (RouteHunter)</span>

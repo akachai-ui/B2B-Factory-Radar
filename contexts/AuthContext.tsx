@@ -34,23 +34,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const cleanEmail = currentUser.email?.toLowerCase().trim() || '';
       
-      // 0. Check if this email has a pending team invitation
-      let pendingInvite: any = null;
+      // 0. Check if this email has a team invitation (either pending or accepted)
+      let matchedInvite: any = null;
       if (cleanEmail) {
         try {
           const { data: invData } = await supabase
             .from('team_invitations')
             .select('*')
             .ilike('email', cleanEmail)
-            .eq('status', 'pending')
+            .in('status', ['pending', 'accepted'])
             .order('created_at', { ascending: false })
             .limit(1)
             .maybeSingle();
           if (invData) {
-            pendingInvite = invData;
+            matchedInvite = invData;
           }
         } catch (invErr) {
-          console.warn('Pending invitation lookup warning:', invErr);
+          console.warn('Team invitation lookup warning:', invErr);
         }
       }
 
@@ -90,28 +90,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // 3. If there is a pending invite in team_invitations, automatically link user to the inviting company
-      if (pendingInvite) {
+      // 3. If there is a team invitation AND (user has no profile OR user is stuck with a fallback personal company id OR invite is pending)
+      const isStuckInPersonalCompany = !data || !data.company_id || data.company_id === currentUser.id || data.company_name === 'บริษัทของฉัน';
+      if (matchedInvite && (isStuckInPersonalCompany || matchedInvite.status === 'pending')) {
         let targetComp: any = null;
         try {
           const { data: cData } = await supabase
             .from('companies')
             .select('*')
-            .eq('id', pendingInvite.company_id)
+            .eq('id', matchedInvite.company_id)
             .maybeSingle();
           targetComp = cData;
         } catch (cErr) {
           console.warn('Fetch target invite company error:', cErr);
         }
 
-        const compName = targetComp?.name || pendingInvite.company_name || 'บริษัทของฉัน';
+        const compName = targetComp?.name || matchedInvite.company_name || 'บริษัทของฉัน';
         const branch = targetComp?.branch || 'สำนักงานใหญ่';
         const taxId = targetComp?.tax_id || null;
         const phone = targetComp?.phone || null;
-        const role = pendingInvite.role || 'sales';
+        const role = matchedInvite.role || 'sales';
 
         // Clean up any fallback dummy company created previously for this user
-        if (data?.company_id === currentUser.id) {
+        if (data?.company_id === currentUser.id || isStuckInPersonalCompany) {
           try {
             await supabase.from('companies').delete().eq('id', currentUser.id);
           } catch (delErr) {
@@ -123,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await supabase
             .from('profiles')
             .update({
-              company_id: pendingInvite.company_id,
+              company_id: matchedInvite.company_id,
               company_name: compName,
               branch: branch,
               tax_id: taxId,
@@ -136,10 +137,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             })
             .eq('id', currentUser.id);
 
-          await supabase
-            .from('team_invitations')
-            .update({ status: 'accepted', updated_at: new Date().toISOString() })
-            .eq('id', pendingInvite.id);
+          if (matchedInvite.status !== 'accepted') {
+            await supabase
+              .from('team_invitations')
+              .update({ status: 'accepted', updated_at: new Date().toISOString() })
+              .eq('id', matchedInvite.id);
+          }
 
           const { data: updatedProfile } = await supabase
             .from('profiles')
@@ -162,7 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             full_name: userName,
             avatar_url: initialAvatar,
             account_type: 'company',
-            company_id: pendingInvite.company_id,
+            company_id: matchedInvite.company_id,
             company_name: compName,
             branch: branch,
             tax_id: taxId,
@@ -178,10 +181,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .select()
             .maybeSingle();
 
-          await supabase
-            .from('team_invitations')
-            .update({ status: 'accepted', updated_at: new Date().toISOString() })
-            .eq('id', pendingInvite.id);
+          if (matchedInvite.status !== 'accepted') {
+            await supabase
+              .from('team_invitations')
+              .update({ status: 'accepted', updated_at: new Date().toISOString() })
+              .eq('id', matchedInvite.id);
+          }
 
           data = inserted || (newProfilePayload as any);
         }
