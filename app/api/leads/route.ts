@@ -61,7 +61,7 @@ export async function GET(request: Request) {
       }
     }
 
-    // Default: Query from public.leads (989 Verified Factory Leads)
+    // Default: Query from public.factory_leads (Industrial Factory Leads)
     if (pool) {
       try {
         const conditions: string[] = ["1=1"];
@@ -79,55 +79,70 @@ export async function GET(request: Request) {
         }
 
         if (query && query.trim()) {
-          conditions.push(`(name ILIKE $${pIdx} OR company_name ILIKE $${pIdx} OR address ILIKE $${pIdx} OR subdistrict ILIKE $${pIdx} OR district ILIKE $${pIdx})`);
+          conditions.push(`(name ILIKE $${pIdx} OR company_name ILIKE $${pIdx} OR address ILIKE $${pIdx} OR subdistrict ILIKE $${pIdx} OR district ILIKE $${pIdx} OR notes ILIKE $${pIdx})`);
           values.push(`%${query.trim()}%`);
           pIdx++;
         }
 
         const sql = `
           SELECT 
-            id, place_id, name, company_name, address, road, district,
-            subdistrict, province, postal_code, phone, website, email,
-            lat, lng, maps_url, rating, user_ratings_total,
-            'leads' as source_type, created_at
-          FROM public.leads
+            id, place_id, name, company_name, address, district,
+            subdistrict, province, phone, website, email,
+            lat, lng, maps_url, status, sales_rep, contact_person, notes,
+            'leads' as source_type, created_at, updated_at
+          FROM public.factory_leads
           WHERE ${conditions.join(" AND ")}
           ORDER BY id ASC
           LIMIT ${limit};
         `;
 
         const res = await pool.query(sql, values);
-        return NextResponse.json({
-          success: true,
-          source: 'leads',
-          total: res.rows.length,
-          leads: res.rows,
-        });
+        if (res.rows.length > 0) {
+          return NextResponse.json({
+            success: true,
+            source: 'factory_leads',
+            total: res.rows.length,
+            leads: res.rows,
+          });
+        }
       } catch (poolErr) {
-        console.warn("Leads pool query failed, falling back to Supabase client:", poolErr);
+        console.warn("Factory leads pool query failed, falling back to Supabase client:", poolErr);
       }
     }
 
     // Supabase REST Client fallback (Guaranteed to work on Cloud / Vercel!)
-    let sb = supabase.from('leads').select('*').limit(limit);
+    let sb = supabase.from('factory_leads').select('*').limit(limit);
+    if (province && province !== 'ALL') {
+      sb = sb.ilike('province', `%${province.replace(/^จ\./, '')}%`);
+    }
     if (district && district !== 'ALL') {
       sb = sb.ilike('district', `%${district.replace(/^(อ\.|เขต)/, '')}%`);
     }
     if (query && query.trim()) {
-      sb = sb.or(`name.ilike.%${query.trim()}%,company_name.ilike.%${query.trim()}%,address.ilike.%${query.trim()}%`);
+      sb = sb.or(`name.ilike.%${query.trim()}%,company_name.ilike.%${query.trim()}%,address.ilike.%${query.trim()}%,notes.ilike.%${query.trim()}%`);
     }
 
     const { data, error } = await sb;
-    if (error) throw error;
+    if (error) {
+      // Fallback to leads table if factory_leads is unavailable
+      const { data: fallbackLeads, error: fbErr } = await supabase.from('leads').select('*').limit(limit);
+      if (fbErr) throw error;
+      return NextResponse.json({
+        success: true,
+        source: 'leads',
+        total: fallbackLeads?.length || 0,
+        leads: (fallbackLeads || []).map((l) => ({ ...l, source_type: 'leads' })),
+      });
+    }
 
     return NextResponse.json({
       success: true,
-      source: 'leads',
+      source: 'factory_leads',
       total: data?.length || 0,
       leads: (data || []).map((l) => ({ ...l, source_type: 'leads' })),
     });
   } catch (error: any) {
-    console.error("Fetch leads error:", error);
+    console.error("Fetch factory leads error:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

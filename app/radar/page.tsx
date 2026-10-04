@@ -730,9 +730,13 @@ export default function LeadsRadarMainPage() {
         }
       }
 
-      // Tier 2: Try Direct Supabase SDK
-      const { data: sbLeads, error } = await supabase.from('leads').select('*').limit(2000);
-      if (!error && sbLeads && sbLeads.length > 0) {
+      // Tier 2: Try Direct Supabase SDK (factory_leads table)
+      let { data: sbLeads, error } = await supabase.from('factory_leads').select('*').limit(5000);
+      if (error || !sbLeads || sbLeads.length === 0) {
+        const { data: fallbackLeads } = await supabase.from('leads').select('*').limit(5000);
+        if (fallbackLeads && fallbackLeads.length > 0) sbLeads = fallbackLeads;
+      }
+      if (sbLeads && sbLeads.length > 0) {
         setLeads(sbLeads as FactoryLead[]);
         return;
       }
