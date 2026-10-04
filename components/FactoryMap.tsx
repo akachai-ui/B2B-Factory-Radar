@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FactoryLead } from '@/lib/types';
 import { maskCompanyName, maskAddress } from '@/lib/leadUtils';
 import districtsGeoJson from '@/lib/geojson/samutprakan_districts.json';
+import thailandProvincesGeoJson from '@/lib/geojson/thailand_provinces.json';
 import {
   MapPin,
   Navigation,
@@ -27,6 +28,8 @@ export interface FactoryMapProps {
   onDistrictSelect?: (district: string) => void;
   selectedRadius: string;
   onSelectRadius?: (radius: string) => void;
+  selectedStatus?: string;
+  onStatusSelect?: (status: string) => void;
   onLeadClick?: (lead: FactoryLead) => void;
   provinces?: string[];
   provinceCounts?: Record<string, number>;
@@ -62,6 +65,8 @@ export function FactoryMap({
   onDistrictSelect,
   selectedRadius,
   onSelectRadius,
+  selectedStatus = 'ALL',
+  onStatusSelect,
   onLeadClick,
   provinces,
   provinceCounts,
@@ -76,7 +81,8 @@ export function FactoryMap({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersClusterGroupRef = useRef<any>(null);
-  const geoJsonLayerRef = useRef<any>(null);
+  const provinceGeoJsonLayerRef = useRef<any>(null);
+  const districtGeoJsonLayerRef = useRef<any>(null);
   const userMarkerRef = useRef<any>(null);
   const radiusCircleRef = useRef<any>(null);
   const selectedMarkerRef = useRef<any>(null);
@@ -95,7 +101,7 @@ export function FactoryMap({
     if (!L) return;
 
     if (!mapInstanceRef.current) {
-      // Create map instance centered on Samut Prakan
+      // Create map instance centered on Thailand/user location
       const map = L.map(mapContainerRef.current, {
         center: [userLocation.lat || 13.6062, userLocation.lng || 100.6974],
         zoom: 11,
@@ -177,84 +183,152 @@ export function FactoryMap({
     tileLayerRef.current = tileGroup;
   }, [mapTheme]);
 
-  // 3. Render Samut Prakan GeoJSON District Polygons
+  // 3. Render Nationwide Thailand Province Boundary Polygons & Samut Prakan District Polygons
   useEffect(() => {
     if (!mapInstanceRef.current || typeof window === 'undefined') return;
     const L = (window as any).L;
     if (!L) return;
 
-    if (geoJsonLayerRef.current) {
-      mapInstanceRef.current.removeLayer(geoJsonLayerRef.current);
+    // Clean up previous GeoJSON layers
+    if (provinceGeoJsonLayerRef.current) {
+      mapInstanceRef.current.removeLayer(provinceGeoJsonLayerRef.current);
+      provinceGeoJsonLayerRef.current = null;
+    }
+    if (districtGeoJsonLayerRef.current) {
+      mapInstanceRef.current.removeLayer(districtGeoJsonLayerRef.current);
+      districtGeoJsonLayerRef.current = null;
     }
 
-    const geoLayer = L.geoJSON(districtsGeoJson as any, {
+    // 3.1 Render All 77 Provinces GeoJSON Boundaries
+    const provinceGeoLayer = L.geoJSON(thailandProvincesGeoJson as any, {
       style: (feature: any) => {
-        const districtName = feature?.properties?.amp_th || '';
-        const isSelected =
-          selectedDistrict !== 'ALL' &&
-          (districtName.includes(selectedDistrict) || selectedDistrict.includes(districtName));
+        const proName = feature?.properties?.pro_th || '';
+        const isSelected = selectedProvince !== 'ALL' && (proName === selectedProvince || selectedProvince.includes(proName));
+        const hasFactories = Boolean(provinceCounts?.[proName] && provinceCounts[proName] > 0);
+
+        if (isSelected) {
+          return {
+            fillColor: '#f59e0b',
+            weight: 3,
+            opacity: 1,
+            color: '#fbbf24',
+            dashArray: '',
+            fillOpacity: 0.22,
+          };
+        }
+
+        if (hasFactories) {
+          return {
+            fillColor: '#0ea5e9',
+            weight: 1.5,
+            opacity: 0.85,
+            color: '#38bdf8',
+            dashArray: '3, 4',
+            fillOpacity: 0.08,
+          };
+        }
 
         return {
-          fillColor: isSelected ? '#f59e0b' : '#38bdf8',
-          weight: isSelected ? 3 : 1.5,
-          opacity: 0.9,
-          color: isSelected ? '#fbbf24' : '#0ea5e9',
-          dashArray: isSelected ? '' : '3, 4',
-          fillOpacity: isSelected ? 0.25 : 0.06,
+          fillColor: '#64748b',
+          weight: 1,
+          opacity: 0.45,
+          color: '#475569',
+          dashArray: '2, 4',
+          fillOpacity: 0.02,
         };
       },
       onEachFeature: (feature: any, layer: any) => {
-        const dName = feature?.properties?.amp_th || '';
-        layer.bindTooltip(`📍 อ.${dName}`, {
+        const proName = feature?.properties?.pro_th || '';
+        const count = provinceCounts?.[proName] || 0;
+        const countBadge = count > 0 ? ` (${count} โรงงาน)` : '';
+
+        layer.bindTooltip(`📍 จ.${proName}${countBadge}`, {
           permanent: false,
           direction: 'center',
-          className: 'geojson-tooltip bg-slate-900 text-amber-300 font-bold border border-slate-700 px-2 py-1 rounded-lg text-xs shadow-lg',
+          className: 'geojson-tooltip bg-slate-900/95 text-cyan-300 font-bold border border-slate-700 px-2.5 py-1 rounded-xl text-xs shadow-xl backdrop-blur-md',
         });
 
         layer.on({
           mouseover: (e: any) => {
             const l = e.target;
-            l.setStyle({
-              fillOpacity: 0.35,
-              weight: 2.5,
-            });
+            const isSelected = selectedProvince !== 'ALL' && (proName === selectedProvince || selectedProvince.includes(proName));
+            if (!isSelected) {
+              l.setStyle({
+                fillOpacity: 0.28,
+                weight: 2.2,
+                color: '#38bdf8',
+              });
+            }
           },
           mouseout: (e: any) => {
-            geoLayer.resetStyle(e.target);
+            provinceGeoLayer.resetStyle(e.target);
           },
           click: () => {
+            if (onProvinceSelect) {
+              onProvinceSelect(proName);
+            }
             if (onDistrictSelect) {
-              onDistrictSelect(dName);
+              onDistrictSelect('ALL');
             }
           },
         });
       },
     }).addTo(mapInstanceRef.current);
 
-    geoJsonLayerRef.current = geoLayer;
+    provinceGeoJsonLayerRef.current = provinceGeoLayer;
 
-    // Smoothly zoom & pan to selected district polygon or province overview
-    if (selectedDistrict !== 'ALL') {
-      let matchedLayer: any = null;
-      geoLayer.eachLayer((layer: any) => {
-        const dName = layer.feature?.properties?.amp_th || '';
-        if (dName.includes(selectedDistrict) || selectedDistrict.includes(dName)) {
-          matchedLayer = layer;
-        }
-      });
-      if (matchedLayer && matchedLayer.getBounds) {
-        mapInstanceRef.current.fitBounds(matchedLayer.getBounds(), {
-          padding: [30, 30],
-          maxZoom: 13,
-          animate: true,
-        });
-      }
-    } else {
-      mapInstanceRef.current.setView([13.6062, 100.6974], 11, { animate: true });
+    // 3.2 If Samut Prakan is selected, overlay District polygons
+    if (selectedProvince === 'สมุทรปราการ') {
+      const districtGeoLayer = L.geoJSON(districtsGeoJson as any, {
+        style: (feature: any) => {
+          const districtName = feature?.properties?.amp_th || '';
+          const isSelected =
+            selectedDistrict !== 'ALL' &&
+            (districtName.includes(selectedDistrict) || selectedDistrict.includes(districtName));
+
+          return {
+            fillColor: isSelected ? '#f59e0b' : '#38bdf8',
+            weight: isSelected ? 3 : 1.5,
+            opacity: 0.9,
+            color: isSelected ? '#fbbf24' : '#0ea5e9',
+            dashArray: isSelected ? '' : '3, 4',
+            fillOpacity: isSelected ? 0.25 : 0.06,
+          };
+        },
+        onEachFeature: (feature: any, layer: any) => {
+          const dName = feature?.properties?.amp_th || '';
+          const dCount = districtCounts?.[dName] ? ` (${districtCounts[dName]} โรงงาน)` : '';
+          layer.bindTooltip(`📍 อ.${dName}${dCount}`, {
+            permanent: false,
+            direction: 'center',
+            className: 'geojson-tooltip bg-slate-900 text-amber-300 font-bold border border-slate-700 px-2 py-1 rounded-lg text-xs shadow-lg',
+          });
+
+          layer.on({
+            mouseover: (e: any) => {
+              const l = e.target;
+              l.setStyle({
+                fillOpacity: 0.35,
+                weight: 2.5,
+              });
+            },
+            mouseout: (e: any) => {
+              districtGeoLayer.resetStyle(e.target);
+            },
+            click: () => {
+              if (onDistrictSelect) {
+                onDistrictSelect(dName);
+              }
+            },
+          });
+        },
+      }).addTo(mapInstanceRef.current);
+
+      districtGeoJsonLayerRef.current = districtGeoLayer;
     }
-  }, [selectedDistrict, onDistrictSelect]);
+  }, [selectedProvince, selectedDistrict, provinceCounts, districtCounts, onProvinceSelect, onDistrictSelect]);
 
-  // 4. Render Factory Markers & Clusters
+  // 4. Render Factory Markers & Clusters with Responsive Auto-Fit Bounds
   useEffect(() => {
     if (!mapInstanceRef.current || typeof window === 'undefined') return;
     const L = (window as any).L;
@@ -284,8 +358,11 @@ export function FactoryMap({
       clusterGroup = L.layerGroup();
     }
 
+    const validPoints: [number, number][] = [];
+
     leads.forEach((lead) => {
       if (!lead.lat || !lead.lng) return;
+      validPoints.push([Number(lead.lat), Number(lead.lng)]);
 
       const currentStatus = lead.status;
       let statusBorderColor = '#f59e0b';
@@ -391,7 +468,7 @@ export function FactoryMap({
           <div class="font-black text-white text-xs">${lead.name || lead.company_name}</div>
           <div class="flex items-center gap-1.5 flex-wrap">
             <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${statusBadgeColor}">${statusLabel}</span>
-            <span class="text-[10px] text-slate-400">${lead.district || 'สมุทรปราการ'}</span>
+            <span class="text-[10px] text-slate-400">${lead.district || ''} ${lead.province ? `จ.${lead.province}` : ''}</span>
           </div>
           ${repBadge}
           ${dealBadge}
@@ -413,16 +490,15 @@ export function FactoryMap({
     mapInstanceRef.current.addLayer(clusterGroup);
     markersClusterGroupRef.current = clusterGroup;
 
-    // Auto-fit bounds if radius filter is active or specific search query is filtered (when district is ALL)
-    if (selectedRadius !== 'ALL' && leads.length > 0) {
-      const validPoints = leads
-        .filter((l) => l.lat && l.lng)
-        .map((l) => [l.lat, l.lng] as [number, number]);
-      if (validPoints.length > 0) {
-        mapInstanceRef.current.fitBounds(validPoints, { padding: [40, 40], maxZoom: 14 });
-      }
+    // Auto-fit bounds dynamically to match the current selection / filtered leads
+    if (validPoints.length > 1) {
+      mapInstanceRef.current.fitBounds(validPoints, { padding: [45, 45], maxZoom: 14, animate: true });
+    } else if (validPoints.length === 1) {
+      mapInstanceRef.current.setView(validPoints[0], 14, { animate: true });
+    } else if (selectedRadius !== 'ALL' && userLocation.lat && userLocation.lng) {
+      mapInstanceRef.current.setView([userLocation.lat, userLocation.lng], 13, { animate: true });
     }
-  }, [leads, userLocation, onLeadClick, selectedRadius]);
+  }, [leads, userLocation, onLeadClick, selectedProvince, selectedDistrict, selectedRadius, selectedStatus]);
 
   // 5. Render User Live GPS Pin & Radius Circle
   useEffect(() => {
@@ -626,6 +702,52 @@ export function FactoryMap({
             <ChevronDown className="w-3.5 h-3.5 text-amber-400 shrink-0 pointer-events-none -ml-3" />
           </div>
         </div>
+
+        {/* Radius Selector Dropdown */}
+        {onSelectRadius && (
+          <div className="relative flex items-center">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-slate-900/95 hover:bg-slate-850 text-slate-100 border border-emerald-500/50 shadow-xl shadow-emerald-500/10 backdrop-blur-md text-xs font-bold transition">
+              <Radio className="w-4 h-4 text-emerald-400 shrink-0" />
+              <select
+                value={selectedRadius}
+                onChange={(e) => onSelectRadius(e.target.value)}
+                className="bg-transparent text-white font-bold text-xs outline-none cursor-pointer pr-4 appearance-none hover:text-emerald-300 transition"
+                aria-label="เลือกรัศมีเรดาร์"
+              >
+                <option value="ALL" className="bg-slate-900 text-white py-1.5">🎯 ทุกระยะ</option>
+                <option value="5" className="bg-slate-900 text-white py-1.5">🎯 5 กม.</option>
+                <option value="10" className="bg-slate-900 text-white py-1.5">🎯 10 กม.</option>
+                <option value="20" className="bg-slate-900 text-white py-1.5">🎯 20 กม.</option>
+                <option value="50" className="bg-slate-900 text-white py-1.5">🎯 50 กม.</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-emerald-400 shrink-0 pointer-events-none -ml-3" />
+            </div>
+          </div>
+        )}
+
+        {/* Status Selector Dropdown */}
+        {onStatusSelect && (
+          <div className="relative flex items-center">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-slate-900/95 hover:bg-slate-850 text-slate-100 border border-purple-500/50 shadow-xl shadow-purple-500/10 backdrop-blur-md text-xs font-bold transition">
+              <span className="text-purple-400 text-xs font-bold">●</span>
+              <select
+                value={selectedStatus}
+                onChange={(e) => onStatusSelect(e.target.value)}
+                className="bg-transparent text-white font-bold text-xs outline-none cursor-pointer pr-4 appearance-none hover:text-purple-300 transition"
+                aria-label="เลือกสถานะ"
+              >
+                <option value="ALL" className="bg-slate-900 text-white py-1.5">📊 ทุกสถานะ</option>
+                <option value="NEW" className="bg-slate-900 text-white py-1.5">✨ ใหม่</option>
+                <option value="CONTACTED" className="bg-slate-900 text-white py-1.5">📞 ติดต่อแล้ว</option>
+                <option value="MEETING" className="bg-slate-900 text-white py-1.5">📅 นัดหมาย</option>
+                <option value="QUOTED" className="bg-slate-900 text-white py-1.5">฿ เสนอราคา</option>
+                <option value="WON" className="bg-slate-900 text-white py-1.5">✓ Won</option>
+                <option value="LOST" className="bg-slate-900 text-white py-1.5">✕ ปิดโอกาส</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-purple-400 shrink-0 pointer-events-none -ml-3" />
+            </div>
+          </div>
+        )}
 
         {/* Standard My Location Recenter Button */}
         <button

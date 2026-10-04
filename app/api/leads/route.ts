@@ -110,23 +110,28 @@ export async function GET(request: Request) {
       }
     }
 
-    // Supabase REST Client fallback (Guaranteed to work on Cloud / Vercel!)
-    let sb = supabase.from('factory_leads').select('*').limit(limit);
+    // Supabase REST Client with automatic parallel chunked range queries (bypasses 1,000 max-rows limit)
+    let allLeads: any[] = [];
+    const CHUNK_SIZE = 1000;
+    const maxToFetch = Math.max(limit, 5000);
+
+    let baseQuery = supabase.from('factory_leads').select('*', { count: 'exact' });
     if (province && province !== 'ALL') {
-      sb = sb.ilike('province', `%${province.replace(/^จ\./, '')}%`);
+      baseQuery = baseQuery.ilike('province', `%${province.replace(/^จ\./, '')}%`);
     }
     if (district && district !== 'ALL') {
-      sb = sb.ilike('district', `%${district.replace(/^(อ\.|เขต)/, '')}%`);
+      baseQuery = baseQuery.ilike('district', `%${district.replace(/^(อ\.|เขต)/, '')}%`);
     }
     if (query && query.trim()) {
-      sb = sb.or(`name.ilike.%${query.trim()}%,company_name.ilike.%${query.trim()}%,address.ilike.%${query.trim()}%,notes.ilike.%${query.trim()}%`);
+      baseQuery = baseQuery.or(`name.ilike.%${query.trim()}%,company_name.ilike.%${query.trim()}%,address.ilike.%${query.trim()}%,notes.ilike.%${query.trim()}%`);
     }
 
-    const { data, error } = await sb;
-    if (error) {
+    const { data: firstPage, count: totalCount, error: firstErr } = await baseQuery.range(0, Math.min(CHUNK_SIZE - 1, maxToFetch - 1));
+    
+    if (firstErr) {
       // Fallback to leads table if factory_leads is unavailable
       const { data: fallbackLeads, error: fbErr } = await supabase.from('leads').select('*').limit(limit);
-      if (fbErr) throw error;
+      if (fbErr) throw firstErr;
       return NextResponse.json({
         success: true,
         source: 'leads',
@@ -135,11 +140,39 @@ export async function GET(request: Request) {
       });
     }
 
+    allLeads = firstPage || [];
+
+    // If there are more records beyond 1,000, fetch remaining chunks in parallel
+    const totalRecords = Math.min(totalCount || allLeads.length, maxToFetch);
+    if (totalRecords > CHUNK_SIZE) {
+      const remainingPromises = [];
+      for (let offset = CHUNK_SIZE; offset < totalRecords; offset += CHUNK_SIZE) {
+        let chunkQuery = supabase.from('factory_leads').select('*');
+        if (province && province !== 'ALL') {
+          chunkQuery = chunkQuery.ilike('province', `%${province.replace(/^จ\./, '')}%`);
+        }
+        if (district && district !== 'ALL') {
+          chunkQuery = chunkQuery.ilike('district', `%${district.replace(/^(อ\.|เขต)/, '')}%`);
+        }
+        if (query && query.trim()) {
+          chunkQuery = chunkQuery.or(`name.ilike.%${query.trim()}%,company_name.ilike.%${query.trim()}%,address.ilike.%${query.trim()}%,notes.ilike.%${query.trim()}%`);
+        }
+        remainingPromises.push(chunkQuery.range(offset, Math.min(offset + CHUNK_SIZE - 1, totalRecords - 1)));
+      }
+
+      const results = await Promise.all(remainingPromises);
+      for (const res of results) {
+        if (res.data) {
+          allLeads = allLeads.concat(res.data);
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       source: 'factory_leads',
-      total: data?.length || 0,
-      leads: (data || []).map((l) => ({ ...l, source_type: 'leads' })),
+      total: allLeads.length,
+      leads: allLeads.map((l) => ({ ...l, source_type: 'leads' })),
     });
   } catch (error: any) {
     console.error("Fetch factory leads error:", error);

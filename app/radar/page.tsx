@@ -1050,7 +1050,7 @@ export default function LeadsRadarMainPage() {
 
       return true;
     });
-  }, [leads, selectedDistrict, selectedRadius, selectedStatusFilter, selectedSalesRepFilter, searchQuery, userLocation]);
+  }, [leads, selectedProvince, selectedDistrict, selectedRadius, selectedStatusFilter, selectedSalesRepFilter, searchQuery, userLocation]);
 
   // Enriched Filtered Leads with Account Manager / Sales Rep Avatar from claimedFactoryMap
   const enrichedFilteredLeads: FactoryLead[] = useMemo(() => {
@@ -2152,6 +2152,8 @@ export default function LeadsRadarMainPage() {
                   onDistrictSelect={(d: string) => setSelectedDistrict(d)}
                   selectedRadius={selectedRadius}
                   onSelectRadius={(r: string) => setSelectedRadius(r)}
+                  selectedStatus={portfolioStatusFilter}
+                  onStatusSelect={(s: string) => setPortfolioStatusFilter(s)}
                   onLeadClick={(lead: FactoryLead) => {
                     const originalPortfolioLead = portfolioLeads.find((l) => l.id === lead.id);
                     if (originalPortfolioLead) {
@@ -2521,6 +2523,8 @@ export default function LeadsRadarMainPage() {
                     onDistrictSelect={(d: string) => setSelectedDistrict(d)}
                     selectedRadius={selectedRadius}
                     onSelectRadius={(r: string) => setSelectedRadius(r)}
+                    selectedStatus={selectedStatusFilter}
+                    onStatusSelect={(s: string) => setSelectedStatusFilter(s)}
                     onLeadClick={(lead: FactoryLead) => handleOpenLeadModal(lead)}
                     provinces={provinces}
                     provinceCounts={provinceCounts}
@@ -4076,6 +4080,8 @@ export default function LeadsRadarMainPage() {
                   onDistrictSelect={(d: string) => setSelectedDistrict(d)}
                   selectedRadius={selectedRadius}
                   onSelectRadius={(r: string) => setSelectedRadius(r)}
+                  selectedStatus={portfolioStatusFilter}
+                  onStatusSelect={(s: string) => setPortfolioStatusFilter(s)}
                   onLeadClick={(lead: FactoryLead) => {
                     const originalLead = portfolioLeads.find((l) => l.id === lead.id);
                     if (originalLead) handleOpenPortfolioDetail(originalLead);
@@ -4349,6 +4355,8 @@ export default function LeadsRadarMainPage() {
                   onDistrictSelect={(d: string) => setSelectedDistrict(d)}
                   selectedRadius={selectedRadius}
                   onSelectRadius={(r: string) => setSelectedRadius(r)}
+                  selectedStatus={selectedStatusFilter}
+                  onStatusSelect={(s: string) => setSelectedStatusFilter(s)}
                   onLeadClick={(lead: FactoryLead) => setMobileSelectedLead(lead)}
                   provinces={provinces}
                   provinceCounts={provinceCounts}
