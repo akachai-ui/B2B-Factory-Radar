@@ -876,7 +876,8 @@ export default function LeadsRadarMainPage() {
       pCounts[p] = (pCounts[p] || 0) + 1;
       pSet.add(p);
 
-      if (selectedProvince === 'ALL' || p === selectedProvince) {
+      const targetP = selectedProvince.replace(/^จ\./, '').trim();
+      if (targetP === 'ALL' || p === targetP) {
         const d = (lead.district || 'ไม่ระบุ').replace('อำเภอ', '').replace('อ.', '').replace(/^เขต/, '').trim();
         dCounts[d] = (dCounts[d] || 0) + 1;
         dSet.add(d);
@@ -969,10 +970,11 @@ export default function LeadsRadarMainPage() {
     return leads.filter((lead) => {
       if (!lead.lat || !lead.lng) return false;
 
-      // Province filter
+      // Province filter (Exact matching)
       if (selectedProvince !== 'ALL') {
         const p = (lead.province || '').replace(/^จ\./, '').trim();
-        if (p !== selectedProvince && !lead.province?.includes(selectedProvince)) {
+        const targetP = selectedProvince.replace(/^จ\./, '').trim();
+        if (p !== targetP) {
           return false;
         }
       }
