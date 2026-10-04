@@ -172,6 +172,7 @@ export default function LeadsRadarMainPage() {
   const [leads, setLeads] = useState<FactoryLead[]>((defaultLeadsData as unknown as FactoryLead[]) || []);
   const [isLoadingLeads, setIsLoadingLeads] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedProvince, setSelectedProvince] = useState<string>('ALL');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('ALL');
   const [selectedRadius, setSelectedRadius] = useState<string>('ALL');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('ALL');
@@ -863,17 +864,32 @@ export default function LeadsRadarMainPage() {
     }
   }, [user, effectiveCompanyId, fetchUnassignedLeads]);
 
-  // District breakdown calculation
-  const districts = ['บางพลี', 'เมืองสมุทรปราการ', 'พระประแดง', 'พระสมุทรเจดีย์', 'บางบ่อ', 'บางเสาธง'];
+  // Dynamic Province & District calculation from loaded leads
+  const { provinces, provinceCounts, districts, districtCounts } = useMemo(() => {
+    const pCounts: Record<string, number> = {};
+    const dCounts: Record<string, number> = {};
+    const pSet = new Set<string>();
+    const dSet = new Set<string>();
 
-  const districtCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
     leads.forEach((lead) => {
-      const d = (lead.district || 'ไม่ระบุ').replace('อำเภอ', '').replace('อ.', '').trim();
-      counts[d] = (counts[d] || 0) + 1;
+      const p = (lead.province || 'ไม่ระบุ').replace(/^จ\./, '').trim();
+      pCounts[p] = (pCounts[p] || 0) + 1;
+      pSet.add(p);
+
+      if (selectedProvince === 'ALL' || p === selectedProvince) {
+        const d = (lead.district || 'ไม่ระบุ').replace('อำเภอ', '').replace('อ.', '').replace(/^เขต/, '').trim();
+        dCounts[d] = (dCounts[d] || 0) + 1;
+        dSet.add(d);
+      }
     });
-    return counts;
-  }, [leads]);
+
+    return {
+      provinces: Array.from(pSet).sort((a, b) => (pCounts[b] || 0) - (pCounts[a] || 0)),
+      provinceCounts: pCounts,
+      districts: Array.from(dSet).sort((a, b) => (dCounts[b] || 0) - (dCounts[a] || 0)),
+      districtCounts: dCounts,
+    };
+  }, [leads, selectedProvince]);
 
   // Filtered Portfolio Leads
   const filteredPortfolioLeads = useMemo(() => {
@@ -928,9 +944,9 @@ export default function LeadsRadarMainPage() {
       name: cl.company_name,
       company_name: cl.company_name,
       address: cl.address || `${cl.subdistrict || ''} ${cl.district || ''} ${cl.province || ''}`.trim(),
-      district: cl.district || 'สมุทรปราการ',
+      district: cl.district || 'ไม่ระบุ',
       subdistrict: cl.subdistrict || '',
-      province: cl.province || 'สมุทรปราการ',
+      province: cl.province || 'ไม่ระบุ',
       postal_code: cl.postal_code || '',
       lat: Number(cl.lat) || 13.6062,
       lng: Number(cl.lng) || 100.6974,
@@ -953,9 +969,17 @@ export default function LeadsRadarMainPage() {
     return leads.filter((lead) => {
       if (!lead.lat || !lead.lng) return false;
 
+      // Province filter
+      if (selectedProvince !== 'ALL') {
+        const p = (lead.province || '').replace(/^จ\./, '').trim();
+        if (p !== selectedProvince && !lead.province?.includes(selectedProvince)) {
+          return false;
+        }
+      }
+
       // District filter
       if (selectedDistrict !== 'ALL') {
-        const d = (lead.district || '').replace('อำเภอ', '').replace('อ.', '').trim();
+        const d = (lead.district || '').replace('อำเภอ', '').replace('อ.', '').replace(/^เขต/, '').trim();
         if (d !== selectedDistrict && !lead.district?.includes(selectedDistrict)) {
           return false;
         }
@@ -2403,43 +2427,84 @@ export default function LeadsRadarMainPage() {
 
             {/* Target Factory Radar Catalog */}
             <div className="space-y-6">
-                {/* Search & Radius (3D Glass Console) */}
-                <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5 p-5 rounded-[2rem] backdrop-blur-2xl bg-gradient-to-b from-white/[0.07] via-slate-900/70 to-slate-950/90 border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.6)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
-                  <div className="flex-1 min-w-[280px] relative">
-                    <Search className="w-4 h-4 text-amber-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="ค้นหาชื่อโรงงาน, ถนน, หรือเบอร์โทรศัพท์..."
-                      className="w-full pl-11 pr-9 py-2.5 backdrop-blur-xl bg-slate-950/70 border border-white/10 rounded-2xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400 focus:shadow-[0_0_15px_rgba(245,158,11,0.2)] transition"
-                    />
-                    {searchQuery && (
-                      <button onClick={() => setSearchQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">✕</button>
-                    )}
+                {/* Search, Province & Radius (3D Glass Console) */}
+                <div className="flex flex-col gap-3 p-5 rounded-[2rem] backdrop-blur-2xl bg-gradient-to-b from-white/[0.07] via-slate-900/70 to-slate-950/90 border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.6)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
+                  <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5">
+                    <div className="flex-1 min-w-[280px] relative">
+                      <Search className="w-4 h-4 text-amber-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="ค้นหาชื่อโรงงาน, จังหวัด, อำเภอ, วัตถุดิบ..."
+                        className="w-full pl-11 pr-9 py-2.5 backdrop-blur-xl bg-slate-950/70 border border-white/10 rounded-2xl text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400 focus:shadow-[0_0_15px_rgba(245,158,11,0.2)] transition"
+                      />
+                      {searchQuery && (
+                        <button onClick={() => setSearchQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">✕</button>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+                      <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5 shrink-0 px-1">
+                        <Zap className="w-3.5 h-3.5 text-amber-400" />
+                        <span>รัศมีเรดาร์:</span>
+                      </span>
+                      <div className="flex items-center gap-1 backdrop-blur-xl bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 shadow-inner">
+                        {['3', '5', '10', '15', 'ALL'].map((rad) => (
+                          <button
+                            key={rad}
+                            onClick={() => setSelectedRadius(rad)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 shrink-0 cursor-pointer active:scale-95 ${
+                              selectedRadius === rad
+                                ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black shadow-[0_0_12px_rgba(245,158,11,0.4)] border border-amber-300/40'
+                                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+                            }`}
+                          >
+                            {rad === 'ALL' ? 'ทั้งหมด' : `${rad} กม.`}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
-                    <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5 shrink-0 px-1">
-                      <Zap className="w-3.5 h-3.5 text-amber-400" />
-                      <span>รัศมีเรดาร์:</span>
-                    </span>
-                    <div className="flex items-center gap-1 backdrop-blur-xl bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 shadow-inner">
-                      {['3', '5', '10', '15', 'ALL'].map((rad) => (
+                  {/* Province Filter Pills */}
+                  {provinces.length > 0 && (
+                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-white/5 text-xs">
+                      <span className="text-[11px] font-bold text-cyan-300 shrink-0 flex items-center gap-1">
+                        <Building2 className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>จังหวัด:</span>
+                      </span>
+                      <button
+                        onClick={() => {
+                          setSelectedProvince('ALL');
+                          setSelectedDistrict('ALL');
+                        }}
+                        className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
+                          selectedProvince === 'ALL'
+                            ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black shadow-md'
+                            : 'text-slate-400 hover:text-white bg-slate-950/80 border border-white/10'
+                        }`}
+                      >
+                        ทั่วประเทศ ({leads.length.toLocaleString()})
+                      </button>
+                      {provinces.map((p) => (
                         <button
-                          key={rad}
-                          onClick={() => setSelectedRadius(rad)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 shrink-0 cursor-pointer active:scale-95 ${
-                            selectedRadius === rad
-                              ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black shadow-[0_0_12px_rgba(245,158,11,0.4)] border border-amber-300/40'
-                              : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+                          key={p}
+                          onClick={() => {
+                            setSelectedProvince(p);
+                            setSelectedDistrict('ALL');
+                          }}
+                          className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
+                            selectedProvince === p
+                              ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black shadow-md'
+                              : 'text-slate-400 hover:text-white bg-slate-950/80 border border-white/10'
                           }`}
                         >
-                          {rad === 'ALL' ? 'ทั้งหมด' : `${rad} กม.`}
+                          {p} ({provinceCounts[p] || 0})
                         </button>
                       ))}
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Factory Map (3D Glass Framed) */}
@@ -2447,11 +2512,18 @@ export default function LeadsRadarMainPage() {
                   <FactoryMap
                     leads={enrichedFilteredLeads}
                     userLocation={userLocation}
+                    selectedProvince={selectedProvince}
+                    onProvinceSelect={(p: string) => {
+                      setSelectedProvince(p);
+                      setSelectedDistrict('ALL');
+                    }}
                     selectedDistrict={selectedDistrict}
                     onDistrictSelect={(d: string) => setSelectedDistrict(d)}
                     selectedRadius={selectedRadius}
                     onSelectRadius={(r: string) => setSelectedRadius(r)}
                     onLeadClick={(lead: FactoryLead) => handleOpenLeadModal(lead)}
+                    provinces={provinces}
+                    provinceCounts={provinceCounts}
                     districts={districts}
                     districtCounts={districtCounts}
                     totalLeadCount={leads.length}
@@ -4224,6 +4296,42 @@ export default function LeadsRadarMainPage() {
                   </button>
                 ))}
               </div>
+
+              {/* Mobile Quick Province Filter Chips */}
+              {provinces.length > 0 && (
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 border-t border-slate-800/80 text-[11px]">
+                  <span className="text-cyan-400 font-medium whitespace-nowrap text-[10px]">🏢 จังหวัด:</span>
+                  <button
+                    onClick={() => {
+                      setSelectedProvince('ALL');
+                      setSelectedDistrict('ALL');
+                    }}
+                    className={`px-2 py-0.5 rounded-lg font-bold whitespace-nowrap transition cursor-pointer text-[10px] ${
+                      selectedProvince === 'ALL'
+                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black shadow-sm'
+                        : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    ทั่วประเทศ ({leads.length.toLocaleString()})
+                  </button>
+                  {provinces.map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => {
+                        setSelectedProvince(p);
+                        setSelectedDistrict('ALL');
+                      }}
+                      className={`px-2 py-0.5 rounded-lg font-bold whitespace-nowrap transition cursor-pointer text-[10px] ${
+                        selectedProvince === p
+                          ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black shadow-sm'
+                          : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {p} ({provinceCounts[p] || 0})
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Mobile View Content: Map View or List View */}
@@ -4232,11 +4340,18 @@ export default function LeadsRadarMainPage() {
                 <FactoryMap
                   leads={enrichedFilteredLeads}
                   userLocation={userLocation}
+                  selectedProvince={selectedProvince}
+                  onProvinceSelect={(p: string) => {
+                    setSelectedProvince(p);
+                    setSelectedDistrict('ALL');
+                  }}
                   selectedDistrict={selectedDistrict}
                   onDistrictSelect={(d: string) => setSelectedDistrict(d)}
                   selectedRadius={selectedRadius}
                   onSelectRadius={(r: string) => setSelectedRadius(r)}
                   onLeadClick={(lead: FactoryLead) => setMobileSelectedLead(lead)}
+                  provinces={provinces}
+                  provinceCounts={provinceCounts}
                   districts={districts}
                   districtCounts={districtCounts}
                   totalLeadCount={leads.length}

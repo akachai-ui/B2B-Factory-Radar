@@ -21,11 +21,15 @@ import {
 export interface FactoryMapProps {
   leads: FactoryLead[];
   userLocation: { lat: number; lng: number; label: string };
+  selectedProvince?: string;
+  onProvinceSelect?: (province: string) => void;
   selectedDistrict: string;
   onDistrictSelect?: (district: string) => void;
   selectedRadius: string;
   onSelectRadius?: (radius: string) => void;
   onLeadClick?: (lead: FactoryLead) => void;
+  provinces?: string[];
+  provinceCounts?: Record<string, number>;
   districts?: string[];
   districtCounts?: Record<string, number>;
   totalLeadCount?: number;
@@ -52,11 +56,15 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
 export function FactoryMap({
   leads,
   userLocation,
+  selectedProvince = 'ALL',
+  onProvinceSelect,
   selectedDistrict,
   onDistrictSelect,
   selectedRadius,
   onSelectRadius,
   onLeadClick,
+  provinces,
+  provinceCounts,
   districts,
   districtCounts,
   totalLeadCount,
@@ -545,10 +553,18 @@ export function FactoryMap({
     }
   };
 
-  const handleRecenterSamutPrakan = () => {
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.setView([13.6062, 100.6974], 11, { animate: true });
+  const handleRecenterOverview = () => {
+    if (!mapInstanceRef.current) return;
+    if (leads.length > 0) {
+      const validPoints = leads
+        .filter((l) => l.lat && l.lng)
+        .map((l) => [l.lat, l.lng] as [number, number]);
+      if (validPoints.length > 0) {
+        mapInstanceRef.current.fitBounds(validPoints, { padding: [40, 40], maxZoom: 14 });
+        return;
+      }
     }
+    mapInstanceRef.current.setView([13.6, 100.7], 8, { animate: true });
   };
 
   return (
@@ -560,6 +576,34 @@ export function FactoryMap({
       {/* Floating Map Controls (Top-Left) */}
       <div className="absolute top-4 left-4 z-[400] flex flex-wrap items-center gap-2 max-w-[calc(100%-2rem)]">
         
+        {/* Province Selector Dropdown inside Map */}
+        {provinces && provinces.length > 0 && (
+          <div className="relative flex items-center">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-slate-900/95 hover:bg-slate-850 text-slate-100 border border-cyan-500/50 shadow-xl shadow-cyan-500/10 backdrop-blur-md text-xs font-bold transition">
+              <Building2 className="w-4 h-4 text-cyan-400 shrink-0" />
+              <select
+                value={selectedProvince}
+                onChange={(e) => {
+                  if (onProvinceSelect) onProvinceSelect(e.target.value);
+                  if (onDistrictSelect) onDistrictSelect('ALL');
+                }}
+                className="bg-transparent text-white font-bold text-xs outline-none cursor-pointer pr-4 appearance-none hover:text-cyan-300 transition"
+                aria-label="เลือกจังหวัด"
+              >
+                <option value="ALL" className="bg-slate-900 text-white py-1.5">
+                  🗺️ ทั่วประเทศ {totalLeadCount ? `(${totalLeadCount.toLocaleString()} โรงงาน)` : ''}
+                </option>
+                {provinces.map((p) => (
+                  <option key={p} value={p} className="bg-slate-900 text-white py-1.5">
+                    📍 จ.{p} {provinceCounts?.[p] ? `(${provinceCounts[p]} โรงงาน)` : ''}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-cyan-400 shrink-0 pointer-events-none -ml-3" />
+            </div>
+          </div>
+        )}
+
         {/* District Selector Dropdown inside Map */}
         <div className="relative flex items-center">
           <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-slate-900/95 hover:bg-slate-850 text-slate-100 border border-amber-500/50 shadow-xl shadow-amber-500/10 backdrop-blur-md text-xs font-bold transition">
@@ -571,11 +615,11 @@ export function FactoryMap({
               aria-label="เลือกพื้นที่อำเภอ"
             >
               <option value="ALL" className="bg-slate-900 text-white py-1.5">
-                🗺️ ทุกอำเภอ {totalLeadCount ? `(${totalLeadCount} โรงงาน)` : ''}
+                📍 ทุกอำเภอ/เขต
               </option>
               {districtList.map((d) => (
                 <option key={d} value={d} className="bg-slate-900 text-white py-1.5">
-                  📍 อ.{d} {districtCounts?.[d] ? `(${districtCounts[d]} โรงงาน)` : ''}
+                  📍 {d} {districtCounts?.[d] ? `(${districtCounts[d]} โรงงาน)` : ''}
                 </option>
               ))}
             </select>
@@ -595,12 +639,12 @@ export function FactoryMap({
 
         {/* Recenter Overview */}
         <button
-          onClick={handleRecenterSamutPrakan}
+          onClick={handleRecenterOverview}
           className="p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 shadow-xl backdrop-blur-md flex items-center gap-1.5 text-xs font-bold transition cursor-pointer active:scale-95"
-          title="ภาพรวมสมุทรปราการ 6 อำเภอ"
+          title="ซูมดูภาพรวมทั้งหมด"
         >
           <Maximize2 className="w-4 h-4 text-amber-400" />
-          <span className="hidden sm:inline">ภาพรวมทั้งจังหวัด</span>
+          <span className="hidden sm:inline">ภาพรวมพื้นที่</span>
         </button>
 
         {/* Theme Toggle (Dark / Street) */}
