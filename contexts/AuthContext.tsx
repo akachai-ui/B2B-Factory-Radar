@@ -261,10 +261,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const effectiveSuperAdmin = adminGranted;
         setIsSuperAdmin(effectiveSuperAdmin);
 
-        // 2. Check if Company / Workspace Owner is PRO_UNLOCKED or Super Admin
+        // 2. Check if Company / Workspace Owner is Super Admin or Approved Pro
         let isCompanyUnlocked = false;
         const compIdToCheck = data.company_id;
-        if (compIdToCheck) {
+        
+        // If the user is a team member in a company owned by someone else
+        if (compIdToCheck && compIdToCheck !== currentUser.id) {
           try {
             // Find the workspace owner
             const { data: ownerProf } = await supabase
@@ -274,18 +276,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .eq('role', 'owner')
               .maybeSingle();
 
-            if (ownerProf) {
-              if (ownerProf.status === 'active' || ownerProf.role === 'owner') {
+            if (ownerProf?.email) {
+              const { data: ownerAdmin } = await supabase
+                .from('system_admins')
+                .select('id')
+                .ilike('email', ownerProf.email.toLowerCase().trim())
+                .maybeSingle();
+              if (ownerAdmin) {
                 isCompanyUnlocked = true;
-              } else if (ownerProf.email) {
-                const { data: ownerAdmin } = await supabase
-                  .from('system_admins')
-                  .select('id')
-                  .ilike('email', ownerProf.email.toLowerCase().trim())
-                  .maybeSingle();
-                if (ownerAdmin) {
-                  isCompanyUnlocked = true;
-                }
               }
             } else {
               // Also check company table directly
@@ -294,15 +292,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .select('owner_id')
                 .eq('id', compIdToCheck)
                 .maybeSingle();
-              if (compRow?.owner_id) {
+              if (compRow?.owner_id && compRow.owner_id !== currentUser.id) {
                 const { data: directOwner } = await supabase
                   .from('profiles')
                   .select('id, email, status, role')
                   .eq('id', compRow.owner_id)
                   .maybeSingle();
-                if (directOwner?.status === 'active' || directOwner?.role === 'owner') {
-                  isCompanyUnlocked = true;
-                } else if (directOwner?.email) {
+                if (directOwner?.email) {
                   const { data: directAdmin } = await supabase
                     .from('system_admins')
                     .select('id')
@@ -317,9 +313,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
 
-        const resolvedAccessStatus = (effectiveSuperAdmin || data.access_status === 'PRO_UNLOCKED' || isCompanyUnlocked) 
+        const resolvedAccessStatus = (effectiveSuperAdmin || isCompanyUnlocked) 
           ? 'PRO_UNLOCKED' 
-          : (data.access_status || 'PENDING_APPROVAL');
+          : 'PENDING_APPROVAL';
 
         // If the status is resolved to PRO_UNLOCKED, sync status to active in profile row
         if (resolvedAccessStatus === 'PRO_UNLOCKED' && data.status !== 'active') {

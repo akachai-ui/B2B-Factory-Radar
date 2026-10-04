@@ -201,10 +201,10 @@ export default function LeadsRadarMainPage() {
   // Pro / Freemium Access Control & Preview Mode Gate (Inherits from Super Admin or Company Owner if approved)
   const isCompanyOwnerUnlocked = useMemo(() => {
     if (profile?.company_id && profile.company_id !== profile.id && profile.role !== 'owner') {
-      return true; // Team members in company automatically inherit Pro
+      const companyOwnerMember = teamMembers.find((m) => m.role === 'owner' || (currentCompany?.owner_id && m.id === currentCompany.owner_id));
+      return companyOwnerMember?.access_status === 'PRO_UNLOCKED';
     }
-    const companyOwnerMember = teamMembers.find((m) => m.role === 'owner' || (currentCompany?.owner_id && m.id === currentCompany.owner_id));
-    return companyOwnerMember?.access_status === 'PRO_UNLOCKED' || teamMembers.some((m) => m.access_status === 'PRO_UNLOCKED' || m.role === 'owner');
+    return false;
   }, [profile?.company_id, profile?.id, profile?.role, teamMembers, currentCompany?.owner_id]);
 
   const isProUnlocked = isSuperAdmin || profile?.access_status === 'PRO_UNLOCKED' || isCompanyOwnerUnlocked;
