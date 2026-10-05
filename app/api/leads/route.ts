@@ -113,7 +113,7 @@ export async function GET(request: Request) {
     // Supabase REST Client with automatic parallel chunked range queries (bypasses 1,000 max-rows limit)
     let allLeads: any[] = [];
     const CHUNK_SIZE = 1000;
-    const maxToFetch = Math.max(limit, 5000);
+    const maxToFetch = Math.max(limit, 30000);
 
     let baseQuery = supabase.from('factory_leads').select('*', { count: 'exact' });
     if (province && province !== 'ALL') {
@@ -126,7 +126,7 @@ export async function GET(request: Request) {
       baseQuery = baseQuery.or(`name.ilike.%${query.trim()}%,company_name.ilike.%${query.trim()}%,address.ilike.%${query.trim()}%,notes.ilike.%${query.trim()}%`);
     }
 
-    const { data: firstPage, count: totalCount, error: firstErr } = await baseQuery.range(0, Math.min(CHUNK_SIZE - 1, maxToFetch - 1));
+    const { data: firstPage, count: totalCount, error: firstErr } = await baseQuery.range(0, CHUNK_SIZE - 1);
     
     if (firstErr) {
       // Fallback to leads table if factory_leads is unavailable

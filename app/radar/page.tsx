@@ -722,7 +722,7 @@ export default function LeadsRadarMainPage() {
     setIsLoadingLeads(true);
     try {
       // Tier 1: Try Backend API
-      const res = await fetch('/api/leads?limit=5000').catch(() => null);
+      const res = await fetch('/api/leads?limit=30000').catch(() => null);
       if (res && res.ok) {
         const data = await res.json();
         if (data.success && Array.isArray(data.leads) && data.leads.length > 0) {
@@ -1746,7 +1746,7 @@ export default function LeadsRadarMainPage() {
                 <p className="text-[11px] text-slate-400 truncate">
                   {mainTab === 'portfolio' && 'แดชบอร์ดติดตามลูกค้าในความดูแล วางแผนเส้นทางพบลูกค้า และอัปเดตสถานะ'}
                   {mainTab === 'market' && 'วิเคราะห์ขนาดตลาด ความต้องการเม็ดพลาสติก และทิศทางราคา Real-time'}
-                  {mainTab === 'marketplace' && 'คลังข้อมูลโรงงานเป้าหมาย 989 แห่ง สำหรับหยิบเข้าพอร์ตงานขาย'}
+                  {mainTab === 'marketplace' && `คลังข้อมูลโรงงานเป้าหมาย ${leads.length.toLocaleString()} แห่งทั่วประเทศ สำหรับหยิบเข้าพอร์ตงานขาย`}
                   {mainTab === 'team' && 'บริหารจัดการสมาชิกในทีมฝ่ายขายและกำหนดสิทธิ์'}
                   {mainTab === 'mileage' && 'ศูนย์บันทึกการเดินทางดิจิทัล ตรวจสอบเลขไมล์ GPS เช็คอิน และระบบอนุมัติเบิกจ่ายค่าน้ำมัน'}
                 </p>
@@ -1798,7 +1798,7 @@ export default function LeadsRadarMainPage() {
                   <ShoppingCart className="w-3.5 h-3.5 text-cyan-300" />
                   <span>ช้อปหาลูกค้า</span>
                   <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-cyan-400 text-slate-950 font-black">
-                    989
+                    {leads.length.toLocaleString()}
                   </span>
                 </button>
 
