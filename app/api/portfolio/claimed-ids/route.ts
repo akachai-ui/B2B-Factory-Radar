@@ -36,14 +36,14 @@ export async function GET(request: NextRequest) {
     if (!poolSucceeded) {
       let sbRes: any = await supabase
         .from('company_leads')
-        .select('id, dbd_id, lead_id, user_id, status, profiles:user_id(full_name, avatar_url)')
+        .select('id, dbd_id, lead_id, place_id, user_id, status, profiles:user_id(full_name, avatar_url)')
         .eq('company_id', company_id);
 
       if (sbRes.error && (sbRes.error.message.includes('dbd_id') || sbRes.error.code === 'PGRST204')) {
         // Safe fallback without dbd_id if column hasn't been migrated yet on cloud
         sbRes = await supabase
           .from('company_leads')
-          .select('id, lead_id, user_id, status, profiles:user_id(full_name, avatar_url)')
+          .select('id, lead_id, place_id, user_id, status, profiles:user_id(full_name, avatar_url)')
           .eq('company_id', company_id);
       }
 
@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
           id: r.id,
           dbd_id: (r as any).dbd_id || null,
           lead_id: (r as any).lead_id || null,
+          place_id: (r as any).place_id || null,
           user_id: r.user_id,
           status: r.status,
           claimed_by_name: (r as any).profiles?.full_name || null,
@@ -79,6 +80,15 @@ export async function GET(request: NextRequest) {
       if (row.lead_id) {
         lead_ids.push(row.lead_id);
         claimed_map[`lead_${row.lead_id}`] = claimInfo;
+      }
+      if (row.place_id) {
+        claimed_map[row.place_id] = claimInfo;
+        claimed_map[`lead_${row.place_id}`] = claimInfo;
+        if (typeof row.place_id === 'string' && row.place_id.startsWith('factory_')) {
+          const rawId = row.place_id.replace('factory_', '');
+          claimed_map[`lead_${rawId}`] = claimInfo;
+          lead_ids.push(Number(rawId) || rawId);
+        }
       }
     });
 

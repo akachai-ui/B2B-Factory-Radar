@@ -171,9 +171,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Supabase REST Client fallback
-    let checkQuery = supabase.from('company_leads').select('id, user_id, profiles:user_id(full_name)').eq('company_id', company_id);
-    if (dbd_id) checkQuery = checkQuery.eq('dbd_id', dbd_id);
-    else if (lead_id) checkQuery = checkQuery.eq('lead_id', lead_id);
+    let checkQuery = supabase.from('company_leads').select('id, user_id, place_id, lead_id, profiles:user_id(full_name)').eq('company_id', company_id);
+    if (dbd_id) {
+      checkQuery = checkQuery.eq('dbd_id', dbd_id);
+    } else if (place_id) {
+      checkQuery = checkQuery.eq('place_id', place_id);
+    } else if (lead_id) {
+      checkQuery = checkQuery.or(`lead_id.eq.${lead_id},place_id.eq.factory_${lead_id}`);
+    }
 
     const { data: existingLeads } = await checkQuery;
     if (existingLeads && existingLeads.length > 0) {
@@ -202,37 +207,57 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const { data: newLead, error: insErr } = await supabase
+    const effectivePlaceId = place_id || (lead_id ? `factory_${lead_id}` : null);
+    const insertPayload: any = {
+      company_id,
+      user_id,
+      claimed_by: user_id,
+      source_type: source_type || 'factory_radar',
+      dbd_id: dbd_id ? Number(dbd_id) : null,
+      lead_id: lead_id ? Number(lead_id) : null,
+      place_id: effectivePlaceId,
+      company_name,
+      tax_id,
+      registered_capital,
+      tsic_code,
+      objective,
+      address,
+      subdistrict,
+      district,
+      province,
+      postal_code,
+      lat: lat ? Number(lat) : null,
+      lng: lng ? Number(lng) : null,
+      phone,
+      email,
+      website,
+      notes,
+      status: 'NEW',
+      priority: 'MEDIUM',
+    };
+
+    let { data: newLead, error: insErr } = await supabase
       .from('company_leads')
-      .insert({
-        company_id,
-        user_id,
-        claimed_by: user_id,
-        source_type,
-        dbd_id,
-        lead_id,
-        place_id,
-        company_name,
-        tax_id,
-        registered_capital,
-        tsic_code,
-        objective,
-        address,
-        subdistrict,
-        district,
-        province,
-        postal_code,
-        lat,
-        lng,
-        phone,
-        email,
-        website,
-        notes,
-        status: 'NEW',
-        priority: 'MEDIUM',
-      })
+      .insert(insertPayload)
       .select()
       .single();
+
+    // If Foreign Key Constraint error occurs on lead_id (violates company_leads_lead_id_fkey to legacy leads table)
+    // gracefully retry insert with lead_id: null while preserving place_id, company_name and all factory lead details
+    if (insErr && (insErr.message?.includes('foreign key') || insErr.message?.includes('fkey') || insErr.code === '23503')) {
+      console.warn('Foreign key constraint on lead_id detected, saving with place_id mapping:', insErr.message);
+      const fallbackPayload = {
+        ...insertPayload,
+        lead_id: null,
+      };
+      const retryResult = await supabase
+        .from('company_leads')
+        .insert(fallbackPayload)
+        .select()
+        .single();
+      newLead = retryResult.data;
+      insErr = retryResult.error;
+    }
 
     if (insErr) throw insErr;
 

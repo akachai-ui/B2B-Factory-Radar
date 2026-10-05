@@ -1057,7 +1057,10 @@ export default function LeadsRadarMainPage() {
   // Enriched Filtered Leads with Account Manager / Sales Rep Avatar from claimedFactoryMap
   const enrichedFilteredLeads: FactoryLead[] = useMemo(() => {
     return filteredLeads.map((lead) => {
-      const claimInfo = claimedFactoryMap[`lead_${lead.id}`];
+      const claimInfo =
+        claimedFactoryMap[`lead_${lead.id}`] ||
+        (lead.place_id ? claimedFactoryMap[`lead_${lead.place_id}`] : null) ||
+        (lead.place_id ? claimedFactoryMap[lead.place_id] : null);
       if (claimInfo) {
         return {
           ...lead,
